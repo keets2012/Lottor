@@ -1,0 +1,75 @@
+spring:
+  datasource:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.168.1.200:3306/pay?useUnicode=true&characterEncoding=utf8
+      username: simu
+      password: simu123
+  application:
+      name: t-consumer
+  cloud:
+    consul:
+      host: 192.168.1.204
+      port: 8500
+      discovery:
+        ip-address: ${HOST_ADDRESS:localhost}
+        port: ${SERVER_PORT:${server.port}}
+#        healthCheckPath: /health
+        healthCheckInterval: 15s
+        instance-id: transaction-consumer-${server.port}
+        service-name: transaction-consumer
+
+server:
+  port: 8007
+
+management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: false
+  security:
+    enabled: false
+
+logging:
+  level:
+    root: info
+    com.blueskykong.tm.core: debug
+  path: "./logs"
+
+---
+spring:
+  cloud:
+    stream:
+      bindings:
+        msg-input:
+          group: msgGroup
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: gts
+          binder: rabbit1
+      binders:
+        rabbit1:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 192.168.1.200
+                port: 5672
+                username: user
+                password: user
+                virtual-host: /user
+
+---
+tx:
+  enabled: true
+  core:
+    compensation-cache-type: redis
+    tx-redis-config:
+      host-name: 192.168.1.200
+      port: 6378
+      password: Superid123
+    serializer: kryo
+    netty-serializer: kryo
+    blocking-queue-type: Linked
+    compensation: false
+    tx-manager-id: tm-server

@@ -1,0 +1,91 @@
+spring:
+  application:
+    name: tm-server
+  cloud:
+    consul:
+      host: 192.168.1.204
+      port: 8500
+      discovery:
+        ip-address: 192.169.1.78
+        port: ${SERVER_PORT:${server.port}}
+        healthCheckPath: /health
+        healthCheckInterval: 15s
+        instance-id: tm-server-${server.port}
+        service-name: tm-server
+    stream:
+      bindings:
+        msg-output:
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: gts
+          binder: rabbit1
+      binders:
+        rabbit1:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 192.168.1.200
+                port: 5672
+                username: user
+                password: user
+                virtual-host: /user
+
+server:
+  port: 9666
+
+management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: false
+  security:
+    enabled: false
+    
+---
+spring:
+  data:
+    mongodb:
+      authentication-database: new_test
+      database: new_test
+      field-naming-strategy: # Fully qualified name of the FieldNamingStrategy to use.
+      #grid-fs-database: # GridFS database name.
+      password: root123
+      repositories.enabled: true
+      db.username: test
+      host: ${MONGO_ADDR:192.168.1.204}
+      port: ${MONGO_PORT:27017}
+  thymeleaf:  
+    prefix: classpath:/html/
+    suffix: .html
+    cache: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+
+tx:
+  redis:
+    cluster: false
+#      redirects: 20
+    hostName: 192.168.1.200
+    port: 6378
+    password: Superid123
+  manager: 
+    netty: 
+      port: 9998
+      serialize: kryo
+      maxConnection: 100
+      maxThreads: 16
+      delayTime: 5
+      heartTime: 20    
+
+transactionWaitMaxTime: 500
+redisSaveMaxTime: 3000
+
+logging:
+  level:
+    root: info
+    com.blueskykong.tm.server: debug
+  path: "./logs"

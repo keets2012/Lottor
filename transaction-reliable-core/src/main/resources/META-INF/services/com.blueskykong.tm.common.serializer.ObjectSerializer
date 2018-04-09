@@ -1,0 +1,4 @@
+com.blueskykong.tm.common.serializer.KryoSerializer
+com.blueskykong.tm.common.serializer.ProtostuffSerializer
+com.blueskykong.tm.common.serializer.HessianSerializer
+com.blueskykong.tm.common.serializer.JavaSerializer
