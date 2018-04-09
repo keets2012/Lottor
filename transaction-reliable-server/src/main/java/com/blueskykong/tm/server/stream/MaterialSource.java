@@ -1,15 +1,15 @@
 package com.blueskykong.tm.server.stream;
 
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.messaging.MessageChannel;
 
 /**
  * @author keets
  */
-public interface SenderParent {
+public interface MaterialSource {
+    String OUTPUT = "material-output";
 
-    /**
-     * 父接口
-     */
+    @Output(OUTPUT)
     MessageChannel output();
 
 

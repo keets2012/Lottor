@@ -12,7 +12,8 @@ import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.entity.TxTransactionItemAdapter;
 import com.blueskykong.tm.server.service.OutputFactoryService;
 import com.blueskykong.tm.server.service.TxManagerService;
-import com.blueskykong.tm.server.stream.MsgSource;
+import com.blueskykong.tm.server.stream.AffairSource;
+import com.blueskykong.tm.server.stream.MaterialSource;
 import com.mongodb.WriteResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-@EnableBinding({MsgSource.class})
+@EnableBinding({AffairSource.class, MaterialSource.class})
 @Component
 @SuppressWarnings("unchecked")
 public class TxManagerServiceImpl implements TxManagerService {

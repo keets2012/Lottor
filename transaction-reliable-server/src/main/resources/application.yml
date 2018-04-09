@@ -14,9 +14,13 @@ spring:
         service-name: tm-server
     stream:
       bindings:
-        msg-output:
+        affair-output:
           content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: gts
+          destination: affair
+          binder: rabbit1
+        material-output:
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: material
           binder: rabbit1
       binders:
         rabbit1:

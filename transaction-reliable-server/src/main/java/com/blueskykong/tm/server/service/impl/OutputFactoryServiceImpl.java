@@ -2,8 +2,12 @@ package com.blueskykong.tm.server.service.impl;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
+import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.server.service.OutputFactoryService;
-import com.blueskykong.tm.server.stream.MsgSource;
+import com.blueskykong.tm.server.stream.AffairSource;
+import com.blueskykong.tm.server.stream.MaterialSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -14,8 +18,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutputFactoryServiceImpl implements OutputFactoryService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutputFactoryServiceImpl.class);
+
+
     @Autowired
-    private MsgSource msgSource;
+    private AffairSource affairSource;
+
+    @Autowired
+    private MaterialSource materialSource;
 
     /**
      * 发送事务消息
@@ -26,15 +36,17 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
     @Override
     public Boolean sendMsg(TransactionMsg msg) {
         ServiceNameEnum serviceNameEnum = ServiceNameEnum.fromString(msg.getTarget());
+        LogUtil.debug(LOGGER, "target service {}", () -> serviceNameEnum.getServiceName());
         switch (serviceNameEnum) {
             case AFFAIR:
-                msgSource.output().send(MessageBuilder.withPayload(msg).build());
+                affairSource.output().send(MessageBuilder.withPayload(msg).build());
                 break;
-
+            case MATERIAL:
+                materialSource.output().send(MessageBuilder.withPayload(msg).build());
+                break;
             default:
-                msgSource.output().send(MessageBuilder.withPayload(msg).build());
+                LogUtil.error(LOGGER, "no available cases for {}.", () -> serviceNameEnum.getServiceName());
                 break;
-
         }
         return true;
     }

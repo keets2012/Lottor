@@ -8,7 +8,8 @@ import java.util.Optional;
  * @author keets
  */
 public enum ServiceNameEnum {
-    AFFAIR("affair");
+    AFFAIR("affair"),
+    MATERIAL("material");
 
     String serviceName;
 

@@ -6,8 +6,8 @@ import org.springframework.messaging.MessageChannel;
 /**
  * @author keets
  */
-public interface MsgSource extends SenderParent {
-    String OUTPUT = "msg-output";
+public interface AffairSource {
+    String OUTPUT = "affair-output";
 
     @Output(OUTPUT)
     MessageChannel output();
