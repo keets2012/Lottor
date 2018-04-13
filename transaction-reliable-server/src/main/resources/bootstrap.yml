@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: tm-server
+  cloud:
+    consul:
+      host: 192.168.1.204
+      port: 8500
+      discovery:
+        ip-address: 192.169.1.78
+        port: ${SERVER_PORT:${server.port}}
+        healthCheckPath: /health
+        healthCheckInterval: 15s
+        instance-id: tm-server-${server.port}
+        service-name: tm-server
+    stream:
+      bindings:
+        affair-output:
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: affair
+          binder: rabbit1
+        material-output:
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: material
+          binder: rabbit1
+      binders:
+        rabbit1:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 192.168.1.200
+                port: 5672
+                username: user
+                password: user
+                virtual-host: /user
+
+server:
+  port: 9666
+
+management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: false
+#  security:
+#    enabled: false

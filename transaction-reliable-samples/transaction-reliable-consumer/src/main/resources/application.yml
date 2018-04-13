@@ -45,7 +45,7 @@ spring:
         msg-input:
           group: msgGroup
           content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: gts
+          destination: affair
           binder: rabbit1
       binders:
         rabbit1:

@@ -39,6 +39,7 @@ public enum NettyMessageActionEnum {
      * Rollback transaction status enum.
      */
     ROLLBACK(5, "回滚"),
+
     /**
      * Failure transaction status enum.
      */

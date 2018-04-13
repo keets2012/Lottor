@@ -1,5 +1,6 @@
 package com.blueskykong.tm.common.netty.bean;
 
+import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,7 +21,7 @@ public class TxTransactionItem implements Serializable {
     private String transId;
 
     /**
-     * 事务状态
+     * 事务状态 {@link TransactionStatusEnum}
      */
     private int status;
 

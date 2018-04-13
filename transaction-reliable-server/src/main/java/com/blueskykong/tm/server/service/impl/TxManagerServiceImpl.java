@@ -92,9 +92,12 @@ public class TxManagerServiceImpl implements TxManagerService {
             query.addCriteria(new Criteria("txGroupId").is(key).and("taskKey").is(taskKey)).fields().include("createDate").include("args");
             TxTransactionItem item = mongoTemplate.findOne(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
             List<LinkedHashMap<String, Object>> msgs = (List<LinkedHashMap<String, Object>>) item.getArgs()[0];
-            Boolean success = sendTxTransactionMsg(key, msgs);
+            Boolean success = true;
+            if (status == TransactionStatusEnum.COMMIT.getCode()) {
+                success = sendTxTransactionMsg(key, msgs);
+            }
             if (success) {
-                Update update = Update.update("staus", status);
+                Update update = Update.update("status", status);
                 if (Objects.nonNull(message)) {
                     update.set("message", message);
                 }
@@ -110,7 +113,7 @@ public class TxManagerServiceImpl implements TxManagerService {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                final WriteResult writeResult = mongoTemplate.updateFirst(query, update, MongoAdapter.class, CollectionNameEnum.TxTransactionItem.name());
+                final WriteResult writeResult = mongoTemplate.updateFirst(query, update, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
                 return writeResult.getN() > 0;
             }
         } catch (Exception e) {
