@@ -2,6 +2,7 @@ package com.blueskykong.sc.producer.service.impl;
 
 import com.blueskykong.sc.producer.service.PayService;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.service.ExternalNettyService;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class PayServiceImpl implements PayService {
         transactionMsg.setSource("producer");
         transactionMsg.setTarget("affair");
         transactionMsg.setArgs(null);
-        transactionMsg.setSubTaskId("4323121");
+        transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         nettyService.preSend(Collections.singletonList(transactionMsg));
 
         try {
