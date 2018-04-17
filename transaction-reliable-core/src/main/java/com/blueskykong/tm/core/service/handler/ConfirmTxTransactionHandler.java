@@ -69,8 +69,7 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
             //通知tm整个事务组失败，需要回滚标志状态
             //TODO ROLLABCK待优化
             txManagerMessageService.rollBackTxTransaction(groupId, waitKey);
-
-            throwable.printStackTrace();
+            LogUtil.error(LOGGER, throwable::getLocalizedMessage);
             throw throwable;
         } finally {
             TxTransactionLocal.getInstance().removeTxGroupId();

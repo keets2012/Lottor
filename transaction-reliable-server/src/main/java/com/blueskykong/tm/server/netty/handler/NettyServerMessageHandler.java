@@ -1,6 +1,7 @@
 package com.blueskykong.tm.server.netty.handler;
 
 
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.NettyResultEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
@@ -97,10 +98,9 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                     }
                     break;
                 case CONSUMED:
-                    if (CollectionUtils.isNotEmpty(items)) {
-                        final TxTransactionItem item = items.get(0);
-                        txManagerService.get().updateTxTransactionMsgStatus(txTransactionGroup.getId(),
-                                item.getTaskKey(), item.getStatus());
+                    TransactionMsg transactionMsg = hb.getTransactionMsg();
+                    if (transactionMsg != null) {
+                        txManagerService.get().updateTxTransactionMsgStatus(transactionMsg);
                     }
                     break;
                 default:

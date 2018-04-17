@@ -1,17 +1,13 @@
 package com.blueskykong.tm.server.controller;
 
-import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.entity.SentMsgDetails;
-import com.blueskykong.tm.server.entity.TxManagerInfo;
 import com.blueskykong.tm.server.helper.MongoPageable;
 import com.blueskykong.tm.server.service.TxManagerInfoService;
-import com.blueskykong.tm.server.service.impl.TxManagerServiceImpl;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,45 +17,33 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
-@RequestMapping("/manager")
-public class TxManagerIndexController {
+@RequestMapping("/manager/msg")
+public class TxManagerMsgController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TxManagerServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TxManagerMsgController.class);
 
     private final TxManagerInfoService txManagerInfoService;
     private final int pageSize = 15;
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    public TxManagerIndexController(TxManagerInfoService txManagerInfoService, MongoTemplate mongoTemplate) {
+    public TxManagerMsgController(TxManagerInfoService txManagerInfoService, MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
         this.txManagerInfoService = txManagerInfoService;
     }
 
-
-    @GetMapping("/index")
-    public String index(HttpServletRequest request) {
-        final List<TxManagerInfo> txManagerInfo = txManagerInfoService.findTxManagerInfo();
-        request.setAttribute("info", txManagerInfo);
-        return "index";
-    }
-
-
-    @GetMapping("/msg/rollback")
+    @GetMapping("/rollback")
     @ResponseBody
     @ApiOperation("获取所有的回滚消息")
     public List<TxTransactionItem> findRollbackMsgs(@RequestParam(required = false) String sortFiled, @RequestParam(required = false) Boolean desc, @RequestParam(required = false) int pageNum) {
@@ -96,7 +80,7 @@ public class TxManagerIndexController {
         return pagelist.getContent();
     }
 
-    @GetMapping("/msg/count")
+    @GetMapping("/count")
     @ResponseBody
     @ApiOperation("获取消息消费的详情")
     public SentMsgDetails sentDetails() {

@@ -52,6 +52,11 @@ public class TransactionMsg {
     private Long createTime = System.currentTimeMillis();
 
     /**
+     * 操作结果信息
+     */
+    private String message;
+
+    /**
      * 更新时间
      */
     private Long updateTime;

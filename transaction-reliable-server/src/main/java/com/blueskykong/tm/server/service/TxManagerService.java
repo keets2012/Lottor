@@ -63,7 +63,7 @@ public interface TxManagerService {
      * @param hashKey
      * @param status
      */
-    Boolean updateTxTransactionMsgStatus(String key, String hashKey, int status);
+    Boolean updateTxTransactionMsgStatus(TransactionMsg transactionMsg);
 
     /**
      * 获取事务组的状态

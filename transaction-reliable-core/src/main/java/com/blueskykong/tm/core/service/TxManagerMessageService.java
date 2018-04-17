@@ -1,6 +1,7 @@
 
 package com.blueskykong.tm.core.service;
 
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
@@ -86,15 +87,11 @@ public interface TxManagerMessageService {
      */
     void asyncCompleteCommit(String txGroupId, String taskKey, int status, Object message);
 
-
     /**
-     * 提交参与者事务状态
+     * 异步完成自身的消费
      *
-     * @param txGroupId 事务组id
-     * @param hashKey   taskKey
-     * @param status    状态
-     * @return
+     * @param message   完成信息 返回结果，或者是异常信息
      */
-    Boolean commitActorTxTransaction(String txGroupId, String hashKey, Boolean status);
+    void asyncCompleteConsume(TransactionMsg message);
 
 }

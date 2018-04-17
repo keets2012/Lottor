@@ -16,6 +16,7 @@ import com.blueskykong.tm.server.stream.AffairSource;
 import com.blueskykong.tm.server.stream.MaterialSource;
 import com.mongodb.WriteResult;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -44,12 +45,12 @@ public class TxManagerServiceImpl implements TxManagerService {
     private final MongoTemplate mongoTemplate;
     private final OutputFactoryService outputFactoryService;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     public TxManagerServiceImpl(MongoTemplate mongoTemplate, OutputFactoryService outputFactoryService) {
         this.mongoTemplate = mongoTemplate;
         this.outputFactoryService = outputFactoryService;
     }
-
 
     /**
      * 保存事务组 在事务发起方的时候进行调用
@@ -70,9 +71,10 @@ public class TxManagerServiceImpl implements TxManagerService {
                 }
             }
         } catch (Exception e) {
+            LogUtil.error(LOGGER, "failed to save TxTransactionGroup, groupId is {} and cause is {}",
+                    () -> txTransactionGroup.getId(), () -> e.getLocalizedMessage());
             return false;
         }
-
         return true;
     }
 
@@ -117,7 +119,7 @@ public class TxManagerServiceImpl implements TxManagerService {
                 return writeResult.getN() > 0;
             }
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "failed to send msgs and  groupId is {}, cause is {}", () -> key, () -> e.getMessage());
+            LogUtil.error(LOGGER, "failed to send msgs and  groupId is {}, cause is {}", () -> key, e::getMessage);
         }
         return false;
     }
@@ -164,17 +166,18 @@ public class TxManagerServiceImpl implements TxManagerService {
     /**
      * 更新 TM中的消息状态
      *
-     * @param key
-     * @param hashKey
-     * @param status
+     * @param transactionMsg
      */
     @Override
-    public Boolean updateTxTransactionMsgStatus(String key, String hashKey, int status) {
+    public Boolean updateTxTransactionMsgStatus(TransactionMsg transactionMsg) {
         try {
             Query query = new Query();
-            query.addCriteria(new Criteria("groupId").is(key).and("subTaskId").is(hashKey));
-            Update update = Update.update("consumed", status);
-
+            query.addCriteria(new Criteria("groupId").is(transactionMsg.getGroupId()).and("subTaskId").is(transactionMsg.getSubTaskId()));
+            Update update = Update.update("consumed", transactionMsg.getConsumed());
+            String message = transactionMsg.getMessage();
+            if (StringUtils.isNotBlank(message)) {
+                update.set("message", message);
+            }
             final WriteResult writeResult = mongoTemplate.updateFirst(query, update, TransactionMsg.class, CollectionNameEnum.TransactionMsg.name());
             return writeResult.getN() > 0;
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -35,6 +36,9 @@ public class PayServiceImpl implements PayService {
 
         try {
             LogUtil.debug(LOGGER, () -> "执行本地事务！");
+/*            if (Objects.nonNull(transactionMsg)) {
+                throw new IllegalArgumentException();
+            }*/
         } catch (Exception e) {
             nettyService.postSend(false);
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");

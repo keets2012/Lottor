@@ -29,6 +29,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Arrays;
@@ -85,4 +88,21 @@ public class TxManagerConfiguration {
         }
 
     }
+
+    @Configuration
+    protected static class CORSConfiguration {
+        @Bean
+        public WebMvcConfigurer corsConfigurer() {
+            return new WebMvcConfigurerAdapter() {
+                @Override
+                public void addCorsMappings(CorsRegistry registry) {
+                    registry.addMapping("/**")
+                            .allowedHeaders("*")
+                            .allowedMethods("*")
+                            .allowedOrigins("*");
+                }
+            };
+        }
+    }
+
 }

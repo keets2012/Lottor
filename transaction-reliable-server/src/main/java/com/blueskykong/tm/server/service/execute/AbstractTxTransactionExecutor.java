@@ -101,7 +101,6 @@ public abstract class AbstractTxTransactionExecutor implements TxTransactionExec
          1.检查当前tm的channel状态，并只提交当前渠道的命令
          2.通知 连接到其他tm的channel，执行命令
          */
-
         final List<TxTransactionItem> currentItem = listMap.get(Boolean.TRUE);
 
         final List<TxTransactionItem> elseItems = listMap.get(Boolean.FALSE);
@@ -143,6 +142,5 @@ public abstract class AbstractTxTransactionExecutor implements TxTransactionExec
                 (Collectors.partitioningBy(item ->
                         Objects.equals(Address.getInstance().getDomain(), item.getTmDomain())));
     }
-
 
 }

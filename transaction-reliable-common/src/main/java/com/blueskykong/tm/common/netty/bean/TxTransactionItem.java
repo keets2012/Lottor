@@ -80,5 +80,4 @@ public class TxTransactionItem implements Serializable {
      */
     private Object message;
 
-
 }

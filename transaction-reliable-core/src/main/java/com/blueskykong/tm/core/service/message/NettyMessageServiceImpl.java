@@ -1,6 +1,6 @@
-
 package com.blueskykong.tm.core.service.message;
 
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.ConsumedStatus;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
@@ -195,30 +195,17 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
     }
 
     /**
-     * 提交参与者事务状态
+     * 异步完成自身的消费
      *
-     * @param txGroupId 事务组id
-     * @param hashKey   参与者
-     * @param status    状态
-     * @return true 成功 false 失败
+     * @param message 完成信息 返回结果，或者是异常信息
      */
-    //TODO 是否消费方持久化
     @Override
-    public Boolean commitActorTxTransaction(String txGroupId, String hashKey, Boolean status) {
+    public void asyncCompleteConsume(TransactionMsg message) {
         HeartBeat heartBeat = new HeartBeat();
+
         heartBeat.setAction(NettyMessageActionEnum.CONSUMED.getCode());
+        heartBeat.setTransactionMsg(message);
 
-        TxTransactionItem txTransactionItem = new TxTransactionItem();
-        txTransactionItem.setTaskKey(hashKey);
-        txTransactionItem.setStatus(status ? ConsumedStatus.CONSUMED_SUCCESS.getStatus() : ConsumedStatus.CONSUMED_FAILURE.getStatus());
-
-        TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
-        txTransactionGroup.setId(txGroupId);
-        txTransactionGroup.setItemList(Collections.singletonList(txTransactionItem));
-
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        LogUtil.debug(LOGGER, "消费方发送消息： {}", NettyMessageActionEnum.CONSUMED::getDesc);
         nettyClientMessageHandler.get().asyncSendTxManagerMessage(heartBeat);
-        return true;
     }
 }

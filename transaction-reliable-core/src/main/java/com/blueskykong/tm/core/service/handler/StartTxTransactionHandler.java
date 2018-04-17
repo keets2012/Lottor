@@ -64,7 +64,6 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
                 final Object res = point.proceed();
                 //本地服务记录，用作补偿
                 txCompensationCommand.saveTxCompensation(info.getInvocation(), groupId, waitKey);
-
                 return res;
             } catch (Throwable throwable) {
                 //通知tm整个事务组失败，需要回滚，标志事务组的状态
@@ -103,7 +102,6 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         groupItem.setTargetMethod(info.getInvocation().getMethod());
 
         groupItem.setRole(TransactionRoleEnum.GROUP.getCode());
-
 
         items.add(groupItem);
 
