@@ -42,6 +42,7 @@ public class StreamListener {
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, e::getLocalizedMessage);
+            message.setMessage(e.getLocalizedMessage());
             nettyService.consumedSend(message, false);
             return;
         }

@@ -52,7 +52,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
         List<TxTransactionItem> items = null;
         try {
             final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(hb.getAction());
-            LogUtil.debug(LOGGER, "接收的客户端数据,执行的动作为:{}", actionEnum::getDesc);
+            LogUtil.debug(LOGGER, "接收到客户端数据，执行的动作为:{}", actionEnum::getDesc);
             Boolean success;
             if (txTransactionGroup != null) {
                 items = txTransactionGroup.getItemList();

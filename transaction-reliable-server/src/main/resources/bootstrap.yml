@@ -1,38 +1,3 @@
-spring:
-  application:
-    name: tm-server
-  cloud:
-    consul:
-      host: 192.168.1.204
-      port: 8500
-      discovery:
-        ip-address: 192.169.1.78
-        port: ${SERVER_PORT:${server.port}}
-        healthCheckPath: /health
-        healthCheckInterval: 15s
-        instance-id: tm-server-${server.port}
-        service-name: tm-server
-    stream:
-      bindings:
-        affair-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: affair
-          binder: rabbit1
-        material-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: material
-          binder: rabbit1
-      binders:
-        rabbit1:
-          type: rabbit
-          environment:
-            spring:
-              rabbitmq:
-                host: 192.168.1.200
-                port: 5672
-                username: user
-                password: user
-                virtual-host: /user
 
 server:
   port: 9666
@@ -46,3 +11,45 @@ management:
       enabled: false
 #  security:
 #    enabled: false
+---
+spring:
+  application:
+    name: lotor
+  cloud:
+    consul:
+      discovery:
+        preferIpAddress: true
+        enabled: true
+        register: true
+        service-name: lotor
+        health-check-interval: 10s
+        health-check-timeout: 20s
+        heartbeat:
+          enabled: true
+        instanceId: ${spring.cloud.consul.discovery.service-name}-${spring.profiles.active}-${spring.cloud.consul.discovery.ip-address}-${random.value}
+        ip-address: ${HOST_ADDRESS:localhost}
+        port: ${SERVER_PORT:${server.port}}
+        lifecycle:
+          enabled: true
+        scheme: http
+        prefer-agent-address: false
+        register-health-check: true
+        tags: master
+        query-passing: true
+      host: ${CONSUL_ADDRESS:192.168.1.204}
+      port: ${CONSUL_PORT:8501}
+    config:
+      discovery:
+        service-id: config-service
+        enabled: true
+      failFast: true
+      retry:
+        initial-interval: 1000
+        max-attempts: 4
+        max-interval: 1000
+
+
+---
+spring:
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
