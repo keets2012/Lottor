@@ -46,9 +46,16 @@ public interface TxManagerInfoService {
     Map<String, String> txCountByDate(Timestamp timestamp, int limit);
 
     /**
-     * 按照日期获取tx的数量
+     * client details
      *
      * @return Map
      */
     Map<String, String> clientDetails(Boolean source);
+
+    /**
+     * total msgs
+     *
+     * @return
+     */
+    Map<String, Long> totalMsgs();
 }

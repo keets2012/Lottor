@@ -63,8 +63,12 @@ public class TxManagerController {
 
     @GetMapping("/clients-analysis")
     public Map<String, String> getClients(@RequestParam(defaultValue = "true", required = false) Boolean source) {
-
         return txManagerInfoService.clientDetails(source);
+    }
+
+    @GetMapping("/analysis")
+    public Map<String, Long> totalMsgs() {
+        return txManagerInfoService.totalMsgs();
     }
 
     /**
