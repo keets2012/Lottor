@@ -2,6 +2,7 @@
 package com.blueskykong.tm.core.service;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
@@ -93,5 +94,4 @@ public interface TxManagerMessageService {
      * @param message   完成信息 返回结果，或者是异常信息
      */
     void asyncCompleteConsume(TransactionMsg message);
-
 }

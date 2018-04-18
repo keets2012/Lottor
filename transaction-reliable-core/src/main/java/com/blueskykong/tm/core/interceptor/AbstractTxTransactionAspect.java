@@ -1,5 +1,6 @@
 package com.blueskykong.tm.core.interceptor;
 
+import com.blueskykong.tm.common.enums.OperationEnum;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,15 +18,8 @@ public abstract class AbstractTxTransactionAspect {
         this.txTransactionInterceptor = txTransactionInterceptor;
     }
 
-    @Pointcut("@annotation(com.blueskykong.tm.core.annotation.ReliableTransaction)")
-    public void transactionInterceptor() {
-
-    }
-
-
-    @Around("transactionInterceptor()")
-    public Object interceptMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        return txTransactionInterceptor.interceptor(proceedingJoinPoint);
+    public Object interceptMethod(Object[] pjp, OperationEnum operationEnum) throws Throwable {
+        return txTransactionInterceptor.interceptor(pjp, operationEnum);
     }
 
 

@@ -1,31 +1,42 @@
 package com.blueskykong.tm.server.service.impl;
 
-import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.server.service.OutputFactoryService;
-import com.blueskykong.tm.server.stream.AffairSource;
-import com.blueskykong.tm.server.stream.MaterialSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author keets
  */
 @Component
+@EnableBinding
 public class OutputFactoryServiceImpl implements OutputFactoryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputFactoryServiceImpl.class);
 
+    private static final String CHANNEL_PREFIX = "tx-";
+    private BinderAwareChannelResolver resolver;
+
+    @Value("stream.content-type")
+    private String contentType;
 
     @Autowired
-    private AffairSource affairSource;
+    public OutputFactoryServiceImpl(BinderAwareChannelResolver resolver) {
+        this.resolver = resolver;
+    }
 
-    @Autowired
-    private MaterialSource materialSource;
 
     /**
      * 发送事务消息
@@ -34,20 +45,20 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
      * @return Boolean
      */
     @Override
-    public Boolean sendMsg(TransactionMsg msg) {
+    public Boolean sendMsg(TransactionMsgAdapter msg) {
         ServiceNameEnum serviceNameEnum = ServiceNameEnum.fromString(msg.getTarget());
-        LogUtil.debug(LOGGER, "target service {}", () -> serviceNameEnum.getServiceName());
-        switch (serviceNameEnum) {
-            case AFFAIR:
-                affairSource.output().send(MessageBuilder.withPayload(msg).build());
-                break;
-            case MATERIAL:
-                materialSource.output().send(MessageBuilder.withPayload(msg).build());
-                break;
-            default:
-                LogUtil.error(LOGGER, "no available cases for {}.", () -> serviceNameEnum.getServiceName());
-                break;
+        if (!Objects.nonNull(serviceNameEnum)) {
+            LogUtil.warn(LOGGER, "no available cases for {}. pls check if this topic exists.", () -> msg.getTarget());
+            resolver.resolveDestination(CHANNEL_PREFIX + msg.getTarget()).send(MessageBuilder.createMessage(msg,
+                    new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
+        } else {
+            LogUtil.debug(LOGGER, "send tx-msg and target service: {}", () -> serviceNameEnum.getServiceName());
+            resolver.resolveDestination(serviceNameEnum.getTopic()).send(MessageBuilder.createMessage(msg,
+                    new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
         }
+
+
         return true;
     }
+
 }

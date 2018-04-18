@@ -9,7 +9,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 public abstract class AbstractMessageEncoder extends MessageToByteEncoder<Object> {
 
-    private MessageCodecService util = null;
+    private MessageCodecService util;
 
     public AbstractMessageEncoder(final MessageCodecService util) {
         this.util = util;

@@ -1,11 +1,17 @@
 package com.blueskykong.tm.core.config;
 
+import com.blueskykong.tm.common.concurrent.threadpool.TransactionThreadPool;
 import com.blueskykong.tm.common.config.TxConfig;
+import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
+import com.blueskykong.tm.common.holder.ServiceBootstrap;
+import com.blueskykong.tm.common.serializer.KryoSerializer;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.bootstrap.TxTransactionBootstrap;
 import com.blueskykong.tm.core.bootstrap.TxTransactionInitialize;
-import com.blueskykong.tm.core.compensation.TxCompensationService;
-import com.blueskykong.tm.core.compensation.command.TxCompensationCommand;
-import com.blueskykong.tm.core.compensation.impl.TxCompensationServiceImpl;
+import com.blueskykong.tm.core.compensation.TxOperateService;
+import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
+import com.blueskykong.tm.core.compensation.impl.TxOperateServiceImpl;
+import com.blueskykong.tm.core.interceptor.TxTransactionInterceptor;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.netty.handler.NettyClientHandlerInitializer;
 import com.blueskykong.tm.core.netty.handler.NettyClientMessageHandler;
@@ -32,6 +38,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
+
 /**
  * @author keets
  */
@@ -39,6 +50,11 @@ import org.springframework.context.annotation.Primary;
 @EnableConfigurationProperties(TxConfig.class)
 @ConditionalOnBean({DiscoveryClient.class})
 public class TransactionCoreAutoConfiguration {
+
+    @Bean
+    public TransactionThreadPool transactionThreadPool(TxConfig txConfig) {
+        return new TransactionThreadPool(txConfig);
+    }
 
     @Bean
     public NettyClientService nettyClientService(NettyClientHandlerInitializer nettyClientHandlerInitializer, DiscoveryClient discoveryClient) {
@@ -55,14 +71,13 @@ public class TransactionCoreAutoConfiguration {
 
         @Bean
         @Primary
-        public InitService initService(NettyClientService nettyClientService, TxCompensationService txCompensationService) {
-            return new InitServiceImpl(nettyClientService, txCompensationService);
+        public InitService initService(NettyClientService nettyClientService, TxOperateService txOperateService) {
+            return new InitServiceImpl(nettyClientService, txOperateService);
         }
 
-
         @Bean
-        public ExternalNettyService externalNettyService() {
-            return new ExternalNettyServiceImpl();
+        public ExternalNettyService externalNettyService(TxTransactionInterceptor txTransactionInterceptor) {
+            return new ExternalNettyServiceImpl(txTransactionInterceptor);
         }
 
         @Bean
@@ -74,38 +89,50 @@ public class TransactionCoreAutoConfiguration {
         public TxTransactionFactoryService txTransactionFactoryService() {
             return new TxTransactionFactoryServiceImpl();
         }
+
+        @Bean
+        public ObjectSerializer objectSerializer(TxConfig nettyConfig) {
+            final SerializeProtocolEnum serializeProtocolEnum =
+                    SerializeProtocolEnum.acquireSerializeProtocol(nettyConfig.getNettySerializer());
+
+            final ServiceLoader<ObjectSerializer> objectSerializers = ServiceBootstrap.loadAll(ObjectSerializer.class);
+
+            final Optional<ObjectSerializer> serializer = StreamSupport.stream(objectSerializers.spliterator(), false)
+                    .filter(objectSerializer ->
+                            Objects.equals(objectSerializer.getScheme(), serializeProtocolEnum.getSerializeProtocol())).findFirst();
+            return serializer.orElse(new KryoSerializer());
+        }
     }
 
     @Configuration
     protected static class Compensation {
 
         @Bean
-        public TxCompensationService txCompensationService(ModelNameService modelNameService, TxManagerMessageService txManagerMessageService) {
-            return new TxCompensationServiceImpl(modelNameService, txManagerMessageService);
+        public TxOperateService txCompensationService(ModelNameService modelNameService) {
+            return new TxOperateServiceImpl(modelNameService);
         }
 
         @Bean
-        public TxCompensationCommand command(TxCompensationService txCompensationService) {
-            return new TxCompensationCommand(txCompensationService);
+        public TxOperateCommand command(TxOperateService txOperateService) {
+            return new TxOperateCommand(txOperateService);
         }
-
     }
 
     @Configuration
     protected static class TransactionHandler {
         @Bean
-        public TxTransactionHandler consumedTransactionHandler(TxManagerMessageService txManagerMessageService) {
-            return new ConsumedTransactionHandler(txManagerMessageService);
+        public TxTransactionHandler consumedTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateService txOperateService) {
+            return new ConsumedTransactionHandler(txManagerMessageService, txOperateService);
         }
 
         @Bean
-        public TxTransactionHandler confirmTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand) {
-            return new ConfirmTxTransactionHandler(txManagerMessageService, txCompensationCommand);
+        public TxTransactionHandler confirmTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand) {
+            return new ConfirmTxTransactionHandler(txManagerMessageService, txOperateCommand);
         }
 
         @Bean
-        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand) {
-            return new StartTxTransactionHandler(txManagerMessageService, txCompensationCommand);
+        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand, ObjectSerializer objectSerializer) {
+            return new StartTxTransactionHandler(txManagerMessageService, txOperateCommand, objectSerializer);
         }
     }
 
@@ -127,8 +154,8 @@ public class TransactionCoreAutoConfiguration {
     protected static class NettyHandler {
 
         @Bean
-        public NettyClientMessageHandler nettyClientMessageHandler() {
-            return new NettyClientMessageHandler();
+        public NettyClientMessageHandler nettyClientMessageHandler(ModelNameService modelNameService, TxOperateCommand txOperateCommand) {
+            return new NettyClientMessageHandler(modelNameService, txOperateCommand);
         }
 
         @Bean

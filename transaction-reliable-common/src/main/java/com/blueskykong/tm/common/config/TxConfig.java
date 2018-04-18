@@ -43,18 +43,26 @@ public class TxConfig {
 
     private int compensationRecoverTime = 60;
 
-
+    /**
+     * 刷新manager的周期
+     * 单位：s
+     */
     private int refreshInterval = 60;
 
 
-    private int retryMax = 10;
+    private int retryMax = 5;
+
+    /**
+     * 客户端失联，重试间隔
+     * 单位：s
+     */
+    private int retryInterval = 6;
 
 
     private int recoverDelayTime = 60;
 
 
-    private String txManagerId;
-
+    private String txManagerId = "lotor";
 
     private TxDbConfig txDbConfig;
 
@@ -62,5 +70,6 @@ public class TxConfig {
 
     private TxRedisConfig txRedisConfig;
 
+    private boolean onEpoll = false;
 
 }

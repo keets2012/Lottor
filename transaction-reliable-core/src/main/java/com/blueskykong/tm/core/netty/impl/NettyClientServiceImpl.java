@@ -3,6 +3,8 @@ package com.blueskykong.tm.core.netty.impl;
 import com.blueskykong.tm.common.config.TxConfig;
 import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
+import com.blueskykong.tm.common.exception.TransactionException;
+import com.blueskykong.tm.common.exception.TransactionRuntimeException;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.netty.handler.NettyClientHandlerInitializer;
@@ -16,6 +18,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -54,7 +57,11 @@ public class NettyClientServiceImpl implements NettyClientService {
 
     private Bootstrap bootstrap;
 
-    private static final String OS_NAME = "Linux";
+    private int retryMax;
+
+    private int retryCount = 0;
+
+    private int retryInterval;
 
     private final NettyClientHandlerInitializer nettyClientHandlerInitializer;
 
@@ -74,6 +81,8 @@ public class NettyClientServiceImpl implements NettyClientService {
      */
     @Override
     public void start(TxConfig txConfig) {
+        this.retryMax = txConfig.getRetryMax();
+        this.retryInterval = txConfig.getRetryInterval();
         this.txConfig = txConfig;
         SerializeProtocolEnum serializeProtocol =
                 SerializeProtocolEnum.acquireSerializeProtocol(txConfig.getNettySerializer());
@@ -86,15 +95,18 @@ public class NettyClientServiceImpl implements NettyClientService {
         TxManagerLocator.getInstance().schedulePeriodicRefresh();
         try {
             bootstrap = new Bootstrap();
-            groups(bootstrap, txConfig.getNettyThreadMax());
+            groups(bootstrap, txConfig);
             doConnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.error(LOGGER, "tx client start failed for {}", () -> e.getLocalizedMessage());
+            throw new TransactionRuntimeException(e);
         }
     }
 
-    private void groups(Bootstrap bootstrap, int workThreads) {
-        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+    private void groups(Bootstrap bootstrap, TxConfig txConfig) {
+        int workThreads = txConfig.getNettyThreadMax();
+        //暂时不使用EpollEventLoopGroup，Ubuntu报错
+        if (Epoll.isAvailable() && txConfig.isOnEpoll()) {
             workerGroup = new EpollEventLoopGroup(workThreads);
             bootstrap.group(workerGroup);
             bootstrap.channel(EpollSocketChannel.class);
@@ -134,15 +146,19 @@ public class NettyClientServiceImpl implements NettyClientService {
         }
 
         ChannelFuture future = bootstrap.connect(host, port);
-        LogUtil.info(LOGGER, "连接txManager-socket服务-> host:port:{}", () -> host + ":" + port);
+        LogUtil.info(LOGGER, "连接txManager-socket服务-> {}", () -> host + ":" + port);
 
         future.addListener((ChannelFutureListener) futureListener -> {
             if (futureListener.isSuccess()) {
                 channel = futureListener.channel();
-                LogUtil.info(LOGGER, "Connect to server successfully!-> host:port:{}", () -> host + ":" + port);
+                LogUtil.info(LOGGER, "Connect to -> {} server successfully!", () -> host + ":" + port);
             } else {
-                LogUtil.info(LOGGER, "Failed to connect to server, try connect after 5s-> host:port:{}", () -> host + ":" + port);
-                futureListener.channel().eventLoop().schedule(this::doConnect, 5, TimeUnit.SECONDS);
+                if (retryCount++ >= retryMax) {
+                    LogUtil.error(LOGGER, "Failed to connect to server {}, after {} times", () -> host + ":" + port, () -> --retryCount);
+                    System.exit(1);
+                }
+                LogUtil.error(LOGGER, "Failed to connect to server, retry for {} times, try connect after {}s-> {}", () -> retryCount, () -> this.retryInterval, () -> host + ":" + port);
+                futureListener.channel().eventLoop().schedule(this::doConnect, retryInterval, TimeUnit.SECONDS);
             }
         });
 

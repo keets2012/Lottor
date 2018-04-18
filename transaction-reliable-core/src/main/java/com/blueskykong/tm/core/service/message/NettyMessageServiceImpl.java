@@ -1,18 +1,17 @@
 package com.blueskykong.tm.core.service.message;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
-import com.blueskykong.tm.common.enums.ConsumedStatus;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
-import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
+import com.blueskykong.tm.core.compensation.TxOperateService;
+import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
 import com.blueskykong.tm.core.netty.handler.NettyClientMessageHandler;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -25,17 +24,16 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
 
     private final ThreadLocal<NettyClientMessageHandler> nettyClientMessageHandler;
 
-    @Autowired
     public NettyMessageServiceImpl(NettyClientMessageHandler nettyClientMessageHandler) {
         this.nettyClientMessageHandler = ThreadLocal.withInitial(() -> nettyClientMessageHandler);
     }
 
     @Override
     public Boolean saveTxTransactionGroup(TxTransactionGroup txTransactionGroup) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.CREATE_GROUP.getCode());
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.CREATE_GROUP.getCode());
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Boolean) object;
         }
@@ -45,13 +43,13 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
 
     @Override
     public Boolean addTxTransaction(String txGroupId, TxTransactionItem txTransactionItem) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.ADD_TRANSACTION.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.ADD_TRANSACTION.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(txGroupId);
-        txTransactionGroup.setItemList(Collections.singletonList(txTransactionItem));
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        txTransactionGroup.setItem(txTransactionItem);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Boolean) object;
         }
@@ -60,12 +58,12 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
 
     @Override
     public int findTransactionGroupStatus(String txGroupId) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(txGroupId);
 
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Integer) object;
         }
@@ -81,12 +79,12 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public TxTransactionGroup findByTxGroupId(String txGroupId) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.FIND_TRANSACTION_GROUP_INFO.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.FIND_TRANSACTION_GROUP_INFO.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(txGroupId);
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (TxTransactionGroup) object;
         }
@@ -101,17 +99,17 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public Boolean rollBackTxTransaction(String txGroupId, String taskKey) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.ROLLBACK.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.ROLLBACK.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setStatus(TransactionStatusEnum.ROLLBACK.getCode());
         txTransactionGroup.setId(txGroupId);
         TxTransactionItem item = new TxTransactionItem();
         item.setTaskKey(taskKey);
         item.setStatus(TransactionStatusEnum.ROLLBACK.getCode());
-        txTransactionGroup.setItemList(Collections.singletonList(item));
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        txTransactionGroup.setItem(item);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Boolean) object;
         }
@@ -127,15 +125,15 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public Boolean preCommitTxTransaction(String txGroupId) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.PRE_COMMIT.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.PRE_COMMIT.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setStatus(TransactionStatusEnum.PRE_COMMIT.getCode());
         txTransactionGroup.setId(txGroupId);
 //        TxTransactionItem
 
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Boolean) object;
         }
@@ -152,16 +150,16 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public Boolean completeCommitTxTransaction(String txGroupId, String taskKey, int status) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.COMPLETE_COMMIT.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.COMPLETE_COMMIT.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(txGroupId);
         TxTransactionItem item = new TxTransactionItem();
         item.setTaskKey(taskKey);
         item.setStatus(status);
-        txTransactionGroup.setItemList(Collections.singletonList(item));
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(heartBeat);
+        txTransactionGroup.setItem(item);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        final Object object = nettyClientMessageHandler.get().sendTxManagerMessage(lottorRequest);
         if (Objects.nonNull(object)) {
             return (Boolean) object;
         }
@@ -178,8 +176,8 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public void asyncCompleteCommit(String txGroupId, String taskKey, int status, Object message) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setAction(NettyMessageActionEnum.COMPLETE_COMMIT.getCode());
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setAction(NettyMessageActionEnum.COMPLETE_COMMIT.getCode());
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(txGroupId);
 
@@ -188,10 +186,10 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
         item.setStatus(status);
         item.setMessage(message);
 
-        txTransactionGroup.setItemList(Collections.singletonList(item));
+        txTransactionGroup.setItem(item);
 
-        heartBeat.setTxTransactionGroup(txTransactionGroup);
-        nettyClientMessageHandler.get().asyncSendTxManagerMessage(heartBeat);
+        lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        nettyClientMessageHandler.get().asyncSendTxManagerMessage(lottorRequest);
     }
 
     /**
@@ -201,11 +199,13 @@ public class NettyMessageServiceImpl implements TxManagerMessageService {
      */
     @Override
     public void asyncCompleteConsume(TransactionMsg message) {
-        HeartBeat heartBeat = new HeartBeat();
+        LottorRequest lottorRequest = new LottorRequest();
 
-        heartBeat.setAction(NettyMessageActionEnum.CONSUMED.getCode());
-        heartBeat.setTransactionMsg(message);
+        lottorRequest.setAction(NettyMessageActionEnum.CONSUMED.getCode());
+        lottorRequest.setTransactionMsg(message);
 
-        nettyClientMessageHandler.get().asyncSendTxManagerMessage(heartBeat);
+        nettyClientMessageHandler.get().asyncSendTxManagerMessage(lottorRequest);
     }
+
+
 }

@@ -2,6 +2,9 @@ package com.blueskykong.tm.server.netty.impl;
 
 import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
+import com.blueskykong.tm.common.helper.SpringBeanUtils;
+import com.blueskykong.tm.common.holder.ServiceBootstrap;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.config.NettyConfig;
 import com.blueskykong.tm.server.netty.NettyService;
 import com.blueskykong.tm.server.netty.handler.NettyServerHandlerInitializer;
@@ -12,6 +15,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -23,12 +27,17 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
 
 @Component
+@Order(0)
 public class NettyServerServiceImpl implements NettyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerServiceImpl.class);
@@ -66,11 +75,13 @@ public class NettyServerServiceImpl implements NettyService {
         try {
             final SerializeProtocolEnum serializeProtocolEnum =
                     SerializeProtocolEnum.acquireSerializeProtocol(nettyConfig.getSerialize());
+
             nettyServerHandlerInitializer.setSerializeProtocolEnum(serializeProtocolEnum);
             nettyServerHandlerInitializer.setServletExecutor(servletExecutor);
             ServerBootstrap b = new ServerBootstrap();
             groups(b, MAX_THREADS << 1);
             b.bind(nettyConfig.getPort());
+
             LOGGER.info("netty service started on port: " + nettyConfig.getPort());
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,7 +90,10 @@ public class NettyServerServiceImpl implements NettyService {
 
 
     private void groups(ServerBootstrap b, int workThreads) {
-        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+        /**
+         * ubuntu系统不能很好的适配EpollEventLoopGroup，暂时不启用
+         */
+        if (Epoll.isAvailable() && nettyConfig.isOnEpoll()) {
             bossGroup = new EpollEventLoopGroup(1);
             workerGroup = new EpollEventLoopGroup(workThreads);
             b.group(bossGroup, workerGroup)

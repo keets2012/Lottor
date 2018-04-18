@@ -1,4 +1,3 @@
-
 package com.blueskykong.tm.common.netty.serizlize;
 
 import com.blueskykong.tm.common.netty.MessageCodecService;
@@ -11,10 +10,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public  abstract class AbstractMessageDecoder extends ByteToMessageDecoder {
+public abstract class AbstractMessageDecoder extends ByteToMessageDecoder {
 
     final private static int MESSAGE_LENGTH = MessageCodecService.MESSAGE_LENGTH;
-    private MessageCodecService util = null;
+    private MessageCodecService util;
 
     public AbstractMessageDecoder(final MessageCodecService service) {
         this.util = service;

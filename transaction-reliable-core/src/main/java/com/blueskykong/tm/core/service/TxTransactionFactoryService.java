@@ -17,5 +17,5 @@ public interface TxTransactionFactoryService<T> {
      * @return Class<T>
      * @throws Throwable 抛出异常
      */
-    Class<T> factoryOf(TxTransactionInfo info) throws Throwable;
+    Class<T> factoryOf(TxTransactionInfo info);
 }

@@ -26,9 +26,13 @@ public class LogUtil {
      * @param format   日志信息
      * @param supplier supplier接口
      */
-    public static void debug(Logger logger, String format, Supplier<Object> supplier) {
+    public static void debug(Logger logger, String format, Supplier<Object>... supplier) {
         if (logger.isDebugEnabled()) {
-            logger.debug(format, supplier.get());
+            String[] o = new String[supplier.length];
+            for (int i = 0; i < supplier.length; i++) {
+                o[i] = Objects.toString(supplier[i].get());
+            }
+            logger.debug(format, o);
         }
     }
 

@@ -1,4 +1,3 @@
-
 server:
   port: 9666
 
@@ -36,8 +35,9 @@ spring:
         register-health-check: true
         tags: master
         query-passing: true
-      host: ${CONSUL_ADDRESS:192.168.1.204}
-      port: ${CONSUL_PORT:8500}
+#      host: ${CONSUL_ADDRESS:192.168.1.204}
+      host: ${CONSUL_ADDRESS:localhost}
+      port: ${CONSUL_PORT:8501}
     config:
       discovery:
         service-id: config-service

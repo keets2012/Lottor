@@ -1,7 +1,7 @@
 package com.blueskykong.tm.sc.http;
 
+import com.blueskykong.tm.common.concurrent.threadlocal.TxTransactionLocal;
 import com.blueskykong.tm.common.constant.CommonConstant;
-import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionLocal;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;

@@ -8,10 +8,10 @@ import com.blueskykong.tm.common.helper.SpringBeanUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.holder.ServiceBootstrap;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
-import com.blueskykong.tm.core.compensation.TxCompensationService;
+import com.blueskykong.tm.core.compensation.TxOperateService;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.service.InitService;
-import com.blueskykong.tm.core.spi.TransactionRecoverRepository;
+import com.blueskykong.tm.core.spi.TransactionOperateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +31,12 @@ public class InitServiceImpl implements InitService {
 
     private final NettyClientService nettyClientService;
 
-    private final TxCompensationService txCompensationService;
+    private final TxOperateService txOperateService;
 
     @Autowired
-    public InitServiceImpl(NettyClientService nettyClientService, TxCompensationService txCompensationService) {
+    public InitServiceImpl(NettyClientService nettyClientService, TxOperateService txOperateService) {
         this.nettyClientService = nettyClientService;
-        this.txCompensationService = txCompensationService;
+        this.txOperateService = txOperateService;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class InitServiceImpl implements InitService {
         try {
             loadSpi(txConfig);
             nettyClientService.start(txConfig);
-            txCompensationService.start(txConfig);
+            txOperateService.start(txConfig);
 
         } catch (Exception e) {
             throw new TransactionRuntimeException("补偿配置异常：" + e.getMessage());
@@ -70,9 +70,9 @@ public class InitServiceImpl implements InitService {
 
         //spi  RecoverRepository support
         final CompensationCacheTypeEnum compensationCacheTypeEnum = CompensationCacheTypeEnum.acquireCompensationCacheType(txConfig.getCompensationCacheType());
-        final ServiceLoader<TransactionRecoverRepository> recoverRepositories = ServiceBootstrap.loadAll(TransactionRecoverRepository.class);
+        final ServiceLoader<TransactionOperateRepository> recoverRepositories = ServiceBootstrap.loadAll(TransactionOperateRepository.class);
 
-        final Optional<TransactionRecoverRepository> repositoryOptional =
+        final Optional<TransactionOperateRepository> repositoryOptional =
                 StreamSupport.stream(recoverRepositories.spliterator(), false)
                         .filter(recoverRepository ->
                                 Objects.equals(recoverRepository.getScheme(), compensationCacheTypeEnum.getCompensationCacheType()))
@@ -80,7 +80,7 @@ public class InitServiceImpl implements InitService {
         //将compensationCache实现注入到spring容器
         repositoryOptional.ifPresent(repository -> {
             serializer.ifPresent(repository::setSerializer);
-            SpringBeanUtils.getInstance().registerBean(TransactionRecoverRepository.class.getName(), repository);
+            SpringBeanUtils.getInstance().registerBean(TransactionOperateRepository.class.getName(), repository);
         });
     }
 }

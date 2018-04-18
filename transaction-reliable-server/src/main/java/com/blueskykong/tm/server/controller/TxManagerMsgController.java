@@ -64,7 +64,7 @@ public class TxManagerMsgController {
             orders.add(new Sort.Order(direction, "createDate"));
         }
         if ((Object) pageNum != null) {
-            LogUtil.debug(LOGGER, "query for rollback msgs, pageNum", () -> pageNum);
+            LogUtil.debug(LOGGER, "query for rollback msgs, pageNum is {}", () -> pageNum);
             pageable.setPagenumber(pageNum);
         } else {
             pageable.setPagenumber(1);

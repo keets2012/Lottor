@@ -8,10 +8,15 @@ import java.util.Optional;
  * @author keets
  */
 public enum ServiceNameEnum {
-    AFFAIR("affair"),
-    MATERIAL("material");
+    AFFAIR("affair", "tx-affair"),
+    MATERIAL("material", "tx-material"),
+    TSS("tss-app", "tx-tss-app"),
+    TEST_PRODUCER("producer", "tx-producer"),
+    TEST("test", "tx-test");
 
     String serviceName;
+
+    String topic;
 
     public String getServiceName() {
         return serviceName;
@@ -21,8 +26,17 @@ public enum ServiceNameEnum {
         this.serviceName = serviceName;
     }
 
-    ServiceNameEnum(String serviceName) {
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    ServiceNameEnum(String serviceName, String topic) {
         this.serviceName = serviceName;
+        this.topic = topic;
     }
 
     /**

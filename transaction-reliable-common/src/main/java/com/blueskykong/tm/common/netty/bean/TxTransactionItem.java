@@ -1,9 +1,11 @@
 package com.blueskykong.tm.common.netty.bean;
 
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -73,7 +75,7 @@ public class TxTransactionItem implements Serializable {
     /**
      * 服务消息
      */
-    private Object[] args;
+    private List<TransactionMsgAdapter> msgs;
 
     /**
      * 操作结果信息

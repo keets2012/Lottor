@@ -17,11 +17,6 @@ public class SpringCloudTxTransactionAspect extends AbstractTxTransactionAspect 
         this.setTxTransactionInterceptor(springCloudTxTransactionInterceptor);
     }
 
-
-    public void init() {
-
-    }
-
     @Override
     public int getOrder() {
         return -1;

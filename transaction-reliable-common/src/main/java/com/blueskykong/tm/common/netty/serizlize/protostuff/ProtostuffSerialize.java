@@ -2,7 +2,7 @@
 package com.blueskykong.tm.common.netty.serizlize.protostuff;
 
 import com.blueskykong.tm.common.netty.NettyTransferSerialize;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
@@ -23,8 +23,8 @@ public class ProtostuffSerialize implements NettyTransferSerialize {
     @Override
     public Object deserialize(InputStream input) {
         try {
-            HeartBeat message = objenesis.newInstance(HeartBeat.class);
-            Schema<HeartBeat> schema = getSchema(HeartBeat.class);
+            LottorRequest message = objenesis.newInstance(LottorRequest.class);
+            Schema<LottorRequest> schema = getSchema(LottorRequest.class);
             ProtostuffIOUtil.mergeFrom(input, message, schema);
             return message;
         } catch (Exception e) {

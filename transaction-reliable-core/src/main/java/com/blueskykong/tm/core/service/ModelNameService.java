@@ -3,7 +3,6 @@ package com.blueskykong.tm.core.service;
 /**
  * @author keets
  */
-@FunctionalInterface
 public interface ModelNameService {
 
     /**
@@ -12,4 +11,10 @@ public interface ModelNameService {
      * @return applicationName
      */
     String findModelName();
+
+    /**
+     * 获取netty 客户端的元数据信息
+     * @return
+     */
+    String findClientMetaInfo();
 }

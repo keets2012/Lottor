@@ -94,13 +94,7 @@ public abstract class AbstractTxTransactionExecutor implements TxTransactionExec
             LogUtil.info(LOGGER, "事务组id:{},提交失败！数据不完整", () -> txGroupId);
             return false;
         }
-        /**
-         获取当前连接的channel  为什么？
-         因为如果tm是集群环境，可能业务的channel对象连接到不同的tm
-         那么当前的tm可没有其他业务模块的长连接信息，那么就应该做：
-         1.检查当前tm的channel状态，并只提交当前渠道的命令
-         2.通知 连接到其他tm的channel，执行命令
-         */
+
         final List<TxTransactionItem> currentItem = listMap.get(Boolean.TRUE);
 
         final List<TxTransactionItem> elseItems = listMap.get(Boolean.FALSE);

@@ -1,4 +1,3 @@
-
 package com.blueskykong.tm.core.compensation.command;
 
 
@@ -8,7 +7,7 @@ public interface Command {
     /**
      * 执行命令接口
      *
-     * @param txCompensationAction 封装命令信息
+     * @param txOperateAction 封装命令信息
      */
-    void execute(TxCompensationAction txCompensationAction);
+    void execute(TxOperateAction txOperateAction);
 }

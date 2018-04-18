@@ -12,6 +12,8 @@ public class TxTransactionInfo {
     @Getter
     private TransactionInvocation invocation;
 
+    @Getter
+    private Object[] args;
 
     @Getter
     private String txGroupId;

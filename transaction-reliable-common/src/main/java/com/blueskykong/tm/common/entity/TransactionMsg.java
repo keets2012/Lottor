@@ -1,11 +1,13 @@
 package com.blueskykong.tm.common.entity;
 
 import com.blueskykong.tm.common.enums.ConsumedStatus;
+import com.blueskykong.tm.common.holder.DateUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -49,7 +51,7 @@ public class TransactionMsg {
     /**
      * 创建时间
      */
-    private Long createTime = System.currentTimeMillis();
+    private Long createTime = Timestamp.valueOf(DateUtils.getCurrentDateTime()).getTime();
 
     /**
      * 操作结果信息
@@ -67,7 +69,6 @@ public class TransactionMsg {
      * {@linkplain com.blueskykong.tm.common.enums.ConsumedStatus}
      */
     private int consumed = ConsumedStatus.UNCONSUMED.getStatus();
-
 
     public static class Builder {
         private TransactionMsg transactionMsg = new TransactionMsg();
@@ -126,6 +127,14 @@ public class TransactionMsg {
 
         public Builder setConsumed(int consumed) {
             transactionMsg.setConsumed(consumed);
+            return this;
+        }
+
+        public Builder setMessage(String message) {
+            if (StringUtils.isNotBlank(message)) {
+
+                transactionMsg.setMessage(message);
+            }
             return this;
         }
 

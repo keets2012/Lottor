@@ -1,8 +1,9 @@
 package com.blueskykong.tm.server.service.impl;
 
-import com.blueskykong.tm.common.bean.adapter.MongoAdapter;
 import com.blueskykong.tm.common.constant.CommonConstant;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
+import com.blueskykong.tm.common.enums.ConsumedStatus;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.DateUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
@@ -12,8 +13,6 @@ import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.entity.TxTransactionItemAdapter;
 import com.blueskykong.tm.server.service.OutputFactoryService;
 import com.blueskykong.tm.server.service.TxManagerService;
-import com.blueskykong.tm.server.stream.AffairSource;
-import com.blueskykong.tm.server.stream.MaterialSource;
 import com.mongodb.WriteResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,21 +20,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-@EnableBinding({AffairSource.class, MaterialSource.class})
 @Component
 @SuppressWarnings("unchecked")
 public class TxManagerServiceImpl implements TxManagerService {
@@ -43,10 +42,11 @@ public class TxManagerServiceImpl implements TxManagerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TxManagerServiceImpl.class);
 
     private final MongoTemplate mongoTemplate;
+
     private final OutputFactoryService outputFactoryService;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @Autowired(required = false)
     public TxManagerServiceImpl(MongoTemplate mongoTemplate, OutputFactoryService outputFactoryService) {
         this.mongoTemplate = mongoTemplate;
         this.outputFactoryService = outputFactoryService;
@@ -63,16 +63,14 @@ public class TxManagerServiceImpl implements TxManagerService {
         try {
             final String groupId = txTransactionGroup.getId();
 
-            final List<TxTransactionItem> itemList = txTransactionGroup.getItemList();
-            if (CollectionUtils.isNotEmpty(itemList)) {
-                for (TxTransactionItem item : itemList) {
-                    item.setTxGroupId(groupId);
-                    mongoTemplate.insert(item, CollectionNameEnum.TxTransactionItem.name());
-                }
+            final TxTransactionItem item = txTransactionGroup.getItem();
+            if (Objects.nonNull(item)) {
+                item.setTxGroupId(groupId);
+                mongoTemplate.insert(item, CollectionNameEnum.TxTransactionItem.name());
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, "failed to save TxTransactionGroup, groupId is {} and cause is {}",
-                    () -> txTransactionGroup.getId(), () -> e.getLocalizedMessage());
+                    () -> txTransactionGroup.getId(), e::getLocalizedMessage);
             return false;
         }
         return true;
@@ -91,9 +89,9 @@ public class TxManagerServiceImpl implements TxManagerService {
     public Boolean updateTxTransactionItemStatus(String key, String taskKey, int status, Object message) {
         try {
             Query query = new Query();
-            query.addCriteria(new Criteria("txGroupId").is(key).and("taskKey").is(taskKey)).fields().include("createDate").include("args");
+            query.addCriteria(new Criteria("txGroupId").is(key)).fields().include("createDate").include("msgs");
             TxTransactionItem item = mongoTemplate.findOne(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
-            List<LinkedHashMap<String, Object>> msgs = (List<LinkedHashMap<String, Object>>) item.getArgs()[0];
+            List<TransactionMsgAdapter> msgs = item.getMsgs();
             Boolean success = true;
             if (status == TransactionStatusEnum.COMMIT.getCode()) {
                 success = sendTxTransactionMsg(key, msgs);
@@ -124,33 +122,17 @@ public class TxManagerServiceImpl implements TxManagerService {
         return false;
     }
 
-    private Boolean sendTxTransactionMsg(String groupId, List<LinkedHashMap<String, Object>> msgs) {
+
+    private Boolean sendTxTransactionMsg(String groupId, List<TransactionMsgAdapter> msgs) {
         try {
             if (CollectionUtils.isNotEmpty(msgs)) {
-                List<TransactionMsg> msgList = new ArrayList<>();
 
-                msgs.stream().forEach(msg -> {
-                    TransactionMsg transactionMsg = new TransactionMsg.Builder()
-                            .setGroupId(groupId)
-                            .setMethod(String.valueOf(msg.get("method")))
-                            .setSource(String.valueOf(msg.get("source")))
-                            .setTarget(String.valueOf(msg.get("target")))
-                            .setArgs(msg.get("args"))
-                            .setSubTaskId(String.valueOf(msg.get("subTaskId")))
-                            .setCreateTime((Long) msg.get("createTime"))
-                            .setUpdateTime(System.currentTimeMillis())
-                            .setConsumed((Integer) msg.get("consumed"))
-                            .build();
-
-                    LogUtil.debug(LOGGER, "new TransactionMsg is: {}", () -> transactionMsg);
-                    msgList.add(transactionMsg);
-                });
-
-                msgList.forEach(msg -> {
+                msgs.forEach(msg -> {
                     if (msg != null) {
                         msg.setGroupId(groupId);
                         outputFactoryService.sendMsg(msg);
                         mongoTemplate.insert(msg, CollectionNameEnum.TransactionMsg.name());
+                        LogUtil.debug(LOGGER, () -> "success send msg");
                     }
                 });
             }
@@ -161,7 +143,6 @@ public class TxManagerServiceImpl implements TxManagerService {
         }
         return true;
     }
-
 
     /**
      * 更新 TM中的消息状态
@@ -247,6 +228,31 @@ public class TxManagerServiceImpl implements TxManagerService {
     @Override
     public Boolean removeCommitTxGroup() {
         return true;
+    }
+
+    @Override
+    public List<TxTransactionItem> listTxItemByDelay(long delay) {
+
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+        Timestamp ddl = new Timestamp(current.getTime() - delay * 60 * 1000);
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String toStr = "";
+        toStr = sdf.format(ddl);
+        Criteria criteria = Criteria.where("createDate").lte(toStr).and("status").is(TransactionStatusEnum.BEGIN.getCode());
+        Query query = Query.query(criteria);
+        return mongoTemplate.find(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
+    }
+
+    @Override
+    public List<TransactionMsg> listTxMsgByDelay(long delay) {
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+        Timestamp ddl = new Timestamp(current.getTime() - delay * 60 * 1000);
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String toStr = "";
+        toStr = sdf.format(ddl);
+        Criteria criteria = Criteria.where("createTime").lte(toStr).and("status").is(ConsumedStatus.UNCONSUMED.getStatus());
+        Query query = Query.query(criteria);
+        return mongoTemplate.find(query, TransactionMsg.class, CollectionNameEnum.TransactionMsg.name());
     }
 
     /**

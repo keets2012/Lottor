@@ -1,5 +1,6 @@
 package com.blueskykong.tm.core.service;
 
+import com.blueskykong.tm.common.enums.OperationEnum;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
@@ -16,5 +17,5 @@ public interface AspectTransactionService {
      * @return Object
      * @throws Throwable 异常信息
      */
-    Object invoke(String transactionGroupId, ProceedingJoinPoint point) throws Throwable;
+    Object invoke(String transactionGroupId, Object[] point, OperationEnum operationEnum) ;
 }

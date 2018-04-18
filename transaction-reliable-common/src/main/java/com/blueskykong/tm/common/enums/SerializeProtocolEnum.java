@@ -43,6 +43,7 @@ public enum SerializeProtocolEnum {
                 Arrays.stream(SerializeProtocolEnum.values())
                         .filter(v -> Objects.equals(v.getSerializeProtocol(), serializeProtocol))
                         .findFirst();
+
         return serializeProtocolEnum.orElse(SerializeProtocolEnum.KRYO);
 
     }

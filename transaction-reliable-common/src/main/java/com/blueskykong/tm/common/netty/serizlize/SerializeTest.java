@@ -1,11 +1,10 @@
-
 package com.blueskykong.tm.common.netty.serizlize;
 
 
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.common.netty.serizlize.kryo.KryoPoolFactory;
@@ -19,11 +18,11 @@ import java.util.List;
 
 public class SerializeTest {
 
-    private static final int MAX=1000;
+    private static final int MAX = 1000;
 
     public static void main(String[] args) throws IOException {
         final long start = System.currentTimeMillis();
-        for (int i = 0; i <MAX ; i++) {
+        for (int i = 0; i < MAX; i++) {
             KryoSerialize kryoSerialization = new KryoSerialize(KryoPoolFactory.getKryoPoolInstance());
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             String groupId = IdWorkerUtils.getInstance().createGroupId();
@@ -47,11 +46,11 @@ public class SerializeTest {
             txTransactionGroup.setItemList(items);
 
 
-            HeartBeat heartBeat = new HeartBeat();
-            heartBeat.setAction(NettyMessageActionEnum.HEART.getCode());
-            heartBeat.setTxTransactionGroup(txTransactionGroup);
+            LottorRequest lottorRequest = new LottorRequest();
+            lottorRequest.setAction(NettyMessageActionEnum.HEART.getCode());
+            lottorRequest.setTxTransactionGroup(txTransactionGroup);
 
-            kryoSerialization.serialize(byteArrayOutputStream, heartBeat);
+            kryoSerialization.serialize(byteArrayOutputStream, lottorRequest);
 
 
             byte[] body = byteArrayOutputStream.toByteArray();
@@ -59,16 +58,12 @@ public class SerializeTest {
 
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body);
 
-            final HeartBeat heartBeat1 = (HeartBeat)
+            final LottorRequest lottorRequest1 = (LottorRequest)
                     kryoSerialization.deserialize(byteArrayInputStream);
 
         }
         final long end = System.currentTimeMillis();
 
-        System.out.println((end-start)/1000);
-
-
-
-
+        System.out.println((end - start) / 1000);
     }
 }

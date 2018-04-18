@@ -1,6 +1,7 @@
 
 package com.blueskykong.tm.core.interceptor;
 
+import com.blueskykong.tm.common.enums.OperationEnum;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
@@ -14,7 +15,7 @@ public interface TxTransactionInterceptor {
      *
      * @param pjp spring事务切点
      * @return Object
-     * @throws Throwable 异常
+     * @ 异常
      */
-    Object interceptor(ProceedingJoinPoint pjp) throws Throwable;
+    Object interceptor(Object[] pjp, OperationEnum operationEnum);
 }

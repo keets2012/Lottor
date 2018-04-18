@@ -13,7 +13,6 @@ public enum NettyMessageActionEnum {
      */
     CREATE_GROUP(0, "创建事务组"),
 
-
     /**
      * Add transaction netty message action enum.
      */
@@ -71,7 +70,13 @@ public enum NettyMessageActionEnum {
     GET_TRANSACTION_GROUP_STATUS(11, "获取事务组状态"),
 
 
-    FIND_TRANSACTION_GROUP_INFO(12, "获取事务组信息");
+    FIND_TRANSACTION_GROUP_INFO(12, "获取事务组信息"),
+
+    SYNC_TX_STATUS(13, "同步事务组信息"),
+
+    GET_TRANSACTION_MSG_STATUS(14, "获取事务消息消费状态"),
+
+    SYNC_MSG_STATUS(15, "同步事务消息状态");
 
     private int code;
 

@@ -4,6 +4,7 @@ import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -59,9 +60,7 @@ public interface TxManagerService {
     /**
      * 更新 TM中的消息状态
      *
-     * @param key
-     * @param hashKey
-     * @param status
+     * @param transactionMsg
      */
     Boolean updateTxTransactionMsgStatus(TransactionMsg transactionMsg);
 
@@ -81,7 +80,9 @@ public interface TxManagerService {
      */
     Boolean removeCommitTxGroup();
 
+    List<TxTransactionItem> listTxItemByDelay(long delay);
 
+    List<TransactionMsg> listTxMsgByDelay(long delay);
     /**
      * 删除回滚的事务组
      *

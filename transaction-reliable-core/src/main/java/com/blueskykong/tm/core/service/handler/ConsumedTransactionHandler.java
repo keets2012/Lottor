@@ -4,6 +4,7 @@ import com.blueskykong.tm.common.bean.TxTransactionInfo;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.ConsumedStatus;
 import com.blueskykong.tm.common.holder.LogUtil;
+import com.blueskykong.tm.core.compensation.TxOperateService;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import com.blueskykong.tm.core.service.TxTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -22,39 +23,38 @@ public class ConsumedTransactionHandler implements TxTransactionHandler {
 
     private final TxManagerMessageService txManagerMessageService;
 
+    private final TxOperateService txOperateService;
+
     @Autowired
-    public ConsumedTransactionHandler(TxManagerMessageService txManagerMessageService) {
+    public ConsumedTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateService txOperateService) {
         this.txManagerMessageService = txManagerMessageService;
+        this.txOperateService = txOperateService;
     }
 
     @Override
-    public Object handler(ProceedingJoinPoint point, TxTransactionInfo info) throws Throwable {
-        LogUtil.info(LOGGER, "tx-transaction confirm,  事务确认类：{}",
-                () -> point.getTarget().getClass());
+    public Object handler(TxTransactionInfo info) {
+        LogUtil.info(LOGGER, "tx-transaction confirm,  事务确认类：{}", () -> "");
         try {
-            //发起调用
-            final Object res = point.proceed();
-
             int status;
-            if (info.getInvocation().getArgumentValues().length != 2) {
+            if (info.getArgs().length != 2) {
                 throw new IllegalArgumentException("wrong arguments for consuming!");
             }
-            if ((Boolean) info.getInvocation().getArgumentValues()[1] == true) {
+            if ((Boolean) info.getArgs()[1] == true) {
                 status = ConsumedStatus.CONSUMED_SUCCESS.getStatus();
             } else {
                 status = ConsumedStatus.CONSUMED_FAILURE.getStatus();
             }
             LogUtil.debug(LOGGER, "consume status: {}", () -> status);
-            TransactionMsg transactionMsg = (TransactionMsg) info.getInvocation().getArgumentValues()[0];
+            TransactionMsg transactionMsg = (TransactionMsg) info.getArgs()[0];
             transactionMsg.setConsumed(status);
-            //通知tm完成事务
-            CompletableFuture.runAsync(() ->
-                    txManagerMessageService
-                            .asyncCompleteConsume(transactionMsg));
+            transactionMsg.setUpdateTime(System.currentTimeMillis());
+            //通知tm完成事务消息消费
+            CompletableFuture.runAsync(() -> txManagerMessageService.asyncCompleteConsume(transactionMsg));
+            //完成消费为异步，本地记录结果
+            txOperateService.saveTransactionMsg(transactionMsg);
 
-            LogUtil.info(LOGGER, "tx-transaction 消费完成, 事务发起类：{}",
-                    () -> point.getTarget().getClass());
-            return res;
+            LogUtil.info(LOGGER, "tx-transaction 消费完成, 事务发起类：{}", () -> "");
+            return "";
         } catch (final Throwable throwable) {
             LogUtil.error(LOGGER, throwable::getLocalizedMessage);
             throw throwable;

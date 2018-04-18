@@ -1,8 +1,7 @@
 package com.blueskykong.tm.server.service;
 
 
-import com.blueskykong.tm.common.entity.TransactionMsg;
-import com.blueskykong.tm.common.enums.ServiceNameEnum;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 
 /**
  * @author keets
@@ -15,6 +14,6 @@ public interface OutputFactoryService<T> {
      * @param msg
      * @return Boolean
      */
-    Boolean sendMsg(TransactionMsg msg);
+    Boolean sendMsg(TransactionMsgAdapter msg);
 
 }

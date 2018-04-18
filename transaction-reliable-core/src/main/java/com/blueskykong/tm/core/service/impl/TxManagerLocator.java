@@ -6,7 +6,7 @@ import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.entity.TxManagerServiceDTO;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.holder.httpclient.OkHttpTools;
-import com.blueskykong.tm.core.concurrent.threadpool.TxTransactionThreadFactory;
+import com.blueskykong.tm.common.concurrent.threadpool.TxTransactionThreadFactory;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import lombok.Setter;
@@ -19,6 +19,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +62,7 @@ public class TxManagerLocator {
                 TxTransactionThreadFactory.create("TxManagerLocator", true));
     }
 
+    //todo 逻辑优化
 
     /**
      * 获取TxManager 服务信息
@@ -82,7 +84,6 @@ public class TxManagerLocator {
                 try {
                     return OkHttpTools.getInstance().get(url, null, TxManagerServer.class);
                 } catch (Throwable ex) {
-                    ex.printStackTrace();
                     LogUtil.error(LOGGER, "loadTxManagerServer fail exception:{}", ex::getMessage);
                 }
             }
@@ -103,7 +104,7 @@ public class TxManagerLocator {
     public void schedulePeriodicRefresh() {
         this.mExecutorservice.scheduleAtFixedRate(
                 () -> {
-                    LogUtil.info(LOGGER, "refresh updateTxManagerServices delayTime:{}", () -> txConfig.getRefreshInterval());
+                    LogUtil.debug(LOGGER, "refresh updateTxManagerServices delayTime:{}", () -> txConfig.getRefreshInterval());
                     updateTxManagerServices();
                 }, 0, txConfig.getRefreshInterval(),
                 TimeUnit.SECONDS);
@@ -124,7 +125,6 @@ public class TxManagerLocator {
                 mConfigservices.set(serviceDTOList);
                 return;
             } catch (Throwable e) {
-                e.printStackTrace();
                 LogUtil.error(LOGGER, "updateTxManagerServices fail exception:{}", e::getMessage);
                /* throw new TransactionRuntimeException(
                         String.format("Get config services failed from %s", url), ex);*/
@@ -138,7 +138,7 @@ public class TxManagerLocator {
         return managerInstances.stream().map(manager -> {
             String tmpUrl = "http://" + manager.getHost() + ":" + manager.getPort();
             return String.join("", tmpUrl, CommonConstant.TX_MANAGER_PRE, CommonConstant.LOAD_TX_MANAGER_SERVICE_URL);
-        }).findFirst().get();
+        }).filter(Objects::nonNull).findFirst().get();
     }
 
 }

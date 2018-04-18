@@ -2,7 +2,7 @@
 package com.blueskykong.tm.common.netty.serizlize.kryo;
 
 
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.pool.KryoFactory;
 import com.esotericsoftware.kryo.pool.KryoPool;
@@ -16,7 +16,7 @@ public class KryoPoolFactory {
     private KryoFactory factory = () -> {
         Kryo kryo = new Kryo();
         kryo.setReferences(false);
-        kryo.register(HeartBeat.class);
+        kryo.register(LottorRequest.class);
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         return kryo;
     };

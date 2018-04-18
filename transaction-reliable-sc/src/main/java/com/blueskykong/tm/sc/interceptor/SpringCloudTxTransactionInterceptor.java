@@ -1,6 +1,7 @@
 package com.blueskykong.tm.sc.interceptor;
 
-import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionLocal;
+import com.blueskykong.tm.common.concurrent.threadlocal.TxTransactionLocal;
+import com.blueskykong.tm.common.enums.OperationEnum;
 import com.blueskykong.tm.core.interceptor.TxTransactionInterceptor;
 import com.blueskykong.tm.core.service.AspectTransactionService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,11 +21,11 @@ public class SpringCloudTxTransactionInterceptor implements TxTransactionInterce
 
 
     @Override
-    public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
+    public Object interceptor(Object[] pjp, OperationEnum operationEnum) {
 
         String groupId = TxTransactionLocal.getInstance().getTxGroupId();
 
-        return aspectTransactionService.invoke(groupId, pjp);
+        return aspectTransactionService.invoke(groupId, pjp, operationEnum);
     }
 
 }

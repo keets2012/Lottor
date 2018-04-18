@@ -1,4 +1,3 @@
-
 package com.blueskykong.tm.common.serializer;
 
 import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
