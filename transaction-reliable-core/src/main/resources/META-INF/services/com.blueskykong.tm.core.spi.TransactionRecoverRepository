@@ -1,0 +1,3 @@
+com.blueskykong.tm.core.spi.repository.JdbcTransactionRecoverRepository
+com.blueskykong.tm.core.spi.repository.MongoTransactionRecoverRepository
+com.blueskykong.tm.core.spi.repository.RedisTransactionRecoverRepository
