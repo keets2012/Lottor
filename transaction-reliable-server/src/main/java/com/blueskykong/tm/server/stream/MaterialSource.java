@@ -7,7 +7,7 @@ import org.springframework.messaging.MessageChannel;
  * @author keets
  */
 public interface MaterialSource {
-    String OUTPUT = "material-output";
+    String OUTPUT = "tx-material-output";
 
     @Output(OUTPUT)
     MessageChannel output();

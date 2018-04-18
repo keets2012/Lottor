@@ -7,7 +7,7 @@ import org.springframework.messaging.MessageChannel;
  * @author keets
  */
 public interface AffairSource {
-    String OUTPUT = "affair-output";
+    String OUTPUT = "tx-affair-output";
 
     @Output(OUTPUT)
     MessageChannel output();
