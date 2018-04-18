@@ -79,31 +79,34 @@ public class NettyServerServiceImpl implements NettyService {
 
 
     private void groups(ServerBootstrap b, int workThreads) {
-//        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
-//            bossGroup = new EpollEventLoopGroup(1);
-//            workerGroup = new EpollEventLoopGroup(workThreads);
-//            b.group(bossGroup, workerGroup)
-//                    .channel(EpollServerSocketChannel.class)
-//                    .option(EpollChannelOption.TCP_CORK, true)
-//                    .option(EpollChannelOption.SO_KEEPALIVE, true)
-//                    .option(EpollChannelOption.SO_BACKLOG, 100)
-//                    .option(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-//                    .childOption(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-//                    .handler(new LoggingHandler(LogLevel.INFO))
-//                    .childHandler(nettyServerHandlerInitializer);
-//        } else {
-            bossGroup = new NioEventLoopGroup();
-            workerGroup = new NioEventLoopGroup(workThreads);
+        /**
+         * ubuntu系统不能很好的适配EpollEventLoopGroup，暂时不启用
+         */
+/*        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+            bossGroup = new EpollEventLoopGroup(1);
+            workerGroup = new EpollEventLoopGroup(workThreads);
             b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 100)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .channel(EpollServerSocketChannel.class)
+                    .option(EpollChannelOption.TCP_CORK, true)
+                    .option(EpollChannelOption.SO_KEEPALIVE, true)
+                    .option(EpollChannelOption.SO_BACKLOG, 100)
+                    .option(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(nettyServerHandlerInitializer);
+        } else {*/
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup(workThreads);
+        b.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 100)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(nettyServerHandlerInitializer);
 //        }
     }
 
