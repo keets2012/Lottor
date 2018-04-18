@@ -155,7 +155,7 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
         Map<String, String> res = new HashMap<>();
         for (int i = limit; i-- > 0; ) {
             Timestamp yesterday = new Timestamp(current.getTime() - oneDayMillis);
-            res.put("" + i, String.valueOf(countTxMsgs(yesterday, current)));
+            res.put("" + current, String.valueOf(countTxMsgs(yesterday, current)));
             current = yesterday;
         }
 

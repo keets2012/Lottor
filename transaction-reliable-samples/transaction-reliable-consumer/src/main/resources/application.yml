@@ -72,4 +72,4 @@ tx:
     netty-serializer: kryo
     blocking-queue-type: Linked
     compensation: false
-    tx-manager-id: tm-server
+    tx-manager-id: lotor
