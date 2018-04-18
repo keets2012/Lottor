@@ -21,7 +21,7 @@ public interface ExternalNettyService {
      *
      * @param success
      */
-    public void postSend(Boolean success);
+    public void postSend(Boolean success, Object message);
 
     /**
      * msgs after consuming

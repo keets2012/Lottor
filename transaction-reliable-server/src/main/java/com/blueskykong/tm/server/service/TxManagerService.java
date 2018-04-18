@@ -59,9 +59,7 @@ public interface TxManagerService {
     /**
      * 更新 TM中的消息状态
      *
-     * @param key
-     * @param hashKey
-     * @param status
+     * @param transactionMsg
      */
     Boolean updateTxTransactionMsgStatus(TransactionMsg transactionMsg);
 

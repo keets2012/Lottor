@@ -32,20 +32,23 @@ public class PayServiceImpl implements PayService {
         transactionMsg.setSource("producer");
         transactionMsg.setTarget("affair");
         transactionMsg.setArgs(null);
+        transactionMsg.setMethod("createAffair");
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         nettyService.preSend(Collections.singletonList(transactionMsg));
 
         try {
             LogUtil.debug(LOGGER, () -> "执行本地事务！");
 /*            if (Objects.nonNull(transactionMsg)) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("check your parameter!");
             }*/
+/*            int i = 2;
+            int j = i/0;*/
         } catch (Exception e) {
-            nettyService.postSend(false);
+            nettyService.postSend(false, e.getLocalizedMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
             return false;
         }
-        nettyService.postSend(true);
+        nettyService.postSend(true, null);
         return true;
     }
 }

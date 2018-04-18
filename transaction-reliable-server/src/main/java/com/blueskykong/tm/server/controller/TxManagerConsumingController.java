@@ -72,7 +72,7 @@ public class TxManagerConsumingController {
             orders.add(new Sort.Order(direction, "createDate"));
         }
         if ((Object) pageNum != null) {
-            LogUtil.debug(LOGGER, "query for fail consume msgs, pageNum", () -> pageNum);
+            LogUtil.debug(LOGGER, "query for fail consume msgs, pageNum is {}", () -> pageNum);
             pageable.setPagenumber(pageNum);
         } else {
             pageable.setPagenumber(1);
