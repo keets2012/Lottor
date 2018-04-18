@@ -1,5 +1,6 @@
 package com.blueskykong.tm.server.service.impl;
 
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.entity.TxManagerServiceDTO;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
@@ -186,6 +187,21 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
             }
         });
 
+        return res;
+    }
+
+    /**
+     * total msgs
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Long> totalMsgs() {
+        Map<String, Long> res = new HashMap<>();
+        Long items = mongoTemplate.count(new Query(), TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
+        res.put("item", items);
+        Long msgs = mongoTemplate.count(new Query(), TransactionMsg.class, CollectionNameEnum.TransactionMsg.name());
+        res.put("msg", msgs);
         return res;
     }
 
