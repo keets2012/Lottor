@@ -3,7 +3,7 @@ package com.blueskykong.tm.server.config;
 
 public interface Constant {
 
-    String APPLICATION_NAME = "tm-server";
+    String APPLICATION_NAME = "lotor";
 
     String REDIS_PRE_FIX = "transaction:group:%s";
 
