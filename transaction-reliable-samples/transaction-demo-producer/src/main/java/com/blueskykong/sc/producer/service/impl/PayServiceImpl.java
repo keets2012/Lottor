@@ -44,7 +44,7 @@ public class PayServiceImpl implements PayService {
             int i = 2;
             int j = i/0;
         } catch (Exception e) {
-            nettyService.postSend(false, e.getLocalizedMessage());
+            nettyService.postSend(false, e.getMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
             return false;
         }

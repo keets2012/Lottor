@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -57,16 +58,23 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
 
     private MongoTemplate mongoTemplate;
 
+    private RestTemplate restTemplate;
+
     @Value("${redisSaveMaxTime}")
     private int redisSaveMaxTime;
 
     @Value("${transactionWaitMaxTime}")
     private int transactionWaitMaxTime;
 
-    public TxManagerInfoServiceImpl(DiscoveryService discoveryService, NettyConfig nettyConfig, MongoTemplate mongoTemplate) {
+    @Value("${spring.cloud.consul.host}")
+    private String localHost;
+
+    public TxManagerInfoServiceImpl(DiscoveryService discoveryService, NettyConfig nettyConfig, MongoTemplate mongoTemplate,
+                                    RestTemplate restTemplate) {
         this.discoveryService = discoveryService;
         this.nettyConfig = nettyConfig;
         this.mongoTemplate = mongoTemplate;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -78,7 +86,7 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
     public TxManagerServer findTxManagerServer() {
         final List<ServiceInstance> tmService = findTMService();
         if (CollectionUtils.isNotEmpty(tmService)) {
-            final List<TxManagerInfo> txManagerInfos = findTxManagerInfo();
+            final List<TxManagerInfo> txManagerInfos = findClusterInfo();
 
             if (CollectionUtils.isNotEmpty(txManagerInfos)) {
                 //获取连接数最多的服务  想要把所有的业务长连接，连接到同一个tm，但是又不能超过最大的连接
@@ -86,7 +94,7 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
                         txManagerInfos.stream().filter(Objects::nonNull)
                                 .filter(info -> info.getNowConnection() < info.getMaxConnection())
                                 .sorted(Comparator.comparingInt(TxManagerInfo::getNowConnection).reversed())
-                                .findFirst();
+                                .findAny();
                 if (txManagerInfoOptional.isPresent()) {
                     final TxManagerInfo txManagerInfo = txManagerInfoOptional.get();
                     TxManagerServer txManagerServer = new TxManagerServer();
@@ -106,20 +114,28 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
      * @return TxManagerInfo
      */
     @Override
-    public List<TxManagerInfo> findTxManagerInfo() {
-        List<TxManagerInfo> txManagerInfos = new ArrayList<>();
+    public TxManagerInfo findTxManagerInfo() {
         List<ServiceInstance> serviceInstances = findTMService();
         //设置ip为服务发现注册的TxManager ip
-        serviceInstances.stream().forEach(serviceInstance -> {
-                    TxManagerInfo txManagerInfo = new TxManagerInfo();
-                    String ip = serviceInstance.getHost();
-                    txManagerInfo.setIp(ip);
-                    txManagerInfo.setPort(nettyConfig.getPort());
-                    txManagerInfo.setMaxConnection(SocketManager.getInstance().getMaxConnection());
-                    txManagerInfo.setNowConnection(SocketManager.getInstance().getNowConnection());
-                    txManagerInfo.setTransactionWaitMaxTime(transactionWaitMaxTime);
-                    txManagerInfo.setRedisSaveMaxTime(redisSaveMaxTime);
-                    txManagerInfo.setClusterInfoList(serviceInstances.stream().map(instance -> instance.getHost()).collect(Collectors.toList()));
+        TxManagerInfo txManagerInfo = new TxManagerInfo();
+        txManagerInfo.setIp(localHost);
+        txManagerInfo.setPort(nettyConfig.getPort());
+        txManagerInfo.setMaxConnection(SocketManager.getInstance().getMaxConnection());
+        txManagerInfo.setNowConnection(SocketManager.getInstance().getNowConnection());
+        txManagerInfo.setTransactionWaitMaxTime(transactionWaitMaxTime);
+        txManagerInfo.setRedisSaveMaxTime(redisSaveMaxTime);
+        txManagerInfo.setClusterInfoList(serviceInstances.stream().map(instance -> instance.getHost()).collect(Collectors.toList()));
+        return txManagerInfo;
+    }
+
+    @Override
+    public List<TxManagerInfo> findClusterInfo() {
+        List<TxManagerInfo> txManagerInfos = new ArrayList<>();
+        List<ServiceInstance> serviceInstances = findTMService();
+
+        //设置ip为服务发现注册的TxManager ip
+        serviceInstances.stream().filter(Objects::nonNull).forEach(serviceInstance -> {
+                    TxManagerInfo txManagerInfo = restTemplate.getForObject("http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/tx/manager/findTxManagerInfo", TxManagerInfo.class);
                     txManagerInfos.add(txManagerInfo);
                 }
         );
