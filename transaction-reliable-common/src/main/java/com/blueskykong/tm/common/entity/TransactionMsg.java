@@ -1,6 +1,7 @@
 package com.blueskykong.tm.common.entity;
 
 import com.blueskykong.tm.common.enums.ConsumedStatus;
+import com.blueskykong.tm.common.holder.DateUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -49,7 +50,7 @@ public class TransactionMsg {
     /**
      * 创建时间
      */
-    private Long createTime = System.currentTimeMillis();
+    private Long createTime = Timestamp.valueOf(DateUtils.getCurrentDateTime()).getTime();
 
     /**
      * 操作结果信息

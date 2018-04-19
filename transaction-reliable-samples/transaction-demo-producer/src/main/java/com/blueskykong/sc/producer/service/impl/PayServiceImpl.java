@@ -41,8 +41,8 @@ public class PayServiceImpl implements PayService {
 /*            if (Objects.nonNull(transactionMsg)) {
                 throw new IllegalArgumentException("check your parameter!");
             }*/
-/*            int i = 2;
-            int j = i/0;*/
+            int i = 2;
+            int j = i/0;
         } catch (Exception e) {
             nettyService.postSend(false, e.getLocalizedMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");

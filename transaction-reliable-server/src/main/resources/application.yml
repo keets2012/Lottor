@@ -23,8 +23,8 @@ spring:
                 virtual-host: /user
   data:
     mongodb:
-      authentication-database: new_test
-      database: new_test
+      authentication-database: lotor_test
+      database: lotor_test
       field-naming-strategy: # Fully qualified name of the FieldNamingStrategy to use.
       #grid-fs-database: # GridFS database name.
       password: root123

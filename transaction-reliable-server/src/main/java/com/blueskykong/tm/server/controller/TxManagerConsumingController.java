@@ -69,7 +69,7 @@ public class TxManagerConsumingController {
         if (sortFiled != null) {
             orders.add(new Sort.Order(direction, sortFiled));
         } else {
-            orders.add(new Sort.Order(direction, "createDate"));
+            orders.add(new Sort.Order(direction, "createTime"));
         }
         if ((Object) pageNum != null) {
             LogUtil.debug(LOGGER, "query for fail consume msgs, pageNum is {}", () -> pageNum);
