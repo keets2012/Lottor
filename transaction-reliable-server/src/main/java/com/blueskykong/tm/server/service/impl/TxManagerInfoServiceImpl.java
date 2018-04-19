@@ -66,7 +66,7 @@ public class TxManagerInfoServiceImpl implements TxManagerInfoService {
     @Value("${transactionWaitMaxTime}")
     private int transactionWaitMaxTime;
 
-    @Value("${spring.cloud.consul.host}")
+    @Value("${spring.cloud.consul.discovery.ip-address}")
     private String localHost;
 
     public TxManagerInfoServiceImpl(DiscoveryService discoveryService, NettyConfig nettyConfig, MongoTemplate mongoTemplate,
