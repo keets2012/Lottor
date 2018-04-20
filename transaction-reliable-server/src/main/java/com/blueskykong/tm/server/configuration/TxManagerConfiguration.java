@@ -105,4 +105,11 @@ public class TxManagerConfiguration {
         }
     }
 
+    @Configuration
+    static class RestConfiguration {
+        @Bean
+        public RestTemplate getRestTemplate() {
+            return new RestTemplate();
+        }
+    }
 }

@@ -38,7 +38,7 @@ public class StreamListener {
 //        message.get
             LOGGER.info("===============consume notification message: =======================" + message.toString());
             if (Objects.nonNull(message)) {
-                throw new RuntimeException();
+                int i = 1/0;
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, e::getLocalizedMessage);

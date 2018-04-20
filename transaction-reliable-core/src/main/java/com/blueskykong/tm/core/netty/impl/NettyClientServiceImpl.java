@@ -94,7 +94,8 @@ public class NettyClientServiceImpl implements NettyClientService {
     }
 
     private void groups(Bootstrap bootstrap, int workThreads) {
-        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+        //暂时不使用EpollEventLoopGroup，Ubuntu报错
+/*        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
             workerGroup = new EpollEventLoopGroup(workThreads);
             bootstrap.group(workerGroup);
             bootstrap.channel(EpollSocketChannel.class);
@@ -104,19 +105,19 @@ public class NettyClientServiceImpl implements NettyClientService {
                     .option(EpollChannelOption.SO_BACKLOG, 1024)
                     .option(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .handler(nettyClientHandlerInitializer);
-        } else {
-            workerGroup = new NioEventLoopGroup(workThreads);
-            bootstrap.group(workerGroup);
-            bootstrap.channel(NioSocketChannel.class);
-            bootstrap.option(ChannelOption.SO_BACKLOG, 1024)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .handler(nettyClientHandlerInitializer);
-        }
+                    .handler(nettyClientHandlerInitializer);*/
+//        } else {
+        workerGroup = new NioEventLoopGroup(workThreads);
+        bootstrap.group(workerGroup);
+        bootstrap.channel(NioSocketChannel.class);
+        bootstrap.option(ChannelOption.SO_BACKLOG, 1024)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .handler(nettyClientHandlerInitializer);
+
     }
 
 

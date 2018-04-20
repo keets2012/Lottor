@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -138,7 +139,7 @@ public class TxManagerServiceImpl implements TxManagerService {
                             .setArgs(msg.get("args"))
                             .setSubTaskId(String.valueOf(msg.get("subTaskId")))
                             .setCreateTime((Long) msg.get("createTime"))
-                            .setUpdateTime(System.currentTimeMillis())
+                            .setUpdateTime(Timestamp.valueOf(DateUtils.getCurrentDateTime()).getTime())
                             .setConsumed((Integer) msg.get("consumed"))
                             .build();
 

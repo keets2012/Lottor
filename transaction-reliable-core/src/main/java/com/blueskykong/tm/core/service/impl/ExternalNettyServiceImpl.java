@@ -27,7 +27,7 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
 
     @Override
     @ReliableTransaction(OperationEnum.TX_COMPLETE)
-    public void postSend(Boolean success) {
+    public void postSend(Boolean success, Object message) {
         LogUtil.info(LOGGER, "发送confirm消息, {} ", () -> success);
     }
 

@@ -117,7 +117,7 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         //设置创建时间
         item.setCreateDate(DateUtils.getCurrentDateTime());
         //设置执行类名称
-        item.setTargetClass(info.getInvocation().getTargetClazz().getName());
+        item.setTargetClass(info.getInvocation().getTargetClazz().getName() );
         //设置执行类方法
         item.setTargetMethod(info.getInvocation().getMethod());
         //设置参数

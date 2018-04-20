@@ -49,7 +49,7 @@ public class TxManagerController {
     }
 
     @GetMapping("/findTxManagerInfo")
-    public List<TxManagerInfo> findTxManagerInfo() {
+    public TxManagerInfo findTxManagerInfo() {
         return txManagerInfoService.findTxManagerInfo();
     }
 
@@ -69,6 +69,11 @@ public class TxManagerController {
     @GetMapping("/analysis")
     public Map<String, Long> totalMsgs() {
         return txManagerInfoService.totalMsgs();
+    }
+
+    @GetMapping("/cluster-info")
+    public List<TxManagerInfo> getTxManagerDetails() {
+        return txManagerInfoService.findClusterInfo();
     }
 
     /**

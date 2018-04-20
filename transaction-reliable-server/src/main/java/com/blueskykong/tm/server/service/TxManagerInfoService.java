@@ -26,7 +26,7 @@ public interface TxManagerInfoService {
      *
      * @return TxManagerInfo
      */
-    List<TxManagerInfo> findTxManagerInfo();
+    TxManagerInfo findTxManagerInfo();
 
     /**
      * 获取eureka上的注册服务
@@ -35,6 +35,12 @@ public interface TxManagerInfoService {
      */
     List<TxManagerServiceDTO> loadTxManagerService();
 
+    /**
+     * 获取集群信息
+     *
+     * @return
+     */
+    public List<TxManagerInfo> findClusterInfo();
 
     /**
      * 按照日期获取tx的数量

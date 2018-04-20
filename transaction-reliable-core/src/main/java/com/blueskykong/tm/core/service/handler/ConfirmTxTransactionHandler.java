@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -45,7 +46,6 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
         try {
             //发起调用
             final Object res = point.proceed();
-
             int status;
             if ((Boolean) info.getInvocation().getArgumentValues()[0] == true) {
                 status = TransactionStatusEnum.COMMIT.getCode();
@@ -53,14 +53,24 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
                 txCompensationCommand.removeTxCompensation(groupId);
             } else {
                 status = TransactionStatusEnum.ROLLBACK.getCode();
-            }
-            LogUtil.debug(LOGGER, "comfirm status: {}", () -> status);
 
-            //通知tm完成事务
-            CompletableFuture.runAsync(() ->
-                    txManagerMessageService
-                            .asyncCompleteCommit(groupId, waitKey,
-                                    status, res));
+            }
+            LogUtil.debug(LOGGER, "confirm status: {}", () -> status);
+
+            if (Objects.nonNull(info.getInvocation().getArgumentValues()[1])) {
+                final Object exceptionMsg = info.getInvocation().getArgumentValues()[1];
+                //通知tm完成事务
+                CompletableFuture.runAsync(() ->
+                        txManagerMessageService
+                                .asyncCompleteCommit(groupId, waitKey,
+                                        status, exceptionMsg));
+            } else {
+                CompletableFuture.runAsync(() ->
+                        txManagerMessageService
+                                .asyncCompleteCommit(groupId, waitKey,
+                                        status, res));
+            }
+
 
             LogUtil.info(LOGGER, "tx-transaction end, 事务发起类：{}",
                     () -> point.getTarget().getClass());
