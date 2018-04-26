@@ -55,9 +55,10 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
         net_state = true;
         HeartBeat heartBeat = (HeartBeat) msg;
+        String server_ctx = ctx.channel().remoteAddress().toString();
         final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(heartBeat.getAction());
-        LogUtil.debug(LOGGER, "接收服务端据命令为,执行的动作为:{}", actionEnum::getDesc);
-       /* executorService.execute(() -> {*/
+        LogUtil.debug(LOGGER, "接收服务端 {} ，执行的动作为:{}", () -> server_ctx, actionEnum::getDesc);
+        /* executorService.execute(() -> {*/
         try {
             switch (actionEnum) {
                 case HEART:
@@ -89,7 +90,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         } finally {
             ReferenceCountUtil.release(msg);
         }
-       /* });*/
+        /* });*/
 
     }
 

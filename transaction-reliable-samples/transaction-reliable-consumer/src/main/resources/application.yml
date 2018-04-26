@@ -9,7 +9,7 @@ spring:
   cloud:
     consul:
       host: 192.168.1.204
-      port: 8501
+      port: 8500
       discovery:
         ip-address: ${HOST_ADDRESS:localhost}
         port: ${SERVER_PORT:${server.port}}

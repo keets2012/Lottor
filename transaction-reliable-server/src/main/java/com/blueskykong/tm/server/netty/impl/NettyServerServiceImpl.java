@@ -70,7 +70,8 @@ public class NettyServerServiceImpl implements NettyService {
             nettyServerHandlerInitializer.setServletExecutor(servletExecutor);
             ServerBootstrap b = new ServerBootstrap();
             groups(b, MAX_THREADS << 1);
-            b.bind(nettyConfig.getPort());
+            b.bind( nettyConfig.getPort());
+//            b.bi
             LOGGER.info("netty service started on port: " + nettyConfig.getPort());
         } catch (Exception e) {
             e.printStackTrace();
