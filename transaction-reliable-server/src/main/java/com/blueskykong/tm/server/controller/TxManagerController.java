@@ -3,9 +3,13 @@ package com.blueskykong.tm.server.controller;
 import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.entity.TxManagerServiceDTO;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
+import com.blueskykong.tm.server.entity.ChannelInfo;
 import com.blueskykong.tm.server.entity.TxManagerInfo;
 import com.blueskykong.tm.server.service.TxManagerInfoService;
 import com.blueskykong.tm.server.service.execute.HttpTransactionExecutor;
+import com.blueskykong.tm.server.socket.SocketManager;
+import io.netty.channel.Channel;
+import io.netty.channel.DefaultChannelPipeline;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +39,21 @@ public class TxManagerController {
     public TxManagerController(TxManagerInfoService txManagerInfoService, HttpTransactionExecutor transactionExecutor) {
         this.txManagerInfoService = txManagerInfoService;
         this.httpTransactionExecutor = transactionExecutor;
+    }
+
+    @GetMapping
+    public List<ChannelInfo> getChannel() {
+        List<Channel> channels = SocketManager.getInstance().getClients();
+        List<ChannelInfo> addrs = new ArrayList<>(2);
+        channels.stream().forEach(channel -> {
+            DefaultChannelPipeline channelPipeline = (DefaultChannelPipeline) channel.pipeline();
+            System.out.println(channel.pipeline().toString());
+            ChannelInfo channelInfo = new ChannelInfo();
+            channelInfo.setClient(channel.remoteAddress().toString());
+            channelInfo.setServer(channel.localAddress().toString());
+            addrs.add(channelInfo);
+        });
+        return addrs;
     }
 
     @ResponseBody

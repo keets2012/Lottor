@@ -49,10 +49,11 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         HeartBeat hb = (HeartBeat) msg;
         TxTransactionGroup txTransactionGroup = hb.getTxTransactionGroup();
+        String client_ctx = ctx.channel().remoteAddress().toString();
         List<TxTransactionItem> items = null;
         try {
             final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(hb.getAction());
-            LogUtil.debug(LOGGER, "接收到客户端数据，执行的动作为:{}", actionEnum::getDesc);
+            LogUtil.debug(LOGGER, "接收到客户端 {} 事件，执行的动作为:{}", () -> client_ctx, actionEnum::getDesc);
             Boolean success;
             if (txTransactionGroup != null) {
                 items = txTransactionGroup.getItemList();
@@ -111,14 +112,13 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
         } finally {
             ReferenceCountUtil.release(msg);
         }
-
-
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         //是否到达最大上线连接数
+        ctx.channel().localAddress();
         if (SocketManager.getInstance().isAllowConnection()) {
             SocketManager.getInstance().addClient(ctx.channel());
         } else {
@@ -128,6 +128,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+
 
         super.channelRegistered(ctx);
     }
@@ -159,7 +160,6 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
             }
         }
     }
-
     private HeartBeat buildSendMessage(String key, Boolean success) {
         HeartBeat heartBeat = new HeartBeat();
         heartBeat.setKey(key);
