@@ -8,7 +8,7 @@ spring:
       name: t-producer
   cloud:
     consul:
-      host: 192.168.1.204
+      host: 120.55.43.136
       port: 8500
       discovery:
         ip-address: ${HOST_ADDRESS:localhost}
@@ -20,6 +20,7 @@ spring:
 
 server:
   port: 8009
+
 
 management:
   health:

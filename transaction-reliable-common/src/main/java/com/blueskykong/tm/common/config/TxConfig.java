@@ -47,14 +47,15 @@ public class TxConfig {
     private int refreshInterval = 60;
 
 
-    private int retryMax = 10;
+    private int retryMax = 5;
 
 
     private int recoverDelayTime = 60;
 
 
-    private String txManagerId;
+    private String txManagerId = "lotor";
 
+//    private int/
 
     private TxDbConfig txDbConfig;
 

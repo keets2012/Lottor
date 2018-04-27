@@ -19,6 +19,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -138,7 +139,7 @@ public class TxManagerLocator {
         return managerInstances.stream().map(manager -> {
             String tmpUrl = "http://" + manager.getHost() + ":" + manager.getPort();
             return String.join("", tmpUrl, CommonConstant.TX_MANAGER_PRE, CommonConstant.LOAD_TX_MANAGER_SERVICE_URL);
-        }).findFirst().get();
+        }).filter(Objects::nonNull).findFirst().get();
     }
 
 }

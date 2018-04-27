@@ -65,6 +65,9 @@ public class SocketManager {
         allowConnection = (maxConnection != nowConnection);
     }
 
+    public List<Channel> getClients() {
+        return this.clients;
+    }
 
     public int getMaxConnection() {
         return maxConnection;
