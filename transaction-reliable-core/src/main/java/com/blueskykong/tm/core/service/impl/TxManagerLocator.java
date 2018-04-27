@@ -62,6 +62,7 @@ public class TxManagerLocator {
                 TxTransactionThreadFactory.create("TxManagerLocator", true));
     }
 
+    //todo 逻辑优化
 
     /**
      * 获取TxManager 服务信息
