@@ -60,6 +60,8 @@ public class NettyClientServiceImpl implements NettyClientService {
 
     private int retryCount = 0;
 
+    private int retryInterval;
+
     private static final String OS_NAME = "Linux";
 
     private final NettyClientHandlerInitializer nettyClientHandlerInitializer;
@@ -81,6 +83,7 @@ public class NettyClientServiceImpl implements NettyClientService {
     @Override
     public void start(TxConfig txConfig) {
         this.retryMax = txConfig.getRetryMax();
+        this.retryInterval = txConfig.getRetryInterval();
         this.txConfig = txConfig;
         SerializeProtocolEnum serializeProtocol =
                 SerializeProtocolEnum.acquireSerializeProtocol(txConfig.getNettySerializer());
@@ -148,14 +151,14 @@ public class NettyClientServiceImpl implements NettyClientService {
         future.addListener((ChannelFutureListener) futureListener -> {
             if (futureListener.isSuccess()) {
                 channel = futureListener.channel();
-                LogUtil.info(LOGGER, "Connect to server successfully!-> host:port:{}", () -> host + ":" + port);
+                LogUtil.info(LOGGER, "Connect to -> {} server successfully!", () -> host + ":" + port);
             } else {
                 if (retryCount++ >= retryMax) {
-                    LogUtil.error(LOGGER, "Failed to connect to server {}, after {} times", () -> host + ":" + port, () -> retryCount--);
+                    LogUtil.error(LOGGER, "Failed to connect to server {}, after {} times", () -> host + ":" + port, () -> --retryCount);
                     System.exit(1);
                 }
-                LogUtil.error(LOGGER, "Failed to connect to server, retry for {} times, try connect after 5s-> {}", () -> retryCount, () -> host + ":" + port);
-                futureListener.channel().eventLoop().schedule(this::doConnect, 5, TimeUnit.SECONDS);
+                LogUtil.error(LOGGER, "Failed to connect to server, retry for {} times, try connect after {}s-> {}", () -> retryCount, () -> this.retryInterval, () -> host + ":" + port);
+                futureListener.channel().eventLoop().schedule(this::doConnect, retryInterval, TimeUnit.SECONDS);
             }
         });
 

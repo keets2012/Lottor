@@ -83,7 +83,6 @@ public class TxManagerLocator {
                 try {
                     return OkHttpTools.getInstance().get(url, null, TxManagerServer.class);
                 } catch (Throwable ex) {
-                    ex.printStackTrace();
                     LogUtil.error(LOGGER, "loadTxManagerServer fail exception:{}", ex::getMessage);
                 }
             }
@@ -125,7 +124,6 @@ public class TxManagerLocator {
                 mConfigservices.set(serviceDTOList);
                 return;
             } catch (Throwable e) {
-                e.printStackTrace();
                 LogUtil.error(LOGGER, "updateTxManagerServices fail exception:{}", e::getMessage);
                /* throw new TransactionRuntimeException(
                         String.format("Get config services failed from %s", url), ex);*/
