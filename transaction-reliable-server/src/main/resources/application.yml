@@ -1,79 +1,79 @@
-spring:
-  cloud:
-    stream:
-      bindings:
-        affair-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: affair
-          binder: rabbit1
-        material-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: material
-          binder: rabbit1
-      binders:
-        rabbit1:
-          type: rabbit
-          environment:
-            spring:
-              rabbitmq:
-                host: 192.168.1.200
-                port: 5672
-                username: user
-                password: user
-                virtual-host: /user
-  data:
-    mongodb:
-      authentication-database: new_test
-      database: new_test
-      field-naming-strategy: # Fully qualified name of the FieldNamingStrategy to use.
-      #grid-fs-database: # GridFS database name.
-      password: root123
-      repositories.enabled: true
-      db.username: test
-      host: ${MONGO_ADDR:192.168.1.204}
-      port: ${MONGO_PORT:27017}
-  thymeleaf:
-    prefix: classpath:/html/
-    suffix: .html
-    cache: true
-    check-template-location: true
-    content-type: text/html
-    enabled: true
-    encoding: UTF-8
-
-tx:
-  redis:
-    cluster: false
-#      redirects: 20
-    hostName: 192.168.1.200
-    port: 6378
-    password: Superid123
-  manager:
-    netty:
-      port: 9998
-      serialize: kryo
-      maxConnection: 100
-      maxThreads: 16
-      delayTime: 5
-      heartTime: 20
-
-transactionWaitMaxTime: 500
-redisSaveMaxTime: 3000
-
-logging:
-  level:
-    root: info
-    com.blueskykong.tm.server: debug
-  path: "./logs"
-
----
-swagger:
-  enabled: true
-  title: tx-server
-  description: tx-server
-  version: 1.0
-  contact:
-    name: aoho
-  base-package: com.blueskykong.tm.server.controller
-  base-path: /**
-  exclude-path: /error, /ops/**
+#spring:
+#  cloud:
+#    stream:
+#      bindings:
+#        affair-output:
+#          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+#          destination: affair
+#          binder: rabbit1
+#        material-output:
+#          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+#          destination: material
+#          binder: rabbit1
+#      binders:
+#        rabbit1:
+#          type: rabbit
+#          environment:
+#            spring:
+#              rabbitmq:
+#                host: 192.168.1.200
+#                port: 5672
+#                username: user
+#                password: user
+#                virtual-host: /user
+#  data:
+#    mongodb:
+#      authentication-database: new_test
+#      database: new_test
+#      field-naming-strategy: # Fully qualified name of the FieldNamingStrategy to use.
+#      #grid-fs-database: # GridFS database name.
+#      password: root123
+#      repositories.enabled: true
+#      db.username: test
+#      host: ${MONGO_ADDR:192.168.1.204}
+#      port: ${MONGO_PORT:27017}
+#  thymeleaf:
+#    prefix: classpath:/html/
+#    suffix: .html
+#    cache: true
+#    check-template-location: true
+#    content-type: text/html
+#    enabled: true
+#    encoding: UTF-8
+#
+#tx:
+#  redis:
+#    cluster: false
+##      redirects: 20
+#    hostName: 192.168.1.200
+#    port: 6378
+#    password: Superid123
+#  manager:
+#    netty:
+#      port: 9998
+#      serialize: kryo
+#      maxConnection: 100
+#      maxThreads: 16
+#      delayTime: 5
+#      heartTime: 20
+#
+#transactionWaitMaxTime: 500
+#redisSaveMaxTime: 3000
+#
+#logging:
+#  level:
+#    root: info
+#    com.blueskykong.tm.server: debug
+#  path: "./logs"
+#
+#---
+#swagger:
+#  enabled: true
+#  title: tx-server
+#  description: tx-server
+#  version: 1.0
+#  contact:
+#    name: aoho
+#  base-package: com.blueskykong.tm.server.controller
+#  base-path: /**
+#  exclude-path: /error, /ops/**
