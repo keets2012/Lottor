@@ -6,6 +6,7 @@ import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.server.service.OutputFactoryService;
 import com.blueskykong.tm.server.stream.AffairSource;
 import com.blueskykong.tm.server.stream.MaterialSource;
+import com.blueskykong.tm.server.stream.TssSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
     @Autowired
     private MaterialSource materialSource;
 
+    @Autowired
+    private TssSource tssSource;
+
     /**
      * 发送事务消息
      *
@@ -43,6 +47,9 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
                 break;
             case MATERIAL:
                 materialSource.output().send(MessageBuilder.withPayload(msg).build());
+                break;
+            case TSS:
+                tssSource.output().send(MessageBuilder.withPayload(msg).build());
                 break;
             default:
                 LogUtil.error(LOGGER, "no available cases for {}.", () -> serviceNameEnum.getServiceName());
