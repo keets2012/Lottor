@@ -10,7 +10,8 @@ import java.util.Optional;
 public enum ServiceNameEnum {
     AFFAIR("affair"),
     MATERIAL("material"),
-    TSS("tss-app");
+    TSS("tss-app"),
+    TEST("tx-test");
 
     String serviceName;
 

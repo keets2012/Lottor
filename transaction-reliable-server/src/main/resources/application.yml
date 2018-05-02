@@ -14,6 +14,11 @@ spring:
           content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
           destination: tx-tss
           binder: rabbit1
+        tx-test-output:
+          group: testGroup
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          destination: tx-test
+          binder: rabbit1
       binders:
         rabbit1:
           type: rabbit

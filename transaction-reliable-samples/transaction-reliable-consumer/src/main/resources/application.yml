@@ -42,10 +42,10 @@ spring:
   cloud:
     stream:
       bindings:
-        msg-input:
-          group: msgGroup
+        test-input:
+          group: testGroup
           content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: affair
+          destination: tx-test
           binder: rabbit1
       binders:
         rabbit1:

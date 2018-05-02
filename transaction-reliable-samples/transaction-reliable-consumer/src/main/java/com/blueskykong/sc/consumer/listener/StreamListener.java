@@ -1,6 +1,6 @@
 package com.blueskykong.sc.consumer.listener;
 
-import com.blueskykong.sc.consumer.stream.MsgSink;
+import com.blueskykong.sc.consumer.stream.TestSink;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.service.ExternalNettyService;
@@ -17,7 +17,7 @@ import java.util.Objects;
  * @author keets
  */
 @Component
-@EnableBinding({MsgSink.class})
+@EnableBinding({TestSink.class})
 public class StreamListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamListener.class);
 
@@ -27,7 +27,7 @@ public class StreamListener {
     @Autowired
     private ExternalNettyService nettyService;
 
-    @org.springframework.cloud.stream.annotation.StreamListener(MsgSink.INPUT)
+    @org.springframework.cloud.stream.annotation.StreamListener(TestSink.INPUT)
     public void processSMS(Message<TransactionMsg> message) {
         process(message.getPayload());
     }

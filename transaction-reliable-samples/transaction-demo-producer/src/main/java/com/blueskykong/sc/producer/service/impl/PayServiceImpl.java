@@ -1,7 +1,9 @@
 package com.blueskykong.sc.producer.service.impl;
 
+import com.blueskykong.sc.producer.domain.Product;
 import com.blueskykong.sc.producer.service.PayService;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.enums.ServiceNameEnum;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.service.ExternalNettyService;
@@ -30,8 +32,8 @@ public class PayServiceImpl implements PayService {
     public Boolean createAffair() {
         TransactionMsg transactionMsg = new TransactionMsg();
         transactionMsg.setSource("producer");
-        transactionMsg.setTarget("affair");
-        transactionMsg.setArgs(null);
+        transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
+        transactionMsg.setArgs(new Product("123", "apple", "an apple a day"));
         transactionMsg.setMethod("createAffair");
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         nettyService.preSend(Collections.singletonList(transactionMsg));
@@ -42,7 +44,7 @@ public class PayServiceImpl implements PayService {
                 throw new IllegalArgumentException("check your parameter!");
             }*/
             int i = 2;
-            int j = i/0;
+            int j = i / 1;
         } catch (Exception e) {
             nettyService.postSend(false, e.getMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
