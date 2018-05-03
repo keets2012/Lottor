@@ -34,7 +34,7 @@ public class PayServiceImpl implements PayService {
         transactionMsg.setSource("producer");
         transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
 //        transactionMsg.setArgs(null);
-        transactionMsg.setArgs(new Product("123", "apple", "an apple a day"));
+        transactionMsg.setArgs((Object) new Product("123", "apple", "an apple a day"));
         transactionMsg.setMethod("createAffair");
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         nettyService.preSend(Collections.singletonList(transactionMsg));

@@ -58,7 +58,6 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         String server_ctx = ctx.channel().remoteAddress().toString();
         final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(heartBeat.getAction());
         LogUtil.debug(LOGGER, "接收服务端 {} ，执行的动作为:{}", () -> server_ctx, actionEnum::getDesc);
-        /* executorService.execute(() -> {*/
         try {
             switch (actionEnum) {
                 case HEART:
@@ -90,8 +89,6 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         } finally {
             ReferenceCountUtil.release(msg);
         }
-        /* });*/
-
     }
 
     private void notify(HeartBeat heartBeat) {
@@ -170,8 +167,6 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
      * @return Object
      */
     public Object sendTxManagerMessage(HeartBeat heartBeat) {
-        LogUtil.info(LOGGER, () -> ctx.channel().isActive());
-        ctx.channel();
         if (ctx != null && ctx.channel() != null && ctx.channel().isActive()) {
             final String sendKey = IdWorkerUtils.getInstance().createTaskKey();
             BlockTask sendTask = BlockTaskHelper.getInstance().getTask(sendKey);
