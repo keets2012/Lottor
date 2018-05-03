@@ -170,6 +170,8 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
      * @return Object
      */
     public Object sendTxManagerMessage(HeartBeat heartBeat) {
+        LogUtil.info(LOGGER, () -> ctx.channel().isActive());
+        ctx.channel();
         if (ctx != null && ctx.channel() != null && ctx.channel().isActive()) {
             final String sendKey = IdWorkerUtils.getInstance().createTaskKey();
             BlockTask sendTask = BlockTaskHelper.getInstance().getTask(sendKey);
