@@ -73,7 +73,7 @@ public class TxTransactionItem implements Serializable {
     /**
      * 服务消息
      */
-    private Object[] args;
+    private byte[] args;
 
     /**
      * 操作结果信息

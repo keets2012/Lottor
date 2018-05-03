@@ -1,8 +1,10 @@
 package com.blueskykong.sc.consumer.listener;
 
+import com.blueskykong.sc.consumer.domain.Product;
 import com.blueskykong.sc.consumer.stream.TestSink;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.holder.LogUtil;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.service.ExternalNettyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,9 @@ public class StreamListener {
     @Autowired
     private ExternalNettyService nettyService;
 
+    @Autowired
+    private ObjectSerializer objectSerializer;
+
     @org.springframework.cloud.stream.annotation.StreamListener(TestSink.INPUT)
     public void processSMS(Message<TransactionMsg> message) {
         process(message.getPayload());
@@ -38,7 +43,10 @@ public class StreamListener {
 //        message.get
             LOGGER.info("===============consume notification message: =======================" + message.toString());
             if (Objects.nonNull(message)) {
-                int i = 1/0;
+
+                Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
+//                int i = 1 / 0;
+                LogUtil.info(LOGGER, () -> product);
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, e::getLocalizedMessage);

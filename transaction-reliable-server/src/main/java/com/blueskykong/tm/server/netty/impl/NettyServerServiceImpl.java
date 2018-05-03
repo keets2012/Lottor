@@ -2,6 +2,9 @@ package com.blueskykong.tm.server.netty.impl;
 
 import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
+import com.blueskykong.tm.common.helper.SpringBeanUtils;
+import com.blueskykong.tm.common.holder.ServiceBootstrap;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.config.NettyConfig;
 import com.blueskykong.tm.server.netty.NettyService;
 import com.blueskykong.tm.server.netty.handler.NettyServerHandlerInitializer;
@@ -23,12 +26,17 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
 
 @Component
+@Order(0)
 public class NettyServerServiceImpl implements NettyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerServiceImpl.class);
@@ -66,12 +74,13 @@ public class NettyServerServiceImpl implements NettyService {
         try {
             final SerializeProtocolEnum serializeProtocolEnum =
                     SerializeProtocolEnum.acquireSerializeProtocol(nettyConfig.getSerialize());
+
             nettyServerHandlerInitializer.setSerializeProtocolEnum(serializeProtocolEnum);
             nettyServerHandlerInitializer.setServletExecutor(servletExecutor);
             ServerBootstrap b = new ServerBootstrap();
             groups(b, MAX_THREADS << 1);
-            b.bind( nettyConfig.getPort());
-//            b.bi
+            b.bind(nettyConfig.getPort());
+
             LOGGER.info("netty service started on port: " + nettyConfig.getPort());
         } catch (Exception e) {
             e.printStackTrace();

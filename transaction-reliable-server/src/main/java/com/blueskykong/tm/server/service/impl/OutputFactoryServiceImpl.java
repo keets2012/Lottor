@@ -57,6 +57,7 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
                 break;
             case TEST:
                 testSource.output().send(MessageBuilder.withPayload(msg).build());
+                break;
             default:
                 LogUtil.error(LOGGER, "no available cases for {}.", () -> serviceNameEnum.getServiceName());
                 break;

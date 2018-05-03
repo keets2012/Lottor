@@ -1,6 +1,7 @@
 package com.blueskykong.tm.core.service;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TxTransactionMsg;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface ExternalNettyService {
      *
      * @param preCommitMsgs
      */
-    public Boolean preSend(List<TransactionMsg> preCommitMsgs);
+    public Boolean preSend(TxTransactionMsg preCommitMsgs);
 
     /**
      * confirm msgs

@@ -1,4 +1,4 @@
-package com.blueskykong.sc.producer.domain;
+package com.blueskykong.sc.consumer.domain;
 
 import lombok.Data;
 
@@ -23,5 +23,8 @@ public class Product implements Serializable {
         this.id = id;
         this.name = name;
         this.description = description;
+    }
+
+    public Product() {
     }
 }

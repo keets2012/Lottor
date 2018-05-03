@@ -3,11 +3,13 @@ package com.blueskykong.tm.server.service.impl;
 import com.blueskykong.tm.common.bean.adapter.MongoAdapter;
 import com.blueskykong.tm.common.constant.CommonConstant;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TxTransactionMsg;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.DateUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.entity.TxTransactionItemAdapter;
 import com.blueskykong.tm.server.service.OutputFactoryService;
@@ -46,13 +48,17 @@ public class TxManagerServiceImpl implements TxManagerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TxManagerServiceImpl.class);
 
     private final MongoTemplate mongoTemplate;
+
+    private final ObjectSerializer objectSerializer;
+
     private final OutputFactoryService outputFactoryService;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    public TxManagerServiceImpl(MongoTemplate mongoTemplate, OutputFactoryService outputFactoryService) {
+    @Autowired(required = false)
+    public TxManagerServiceImpl(MongoTemplate mongoTemplate, OutputFactoryService outputFactoryService, ObjectSerializer objectSerializer) {
         this.mongoTemplate = mongoTemplate;
         this.outputFactoryService = outputFactoryService;
+        this.objectSerializer = objectSerializer;
     }
 
     /**
@@ -75,7 +81,7 @@ public class TxManagerServiceImpl implements TxManagerService {
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, "failed to save TxTransactionGroup, groupId is {} and cause is {}",
-                    () -> txTransactionGroup.getId(), () -> e.getLocalizedMessage());
+                    () -> txTransactionGroup.getId(), e::getLocalizedMessage);
             return false;
         }
         return true;
@@ -96,7 +102,7 @@ public class TxManagerServiceImpl implements TxManagerService {
             Query query = new Query();
             query.addCriteria(new Criteria("txGroupId").is(key).and("taskKey").is(taskKey)).fields().include("createDate").include("args");
             TxTransactionItem item = mongoTemplate.findOne(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
-            List<LinkedHashMap<String, Object>> msgs = (List<LinkedHashMap<String, Object>>) item.getArgs()[0];
+            List<TransactionMsg> msgs = objectSerializer.deSerialize(item.getArgs(), TxTransactionMsg.class).getMsgs();
             Boolean success = true;
             if (status == TransactionStatusEnum.COMMIT.getCode()) {
                 success = sendTxTransactionMsg(key, msgs);
@@ -127,7 +133,28 @@ public class TxManagerServiceImpl implements TxManagerService {
         return false;
     }
 
-    private Boolean sendTxTransactionMsg(String groupId, List<LinkedHashMap<String, Object>> msgs) {
+
+    private Boolean sendTxTransactionMsg(String groupId, List<TransactionMsg> msgs) {
+        try {
+            if (CollectionUtils.isNotEmpty(msgs)) {
+
+                msgs.forEach(msg -> {
+                    if (msg != null) {
+                        msg.setGroupId(groupId);
+                        outputFactoryService.sendMsg(msg);
+                        mongoTemplate.insert(msg, CollectionNameEnum.TransactionMsg.name());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LogUtil.error(LOGGER, "send msgs failure and groupId id {}", () -> groupId);
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /*private Boolean sendTxTransactionMsg(String groupId, List<LinkedHashMap<String, Object>> msgs) {
         try {
             if (CollectionUtils.isNotEmpty(msgs)) {
                 List<TransactionMsg> msgList = new ArrayList<>();
@@ -163,7 +190,7 @@ public class TxManagerServiceImpl implements TxManagerService {
             return false;
         }
         return true;
-    }
+    }*/
 
 
     /**
