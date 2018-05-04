@@ -45,7 +45,7 @@ public class TransactionMsg {
     /**
      * 参数，即要传递的内容，可以为null
      */
-    private byte[] args;
+    private Object args;
 
     /**
      * 创建时间

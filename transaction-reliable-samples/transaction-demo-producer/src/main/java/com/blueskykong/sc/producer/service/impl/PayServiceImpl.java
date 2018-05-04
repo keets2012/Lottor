@@ -44,15 +44,15 @@ public class PayServiceImpl implements PayService {
         Map<String, String> arg = new HashMap<>();
         arg.put("123", "456");
 //        transactionMsg.setArgs(arg);
-        try {
+/*        try {
             byte[] produce = kryoSerialize.serialize(new Product("123", "apple", "an apple a day"));
             transactionMsg.setArgs(produce);
 
         } catch (TransactionException e) {
             e.printStackTrace();
-        }
-
-//        transactionMsg.setArgs(new Product("123", "apple", "an apple a day"));
+        }*/
+        Product product = new Product("123", "apple", "an apple a day");
+        transactionMsg.setArgs((Object) product);
 
         transactionMsg.setMethod("createAffair");
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());

@@ -44,9 +44,9 @@ public class StreamListener {
             LOGGER.info("===============consume notification message: =======================" + message.toString());
             if (Objects.nonNull(message)) {
 
-                Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
-//                int i = 1 / 0;
-                LogUtil.info(LOGGER, () -> product);
+//                Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
+                int i = 1 / 0;
+//                LogUtil.info(LOGGER, () -> product);
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, e::getLocalizedMessage);
