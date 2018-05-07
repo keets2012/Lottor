@@ -1,6 +1,7 @@
 package com.blueskykong.tm.core.service.impl;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TxTransactionMsg;
 import com.blueskykong.tm.common.enums.OperationEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.annotation.ReliableTransaction;
@@ -18,7 +19,7 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
 
     @Override
     @ReliableTransaction
-    public Boolean preSend(List<TransactionMsg> preCommitMsgs) {
+    public Boolean preSend(TxTransactionMsg preCommitMsgs) {
         if (preCommitMsgs != null) {
             LogUtil.info(LOGGER, () -> "发送preCommit消息");
         }

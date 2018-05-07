@@ -6,8 +6,8 @@ import org.springframework.messaging.SubscribableChannel;
 /**
  * @author keets
  */
-public interface MsgSink {
-    String INPUT = "msg-input";
+public interface TestSink {
+    String INPUT = "test-input";
 
     @Input(INPUT)
     SubscribableChannel input();

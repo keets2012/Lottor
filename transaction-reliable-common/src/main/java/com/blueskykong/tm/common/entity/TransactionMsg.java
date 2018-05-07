@@ -45,7 +45,7 @@ public class TransactionMsg {
     /**
      * 参数，即要传递的内容，可以为null
      */
-    private Object args;
+    private byte[] args;
 
     /**
      * 创建时间
@@ -118,7 +118,7 @@ public class TransactionMsg {
             return this;
         }
 
-        public Builder setArgs(Object args) {
+        public Builder setArgs(byte[] args) {
             if (args != null) {
                 transactionMsg.setArgs(args);
             }

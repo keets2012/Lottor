@@ -1,5 +1,10 @@
 package com.blueskykong.tm.server.configuration;
 
+import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
+import com.blueskykong.tm.common.helper.SpringBeanUtils;
+import com.blueskykong.tm.common.holder.ServiceBootstrap;
+import com.blueskykong.tm.common.serializer.KryoSerializer;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.config.NettyConfig;
 import com.blueskykong.tm.server.discovery.DiscoveryService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -36,6 +41,10 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
 @Configuration
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
@@ -53,6 +62,19 @@ public class TxManagerConfiguration {
         @ConfigurationProperties("tx.manager.netty")
         public NettyConfig getNettyConfig() {
             return new NettyConfig();
+        }
+
+        @Bean
+        public ObjectSerializer objectSerializer(NettyConfig nettyConfig) {
+            final SerializeProtocolEnum serializeProtocolEnum =
+                    SerializeProtocolEnum.acquireSerializeProtocol(nettyConfig.getSerialize());
+
+            final ServiceLoader<ObjectSerializer> objectSerializers = ServiceBootstrap.loadAll(ObjectSerializer.class);
+
+            final Optional<ObjectSerializer> serializer = StreamSupport.stream(objectSerializers.spliterator(), false)
+                    .filter(objectSerializer ->
+                            Objects.equals(objectSerializer.getScheme(), serializeProtocolEnum.getSerializeProtocol())).findFirst();
+            return serializer.orElse(new KryoSerializer());
         }
 
     }
