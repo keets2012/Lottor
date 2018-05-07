@@ -41,18 +41,14 @@ public class PayServiceImpl implements PayService {
         TransactionMsg transactionMsg = new TransactionMsg();
         transactionMsg.setSource("producer");
         transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
-        Map<String, String> arg = new HashMap<>();
-        arg.put("123", "456");
-//        transactionMsg.setArgs(arg);
-/*        try {
-            byte[] produce = kryoSerialize.serialize(new Product("123", "apple", "an apple a day"));
-            transactionMsg.setArgs(produce);
-
+        //TODO 下个版本优化，客户端暂时需要序列化对象
+        try {
+            Product product = new Product("123", "apple", "an apple a day");
+            transactionMsg.setArgs(kryoSerialize.serialize(product));
         } catch (TransactionException e) {
-            e.printStackTrace();
-        }*/
-        Product product = new Product("123", "apple", "an apple a day");
-        transactionMsg.setArgs((Object) product);
+            LogUtil.error(LOGGER, "failed to serialize: {} for: {} ", () -> Product.class.toString(), e::getLocalizedMessage);
+            throw new IllegalArgumentException("illegal params to serialize!");
+        }
 
         transactionMsg.setMethod("createAffair");
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());

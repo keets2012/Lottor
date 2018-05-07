@@ -1,11 +1,14 @@
 package com.blueskykong.sc.consumer.listener;
 
 import com.blueskykong.sc.consumer.domain.Product;
+import com.blueskykong.sc.consumer.service.ConsumerService;
 import com.blueskykong.sc.consumer.stream.TestSink;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.enums.MethodNameEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.service.ExternalNettyService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +26,18 @@ import java.util.Objects;
 public class StreamListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamListener.class);
 
-//    @Autowired
-//    private NotificationService notificationService;
+    final private ConsumerService consumerService;
+
+    final private ExternalNettyService nettyService;
+
+    final private ObjectSerializer objectSerializer;
 
     @Autowired
-    private ExternalNettyService nettyService;
-
-    @Autowired
-    private ObjectSerializer objectSerializer;
+    public StreamListener(ExternalNettyService nettyService, ObjectSerializer objectSerializer, ConsumerService consumerService) {
+        this.nettyService = nettyService;
+        this.objectSerializer = objectSerializer;
+        this.consumerService = consumerService;
+    }
 
     @org.springframework.cloud.stream.annotation.StreamListener(TestSink.INPUT)
     public void processSMS(Message<TransactionMsg> message) {
@@ -39,14 +46,24 @@ public class StreamListener {
 
     private void process(TransactionMsg message) {
         try {
-            message.getSubTaskId();
-//        message.get
-            LOGGER.info("===============consume notification message: =======================" + message.toString());
             if (Objects.nonNull(message)) {
+                LOGGER.info("===============consume notification message: =======================" + message.toString());
+                if (StringUtils.isNotBlank(message.getMethod())) {
+                    MethodNameEnum method = MethodNameEnum.fromString(message.getMethod());
 
-//                Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
-                int i = 1 / 0;
-//                LogUtil.info(LOGGER, () -> product);
+                    switch (method) {
+                        case CONSUMER_TEST:
+                            //TODO 下个版本优化，客户端暂时需要反序列化对应的对象
+                            Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
+                            LogUtil.info(LOGGER, () -> product);
+                            consumerService.testConsumer(product);
+                            break;
+                        default:
+                            LogUtil.warn(LOGGER, () -> "no matched consumer case!");
+                            nettyService.consumedSend(message, false);
+                            return;
+                    }
+                }
             }
         } catch (Exception e) {
             LogUtil.error(LOGGER, e::getLocalizedMessage);
