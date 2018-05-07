@@ -16,7 +16,7 @@ public class ConsumerService {
 
     public void testConsumer(Product product) {
         // some operations for consumer
-        LogUtil.info(LOGGER, "{} consume the tx msg!", product::getClass);
+        LogUtil.info(LOGGER, "{}: consume the tx msg!", product::getClass);
     }
 
 }

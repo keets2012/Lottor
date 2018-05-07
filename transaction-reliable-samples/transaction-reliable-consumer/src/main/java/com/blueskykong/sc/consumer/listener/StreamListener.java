@@ -55,11 +55,12 @@ public class StreamListener {
                         case CONSUMER_TEST:
                             //TODO 下个版本优化，客户端暂时需要反序列化对应的对象
                             Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
-                            LogUtil.info(LOGGER, () -> product);
+                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.CONSUMER_TEST, () -> product);
                             consumerService.testConsumer(product);
                             break;
                         default:
                             LogUtil.warn(LOGGER, () -> "no matched consumer case!");
+                            message.setMessage("no matched consumer case!");
                             nettyService.consumedSend(message, false);
                             return;
                     }

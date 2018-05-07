@@ -4,6 +4,7 @@ import com.blueskykong.sc.producer.domain.Product;
 import com.blueskykong.sc.producer.service.PayService;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.entity.TxTransactionMsg;
+import com.blueskykong.tm.common.enums.MethodNameEnum;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
 import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
@@ -39,7 +40,7 @@ public class PayServiceImpl implements PayService {
     @Override
     public Boolean createAffair() {
         TransactionMsg transactionMsg = new TransactionMsg();
-        transactionMsg.setSource("producer");
+        transactionMsg.setSource(ServiceNameEnum.TEST_PRODUCER.getServiceName());
         transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
         //TODO 下个版本优化，客户端暂时需要序列化对象
         try {
@@ -50,7 +51,7 @@ public class PayServiceImpl implements PayService {
             throw new IllegalArgumentException("illegal params to serialize!");
         }
 
-        transactionMsg.setMethod("createAffair");
+        transactionMsg.setMethod(MethodNameEnum.CONSUMER_TEST.getMethod());
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         TxTransactionMsg txTransactionMsg = new TxTransactionMsg();
         txTransactionMsg.setMsgs(Collections.singletonList(transactionMsg));
