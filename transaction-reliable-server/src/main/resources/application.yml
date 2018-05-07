@@ -2,13 +2,22 @@
 #  cloud:
 #    stream:
 #      bindings:
-#        affair-output:
+#        tx-affair-output:
 #          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-#          destination: affair
+#          destination: tx-affair
 #          binder: rabbit1
-#        material-output:
+#        tx-material-output:
 #          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-#          destination: material
+#          destination: tx-material
+#          binder: rabbit1
+#        tx-tss-output:
+#          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+#          destination: tx-tss
+#          binder: rabbit1
+#        tx-test-output:
+#          group: testGroup
+#          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+#          destination: tx-test
 #          binder: rabbit1
 #      binders:
 #        rabbit1:

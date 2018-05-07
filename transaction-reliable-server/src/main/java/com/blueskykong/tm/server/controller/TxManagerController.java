@@ -46,7 +46,6 @@ public class TxManagerController {
         List<Channel> channels = SocketManager.getInstance().getClients();
         List<ChannelInfo> addrs = new ArrayList<>(2);
         channels.stream().forEach(channel -> {
-            DefaultChannelPipeline channelPipeline = (DefaultChannelPipeline) channel.pipeline();
             System.out.println(channel.pipeline().toString());
             ChannelInfo channelInfo = new ChannelInfo();
             channelInfo.setClient(channel.remoteAddress().toString());

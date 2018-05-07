@@ -1,6 +1,11 @@
 package com.blueskykong.tm.core.config;
 
 import com.blueskykong.tm.common.config.TxConfig;
+import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
+import com.blueskykong.tm.common.helper.SpringBeanUtils;
+import com.blueskykong.tm.common.holder.ServiceBootstrap;
+import com.blueskykong.tm.common.serializer.KryoSerializer;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.bootstrap.TxTransactionBootstrap;
 import com.blueskykong.tm.core.bootstrap.TxTransactionInitialize;
 import com.blueskykong.tm.core.compensation.TxCompensationService;
@@ -31,6 +36,11 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
 /**
  * @author keets
@@ -74,6 +84,19 @@ public class TransactionCoreAutoConfiguration {
         public TxTransactionFactoryService txTransactionFactoryService() {
             return new TxTransactionFactoryServiceImpl();
         }
+
+        @Bean
+        public ObjectSerializer objectSerializer(TxConfig nettyConfig) {
+            final SerializeProtocolEnum serializeProtocolEnum =
+                    SerializeProtocolEnum.acquireSerializeProtocol(nettyConfig.getNettySerializer());
+
+            final ServiceLoader<ObjectSerializer> objectSerializers = ServiceBootstrap.loadAll(ObjectSerializer.class);
+
+            final Optional<ObjectSerializer> serializer = StreamSupport.stream(objectSerializers.spliterator(), false)
+                    .filter(objectSerializer ->
+                            Objects.equals(objectSerializer.getScheme(), serializeProtocolEnum.getSerializeProtocol())).findFirst();
+            return serializer.orElse(new KryoSerializer());
+        }
     }
 
     @Configuration
@@ -104,8 +127,8 @@ public class TransactionCoreAutoConfiguration {
         }
 
         @Bean
-        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand) {
-            return new StartTxTransactionHandler(txManagerMessageService, txCompensationCommand);
+        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand, ObjectSerializer objectSerializer) {
+            return new StartTxTransactionHandler(txManagerMessageService, txCompensationCommand, objectSerializer);
         }
     }
 

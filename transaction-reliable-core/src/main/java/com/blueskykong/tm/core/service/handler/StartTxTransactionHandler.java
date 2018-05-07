@@ -3,12 +3,14 @@ package com.blueskykong.tm.core.service.handler;
 import com.blueskykong.tm.common.bean.TxTransactionInfo;
 import com.blueskykong.tm.common.enums.TransactionRoleEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
+import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
 import com.blueskykong.tm.common.holder.DateUtils;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
+import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.compensation.command.TxCompensationCommand;
 import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionLocal;
 import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionTaskLocal;
@@ -36,8 +38,11 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
 
     private final TxManagerMessageService txManagerMessageService;
 
+    private final ObjectSerializer objectSerializer;
+
     @Autowired(required = false)
-    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand) {
+    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand, ObjectSerializer objectSerializer) {
+        this.objectSerializer = objectSerializer;
         this.txManagerMessageService = txManagerMessageService;
         this.txCompensationCommand = txCompensationCommand;
 
@@ -117,11 +122,17 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         //设置创建时间
         item.setCreateDate(DateUtils.getCurrentDateTime());
         //设置执行类名称
-        item.setTargetClass(info.getInvocation().getTargetClazz().getName() );
+        item.setTargetClass(info.getInvocation().getTargetClazz().getName());
         //设置执行类方法
         item.setTargetMethod(info.getInvocation().getMethod());
-        //设置参数
-        item.setArgs(info.getInvocation().getArgumentValues());
+        //设置参数，只会是第一个
+        try {
+            byte[] args = objectSerializer.serialize(info.getInvocation().getArgumentValues()[0]);
+            item.setArgs(args);
+        } catch (TransactionException e) {
+            e.printStackTrace();
+            LogUtil.error(LOGGER, "failed to serialize transactionMsg, groupId is: {}, cause is: {}", () -> groupId, e::getLocalizedMessage);
+        }
         items.add(item);
 
         txTransactionGroup.setItemList(items);
