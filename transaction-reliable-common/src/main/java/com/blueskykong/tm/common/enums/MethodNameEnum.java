@@ -8,6 +8,10 @@ import java.util.Optional;
  * @author keets
  */
 public enum MethodNameEnum {
+
+    /**
+     * notice: MethodNameEnum 由两部分组成，服务名和方法名
+     */
     CONSUMER_TEST("consumer-test");
 
     String method;
