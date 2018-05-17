@@ -12,7 +12,10 @@ public enum MethodNameEnum {
     /**
      * notice: MethodNameEnum 由两部分组成，服务名和方法名
      */
-    CONSUMER_TEST("consumer-test");
+    CONSUMER_TEST("consumer-test"),
+    AFFAIR_MODIFY_AFFAIR("modifyAffair");
+
+
 
     String method;
 
