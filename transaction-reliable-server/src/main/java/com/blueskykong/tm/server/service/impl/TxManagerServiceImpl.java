@@ -1,6 +1,5 @@
 package com.blueskykong.tm.server.service.impl;
 
-import com.blueskykong.tm.common.bean.adapter.MongoAdapter;
 import com.blueskykong.tm.common.constant.CommonConstant;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.entity.TxTransactionMsg;
@@ -14,10 +13,6 @@ import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.entity.TxTransactionItemAdapter;
 import com.blueskykong.tm.server.service.OutputFactoryService;
 import com.blueskykong.tm.server.service.TxManagerService;
-import com.blueskykong.tm.server.stream.AffairSource;
-import com.blueskykong.tm.server.stream.MaterialSource;
-import com.blueskykong.tm.server.stream.TestSource;
-import com.blueskykong.tm.server.stream.TssSource;
 import com.mongodb.WriteResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,22 +20,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-@EnableBinding({TestSource.class, AffairSource.class, MaterialSource.class, TssSource.class})
 @Component
 @SuppressWarnings("unchecked")
 public class TxManagerServiceImpl implements TxManagerService {
