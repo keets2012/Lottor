@@ -10,7 +10,7 @@ spring:
     consul:
       host: 120.55.43.136
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
-      port: 8500
+      port: 8501
       discovery:
         ip-address: ${HOST_ADDRESS:localhost}
         port: ${SERVER_PORT:${server.port}}
@@ -54,11 +54,11 @@ spring:
           environment:
             spring:
               rabbitmq:
-                host: 192.168.1.200
+                host: 120.55.43.136
                 port: 5672
-                username: user
-                password: user
-                virtual-host: /user
+                username: guest
+                password: guest
+                virtual-host: /
 
 ---
 tx:

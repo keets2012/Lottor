@@ -16,6 +16,8 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -54,9 +56,9 @@ public class StreamListener {
                     switch (method) {
                         case CONSUMER_TEST:
                             //TODO 下个版本优化，客户端暂时需要反序列化对应的对象
-                            Product product = objectSerializer.deSerialize(message.getArgs(), Product.class);
-                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.CONSUMER_TEST, () -> product);
-                            consumerService.testConsumer(product);
+                            Map product = objectSerializer.deSerialize(message.getArgs(), HashMap.class);
+                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.CONSUMER_TEST, () -> product.get("123"));
+//                            consumerService.testConsumer(product);
                             break;
                         default:
                             LogUtil.warn(LOGGER, () -> "no matched consumer case!");

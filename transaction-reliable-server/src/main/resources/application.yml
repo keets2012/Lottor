@@ -1,35 +1,11 @@
 spring:
-  cloud:
-    stream:
-      bindings:
-        tx-affair-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: tx-affair
-          binder: rabbit1
-        tx-material-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: tx-material
-          binder: rabbit1
-        tx-tss-output:
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: tx-tss
-          binder: rabbit1
-        tx-test-output:
-          group: testGroup
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
-          destination: tx-test
-          binder: rabbit1
-      binders:
-        rabbit1:
-          type: rabbit
-          environment:
-            spring:
-              rabbitmq:
-                host: 192.168.1.200
-                port: 5672
-                username: user
-                password: user
-                virtual-host: /user
+  rabbitmq:
+    host: 120.55.43.136
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
   data:
     mongodb:
       authentication-database: new_test
@@ -74,6 +50,8 @@ logging:
     root: info
     com.blueskykong.tm.server: debug
   path: "./logs"
+
+stream.content-type: application/x-java-object;type=com.blueskykong.springboot.rabbitmq.entity.TransactionMsg
 
 ---
 swagger:
