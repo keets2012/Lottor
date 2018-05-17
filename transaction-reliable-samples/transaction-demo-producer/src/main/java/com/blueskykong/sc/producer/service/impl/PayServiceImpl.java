@@ -44,8 +44,10 @@ public class PayServiceImpl implements PayService {
         transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
         //TODO 下个版本优化，客户端暂时需要序列化对象
         try {
-            Product product = new Product("123", "apple", "an apple a day");
-            transactionMsg.setArgs(kryoSerialize.serialize(product));
+//            Product product = new Product("123", "apple", "an apple a day");
+            Map<String, String> arg = new HashMap<>();
+            arg.put("123", "456");
+            transactionMsg.setArgs(kryoSerialize.serialize(arg));
         } catch (TransactionException e) {
             LogUtil.error(LOGGER, "failed to serialize: {} for: {} ", () -> Product.class.toString(), e::getLocalizedMessage);
             throw new IllegalArgumentException("illegal params to serialize!");

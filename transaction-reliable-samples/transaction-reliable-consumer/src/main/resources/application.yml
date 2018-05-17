@@ -54,11 +54,11 @@ spring:
           environment:
             spring:
               rabbitmq:
-                host: 192.168.1.200
+                host: 120.55.43.136
                 port: 5672
-                username: user
-                password: user
-                virtual-host: /user
+                username: guest
+                password: guest
+                virtual-host: /
 
 ---
 tx:
