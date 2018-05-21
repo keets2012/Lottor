@@ -15,8 +15,6 @@ public enum MethodNameEnum {
     CONSUMER_TEST("consumer-test"),
     AFFAIR_MODIFY_AFFAIR("modifyAffair");
 
-
-
     String method;
 
     public String getMethod() {

@@ -150,8 +150,8 @@ public class TransactionCoreAutoConfiguration {
     protected static class NettyHandler {
 
         @Bean
-        public NettyClientMessageHandler nettyClientMessageHandler() {
-            return new NettyClientMessageHandler();
+        public NettyClientMessageHandler nettyClientMessageHandler(ModelNameService modelNameService) {
+            return new NettyClientMessageHandler(modelNameService);
         }
 
         @Bean

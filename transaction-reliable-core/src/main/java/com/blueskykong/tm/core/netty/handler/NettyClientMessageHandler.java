@@ -12,6 +12,7 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.core.concurrent.task.BlockTask;
 import com.blueskykong.tm.core.concurrent.task.BlockTaskHelper;
 import com.blueskykong.tm.core.netty.NettyClientService;
+import com.blueskykong.tm.core.service.ModelNameService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,7 +23,6 @@ import io.netty.util.concurrent.ScheduledFuture;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,8 +38,6 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
 
     public volatile static boolean net_state = false;
 
-    private Logger logger = LoggerFactory.getLogger(NettyClientMessageHandler.class);
-
     private static volatile ChannelHandlerContext ctx;
 
     private static final HeartBeat HEART_BEAT = new HeartBeat();
@@ -50,6 +48,11 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         this.txConfig = txConfig;
     }
 
+    private ModelNameService modelNameService;
+
+    public NettyClientMessageHandler(ModelNameService modelNameService) {
+        this.modelNameService = modelNameService;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
@@ -125,7 +128,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("与服务器断开连接服务器");
+        LogUtil.info(LOGGER, "与服务器断开连接服务器");
         super.channelInactive(ctx);
         SpringBeanUtils.getInstance().getBean(NettyClientService.class).doConnect();
 
@@ -135,7 +138,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         NettyClientMessageHandler.ctx = ctx;
-        logger.info("建立链接-->" + ctx);
+        LogUtil.info(LOGGER, "建立链接-->" + ctx);
         net_state = true;
     }
 
@@ -150,6 +153,8 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
             } else if (event.state() == IdleState.WRITER_IDLE) {
                 //表示已经多久没有发送数据了
                 HEART_BEAT.setAction(NettyMessageActionEnum.HEART.getCode());
+                HEART_BEAT.setMetaInfo(modelNameService.findClientMetaInfo());
+                HEART_BEAT.setSerialProtocol(this.txConfig.getNettySerializer());
                 ctx.writeAndFlush(HEART_BEAT);
                 LogUtil.debug(LOGGER, () -> "向服务端发送的心跳");
             } else if (event.state() == IdleState.ALL_IDLE) {
@@ -221,6 +226,5 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         }
 
     }
-
 
 }

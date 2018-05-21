@@ -19,6 +19,10 @@ public class HeartBeat implements Serializable {
 
     private int result;
 
+    private String metaInfo;
+
+    private String serialProtocol;
+
     private TxTransactionGroup txTransactionGroup;
 
     /*
