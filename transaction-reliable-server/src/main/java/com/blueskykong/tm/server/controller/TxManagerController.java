@@ -43,15 +43,7 @@ public class TxManagerController {
 
     @GetMapping
     public List<ChannelInfo> getChannel() {
-        List<Channel> channels = SocketManager.getInstance().getClients();
-        List<ChannelInfo> addrs = new ArrayList<>(2);
-        channels.stream().forEach(channel -> {
-            System.out.println(channel.pipeline().toString());
-            ChannelInfo channelInfo = new ChannelInfo();
-            channelInfo.setClient(channel.remoteAddress().toString());
-            channelInfo.setServer(channel.localAddress().toString());
-            addrs.add(channelInfo);
-        });
+        List<ChannelInfo> addrs = SocketManager.getInstance().getChannelInfos();
         return addrs;
     }
 

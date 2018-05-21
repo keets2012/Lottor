@@ -1,6 +1,7 @@
 package com.blueskykong.tm.core.service.handler;
 
 import com.blueskykong.tm.common.bean.TxTransactionInfo;
+import com.blueskykong.tm.common.entity.TxTransactionMsg;
 import com.blueskykong.tm.common.enums.TransactionRoleEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.exception.TransactionException;
@@ -128,6 +129,7 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         //设置参数，只会是第一个
         try {
             byte[] args = objectSerializer.serialize(info.getInvocation().getArgumentValues()[0]);
+            TxTransactionMsg msg = (TxTransactionMsg) info.getInvocation().getArgumentValues()[0];
             item.setArgs(args);
         } catch (TransactionException e) {
             e.printStackTrace();

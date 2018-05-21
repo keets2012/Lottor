@@ -26,6 +26,7 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputFactoryServiceImpl.class);
 
+    private static final String CHANNEL_PREFIX = "tx-";
     private BinderAwareChannelResolver resolver;
 
     @Value("stream.content-type")
@@ -48,11 +49,14 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
         ServiceNameEnum serviceNameEnum = ServiceNameEnum.fromString(msg.getTarget());
         if (!Objects.nonNull(serviceNameEnum)) {
             LogUtil.warn(LOGGER, "no available cases for {}. pls check if this topic exists.", () -> msg.getTarget());
+            resolver.resolveDestination(CHANNEL_PREFIX + msg.getTarget()).send(MessageBuilder.createMessage(msg,
+                    new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
         } else {
             LogUtil.debug(LOGGER, "send tx-msg and target service: {}", () -> serviceNameEnum.getServiceName());
+            resolver.resolveDestination(serviceNameEnum.getTopic()).send(MessageBuilder.createMessage(msg,
+                    new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
         }
-        resolver.resolveDestination(msg.getTarget()).send(MessageBuilder.createMessage(msg,
-                new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
+
 
         return true;
     }
