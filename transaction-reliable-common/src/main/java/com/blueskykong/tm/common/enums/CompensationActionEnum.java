@@ -4,21 +4,23 @@ package com.blueskykong.tm.common.enums;
 public enum CompensationActionEnum {
 
 
-    SAVE(0,"保存"),
+    SAVE(0, "保存"),
 
-    DELETE(1,"删除"),
+    DELETE(1, "删除"),
 
-    UPDATE(2,"更新"),
+    UPDATE(2, "更新"),
 
-    COMPENSATE(3,"补偿");
+    COMPENSATE(3, "补偿"),
+
+    VIEW(4, "查看");
 
     private int code;
 
     private String desc;
 
-    CompensationActionEnum(int code,String desc){
-        this.code=code;
-        this.desc=desc;
+    CompensationActionEnum(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
     /**

@@ -6,7 +6,7 @@ import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.entity.TxManagerServiceDTO;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.holder.httpclient.OkHttpTools;
-import com.blueskykong.tm.core.concurrent.threadpool.TxTransactionThreadFactory;
+import com.blueskykong.tm.common.concurrent.threadpool.TxTransactionThreadFactory;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import lombok.Setter;
@@ -104,7 +104,7 @@ public class TxManagerLocator {
     public void schedulePeriodicRefresh() {
         this.mExecutorservice.scheduleAtFixedRate(
                 () -> {
-                    LogUtil.info(LOGGER, "refresh updateTxManagerServices delayTime:{}", () -> txConfig.getRefreshInterval());
+                    LogUtil.debug(LOGGER, "refresh updateTxManagerServices delayTime:{}", () -> txConfig.getRefreshInterval());
                     updateTxManagerServices();
                 }, 0, txConfig.getRefreshInterval(),
                 TimeUnit.SECONDS);

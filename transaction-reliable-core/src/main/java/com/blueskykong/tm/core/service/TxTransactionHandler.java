@@ -13,10 +13,9 @@ public interface TxTransactionHandler {
     /**
      * 分布式事务处理接口
      *
-     * @param point point 切点
-     * @param info  信息
+     * @param info 信息
      * @return Object
      * @throws Throwable 异常
      */
-    Object handler(ProceedingJoinPoint point, TxTransactionInfo info) throws Throwable;
+    Object handler(TxTransactionInfo info);
 }

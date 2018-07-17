@@ -1,16 +1,18 @@
 package com.blueskykong.tm.core.netty.handler;
 
+import com.blueskykong.tm.common.concurrent.task.BlockTask;
+import com.blueskykong.tm.common.concurrent.task.BlockTaskHelper;
 import com.blueskykong.tm.common.config.TxConfig;
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.NettyResultEnum;
 import com.blueskykong.tm.common.helper.SpringBeanUtils;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
-import com.blueskykong.tm.core.concurrent.task.BlockTask;
-import com.blueskykong.tm.core.concurrent.task.BlockTaskHelper;
+import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.service.ModelNameService;
 import io.netty.channel.ChannelHandler;
@@ -20,11 +22,9 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.ScheduledFuture;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
 
     private static volatile ChannelHandlerContext ctx;
 
-    private static final HeartBeat HEART_BEAT = new HeartBeat();
+    private static final LottorRequest HEART_BEAT = new LottorRequest();
 
     private TxConfig txConfig;
 
@@ -50,39 +50,52 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
 
     private ModelNameService modelNameService;
 
-    public NettyClientMessageHandler(ModelNameService modelNameService) {
+    private TxOperateCommand txOperateCommand;
+
+
+    public NettyClientMessageHandler(ModelNameService modelNameService, TxOperateCommand txOperateCommand) {
         this.modelNameService = modelNameService;
+        this.txOperateCommand = txOperateCommand;
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, final Object msg) {
         net_state = true;
-        HeartBeat heartBeat = (HeartBeat) msg;
+        LottorRequest lottorRequest = (LottorRequest) msg;
         String server_ctx = ctx.channel().remoteAddress().toString();
-        final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(heartBeat.getAction());
+        final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(lottorRequest.getAction());
         LogUtil.debug(LOGGER, "接收服务端 {} ，执行的动作为:{}", () -> server_ctx, actionEnum::getDesc);
         try {
             switch (actionEnum) {
                 case HEART:
                     break;
                 case RECEIVE:
-                    receivedCommand(heartBeat.getKey(), heartBeat.getResult());
+                    receivedCommand(lottorRequest.getKey(), lottorRequest.getResult());
                     break;
                 case ROLLBACK:
-                    notify(heartBeat);
+                    notify(lottorRequest);
                     break;
                 case COMPLETE_COMMIT:
-                    notify(heartBeat);
+                    notify(lottorRequest);
                     break;
                 case GET_TRANSACTION_GROUP_STATUS:
-                    final BlockTask blockTask = BlockTaskHelper.getInstance().getTask(heartBeat.getKey());
-                    final TxTransactionGroup txTransactionGroup = heartBeat.getTxTransactionGroup();
-                    blockTask.setAsyncCall(objects -> txTransactionGroup.getStatus());
-                    blockTask.signal();
+                    LottorRequest replyTxGroup = txOperateCommand.getTxGroupStatus(lottorRequest.getKey());
+                    replyTxGroup.setAction(NettyMessageActionEnum.SYNC_TX_STATUS.getCode());
+                    ctx.writeAndFlush(replyTxGroup);
+                    break;
+                case GET_TRANSACTION_MSG_STATUS:
+                    TransactionMsg transactionMsg = lottorRequest.getTransactionMsg();
+                    LottorRequest replyTxMsg = new LottorRequest();
+                    if (Objects.nonNull(transactionMsg) && Objects.nonNull(transactionMsg.getSubTaskId())) {
+                        replyTxMsg = txOperateCommand.getTxMsgStatus(lottorRequest.getTransactionMsg().getSubTaskId());
+                    }
+                    replyTxMsg.setKey(lottorRequest.getKey());
+                    replyTxMsg.setAction(NettyMessageActionEnum.GET_TRANSACTION_MSG_STATUS.getCode());
+                    ctx.writeAndFlush(replyTxMsg);
                     break;
                 case FIND_TRANSACTION_GROUP_INFO:
-                    final BlockTask task = BlockTaskHelper.getInstance().getTask(heartBeat.getKey());
-                    task.setAsyncCall(objects -> heartBeat.getTxTransactionGroup());
+                    final BlockTask task = BlockTaskHelper.getInstance().getTask(lottorRequest.getKey());
+                    task.setAsyncCall(objects -> lottorRequest.getTxTransactionGroup());
                     task.signal();
                     break;
                 default:
@@ -94,11 +107,10 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void notify(HeartBeat heartBeat) {
-        final List<TxTransactionItem> txTransactionItems = heartBeat.getTxTransactionGroup()
-                .getItemList();
-        if (CollectionUtils.isNotEmpty(txTransactionItems)) {
-            final TxTransactionItem item = txTransactionItems.get(0);
+    private void notify(LottorRequest lottorRequest) {
+        final TxTransactionItem item = lottorRequest.getTxTransactionGroup()
+                .getItem();
+        if (Objects.nonNull(item)) {
             final BlockTask task = BlockTaskHelper.getInstance().getTask(item.getTaskKey());
             task.setAsyncCall(objects -> item.getStatus());
             task.signal();
@@ -137,7 +149,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        NettyClientMessageHandler.ctx = ctx;
+        this.ctx = ctx;
         LogUtil.info(LOGGER, "建立链接-->" + ctx);
         net_state = true;
     }
@@ -155,6 +167,9 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
                 HEART_BEAT.setAction(NettyMessageActionEnum.HEART.getCode());
                 HEART_BEAT.setMetaInfo(modelNameService.findClientMetaInfo());
                 HEART_BEAT.setSerialProtocol(this.txConfig.getNettySerializer());
+                TxTransactionGroup group = new TxTransactionGroup();
+                group.setSource(modelNameService.findModelName());
+                HEART_BEAT.setTxTransactionGroup(group);
                 ctx.writeAndFlush(HEART_BEAT);
                 LogUtil.debug(LOGGER, () -> "向服务端发送的心跳");
             } else if (event.state() == IdleState.ALL_IDLE) {
@@ -168,23 +183,22 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     /**
      * 向TxManager 发消息
      *
-     * @param heartBeat 定义的数据传输对象
+     * @param lottorRequest 定义的数据传输对象
      * @return Object
      */
-    public Object sendTxManagerMessage(HeartBeat heartBeat) {
+    public Object sendTxManagerMessage(LottorRequest lottorRequest) {
         if (ctx != null && ctx.channel() != null && ctx.channel().isActive()) {
             final String sendKey = IdWorkerUtils.getInstance().createTaskKey();
             BlockTask sendTask = BlockTaskHelper.getInstance().getTask(sendKey);
-            heartBeat.setKey(sendKey);
-            ctx.writeAndFlush(heartBeat);
+            lottorRequest.setKey(sendKey);
+            ctx.writeAndFlush(lottorRequest);
             final ScheduledFuture<?> schedule = ctx.executor()
                     .schedule(() -> {
                         if (!sendTask.isNotify()) {
                             if (NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS.getCode()
-                                    == heartBeat.getAction()) {
+                                    == lottorRequest.getAction()) {
                                 sendTask.setAsyncCall(objects -> NettyResultEnum.TIME_OUT.getCode());
-                            } else if (NettyMessageActionEnum.FIND_TRANSACTION_GROUP_INFO.getCode()
-                                    == heartBeat.getAction()) {
+                            } else if (NettyMessageActionEnum.FIND_TRANSACTION_GROUP_INFO.getCode() == lottorRequest.getAction()) {
                                 sendTask.setAsyncCall(objects -> null);
                             } else {
                                 sendTask.setAsyncCall(objects -> false);
@@ -218,11 +232,11 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     /**
      * 向TxManager 异步 发送消息
      *
-     * @param heartBeat 定义的数据传输对象
+     * @param lottorRequest 定义的数据传输对象
      */
-    public void asyncSendTxManagerMessage(HeartBeat heartBeat) {
+    public void asyncSendTxManagerMessage(LottorRequest lottorRequest) {
         if (ctx != null && ctx.channel() != null && ctx.channel().isActive()) {
-            ctx.writeAndFlush(heartBeat);
+            ctx.writeAndFlush(lottorRequest);
         }
 
     }

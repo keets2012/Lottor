@@ -1,18 +1,12 @@
 spring:
   profiles:
     active: dev
-  datasource:
-      driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.1.200:3306/pay?useUnicode=true&characterEncoding=utf8
-      username: simu
-      password: simu123
   application:
       name: t-consumer
   cloud:
     consul:
-#      host: 120.55.43.136
-      host: ${CONSUL_ADDRESS:192.168.1.204}
-      port: 8500
+      host: localhost
+      port: 8501
       discovery:
         ip-address: ${HOST_ADDRESS:localhost}
         port: ${SERVER_PORT:${server.port}}
@@ -47,7 +41,7 @@ spring:
       bindings:
         test-input:
           group: testGroup
-          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsg
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsgAdapter
           destination: tx-test
           binder: rabbit1
       binders:
@@ -56,7 +50,7 @@ spring:
           environment:
             spring:
               rabbitmq:
-                host: 120.55.43.136
+                host: localhost
                 port: 5672
                 username: guest
                 password: guest
@@ -68,11 +62,11 @@ tx:
   core:
     compensation-cache-type: redis
     tx-redis-config:
-      host-name: 192.168.1.200
+      host-name: localhost
       port: 6378
-      password: Superid123
+      password: pwd
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
-    compensation: false
+    compensation: true
     tx-manager-id: lotor

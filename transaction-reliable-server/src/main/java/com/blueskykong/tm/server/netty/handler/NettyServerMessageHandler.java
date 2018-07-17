@@ -5,7 +5,7 @@ import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.enums.NettyResultEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.config.Address;
@@ -19,6 +19,7 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @ChannelHandler.Sharable
 @Component
@@ -42,6 +42,19 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     private ConcurrentHashMap<String, Integer> clients = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String, List<ChannelHandlerContext>> clientContext = new ConcurrentHashMap<>();
+
+    public ConcurrentHashMap<String, List<ChannelHandlerContext>> getClientContext() {
+        return clientContext;
+    }
+
+    public List<ChannelHandlerContext> getCtxByName(String service) {
+        if (StringUtils.isNotBlank(service)) {
+            return clientContext.get(service);
+        }
+        return null;
+    }
+
     @Autowired
     public NettyServerMessageHandler(TxManagerService txManagerService, TxTransactionExecutor txTransactionExecutor) {
         this.txManagerService = ThreadLocal.withInitial(() -> txManagerService);
@@ -51,48 +64,65 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        HeartBeat hb = (HeartBeat) msg;
+        LottorRequest hb = (LottorRequest) msg;
         TxTransactionGroup txTransactionGroup = hb.getTxTransactionGroup();
         String clientCtx = ctx.channel().remoteAddress().toString();
         // initial with zero
         clients.putIfAbsent(clientCtx, 0);
-        List<TxTransactionItem> items = null;
+        TxTransactionItem item = null;
         try {
             final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(hb.getAction());
             LogUtil.debug(LOGGER, "接收到客户端 {} 事件，执行的动作为:{}", () -> clientCtx, actionEnum::getDesc);
             Boolean success;
-            if (txTransactionGroup != null) {
-                items = txTransactionGroup.getItemList();
+            if (Objects.nonNull(txTransactionGroup)) {
+                item = txTransactionGroup.getItem();
             }
             switch (actionEnum) {
                 case HEART:
                     hb.setAction(NettyMessageActionEnum.HEART.getCode());
-                    if (clients.get(clientCtx) < 1) {
+                    if (clients.get(clientCtx) < 1 && txTransactionGroup != null && txTransactionGroup.getSource() != null) {
                         SocketManager.getInstance().completeClientInfo(ctx.channel(), hb.getMetaInfo(), hb.getSerialProtocol());
                         clients.computeIfPresent(clientCtx, (clientValue, val) -> clients.get(clientValue) + 1);
+                        String source = txTransactionGroup.getSource();
+                        List<ChannelHandlerContext> contexts = getCtxByName(source);
+                        if (contexts != null) {
+                            contexts.add(ctx);
+                            clientContext.put(source, contexts);
+                        } else {
+                            clientContext.putIfAbsent(source, Collections.singletonList(ctx));
+                        }
                         LogUtil.debug(LOGGER, "heart set {} : {}", () -> clientCtx, () -> clients.get(clientCtx));
                     }
                     ctx.writeAndFlush(hb);
                     break;
                 case CREATE_GROUP:
                     //预提交，并创建事务组
-                    if (CollectionUtils.isNotEmpty(items)) {
+                    if (Objects.nonNull(item)) {
                         String modelName = ctx.channel().remoteAddress().toString();
                         //这里创建事务组的时候，事务组也作为第一条数据来存储
                         //第二条数据才是发起方 因此是get(1)
-                        final TxTransactionItem item = items.get(1);
                         item.setModelName(modelName);
                         item.setTmDomain(Address.getInstance().getDomain());
-                        txTransactionGroup.setItemList(Collections.singletonList(item));
+                        txTransactionGroup.setItem(item);
                     }
                     success = txManagerService.get().saveTxTransactionGroup(txTransactionGroup);
                     ctx.writeAndFlush(buildSendMessage(hb.getKey(), success));
                     break;
                 case GET_TRANSACTION_GROUP_STATUS:
-                    final int status = txManagerService.get().findTxTransactionGroupStatus(txTransactionGroup.getId());
-                    txTransactionGroup.setStatus(status);
-                    hb.setTxTransactionGroup(txTransactionGroup);
-                    ctx.writeAndFlush(hb);
+                    Boolean updateGroup = false;
+                    if (Objects.nonNull(txTransactionGroup)) {
+                        updateGroup = txManagerService.get().updateTxTransactionItemStatus(hb.getKey(), null,
+                                txTransactionGroup.getStatus(), null);
+                    }
+                    ctx.writeAndFlush(buildSendMessage(hb.getKey(), updateGroup));
+                    break;
+                case GET_TRANSACTION_MSG_STATUS:
+                    Boolean updateMsg = false;
+                    TransactionMsg consumeMsg = hb.getTransactionMsg();
+                    if (Objects.nonNull(consumeMsg)) {
+                        updateMsg = txManagerService.get().updateTxTransactionMsgStatus(consumeMsg);
+                    }
+                    ctx.writeAndFlush(buildSendMessage(hb.getKey(), updateMsg));
                     break;
                 case FIND_TRANSACTION_GROUP_INFO:
                     final List<TxTransactionItem> txTransactionItems = txManagerService.get().listByTxGroupId(txTransactionGroup.getId());
@@ -102,8 +132,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case ROLLBACK:
                 case COMPLETE_COMMIT:
-                    if (CollectionUtils.isNotEmpty(items)) {
-                        final TxTransactionItem item = items.get(0);
+                    if (Objects.nonNull(item)) {
                         txManagerService.get().updateTxTransactionItemStatus(txTransactionGroup.getId(),
                                 item.getTaskKey(),
                                 item.getStatus(), item.getMessage());
@@ -114,6 +143,9 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                     if (transactionMsg != null) {
                         txManagerService.get().updateTxTransactionMsgStatus(transactionMsg);
                     }
+                    break;
+                case SYNC_TX_STATUS:
+
                     break;
                 default:
                     hb.setAction(NettyMessageActionEnum.HEART.getCode());
@@ -138,8 +170,8 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-
         super.channelRegistered(ctx);
+
     }
 
     @Override
@@ -171,16 +203,16 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private HeartBeat buildSendMessage(String key, Boolean success) {
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setKey(key);
-        heartBeat.setAction(NettyMessageActionEnum.RECEIVE.getCode());
+    private LottorRequest buildSendMessage(String key, Boolean success) {
+        LottorRequest lottorRequest = new LottorRequest();
+        lottorRequest.setKey(key);
+        lottorRequest.setAction(NettyMessageActionEnum.RECEIVE.getCode());
         if (success) {
-            heartBeat.setResult(NettyResultEnum.SUCCESS.getCode());
+            lottorRequest.setResult(NettyResultEnum.SUCCESS.getCode());
         } else {
-            heartBeat.setResult(NettyResultEnum.FAIL.getCode());
+            lottorRequest.setResult(NettyResultEnum.FAIL.getCode());
         }
-        return heartBeat;
+        return lottorRequest;
 
     }
 

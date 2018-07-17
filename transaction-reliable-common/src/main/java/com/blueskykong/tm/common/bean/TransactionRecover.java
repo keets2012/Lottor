@@ -1,10 +1,12 @@
 package com.blueskykong.tm.common.bean;
 
 
+import com.blueskykong.tm.common.entity.TransactionMsg;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class TransactionRecover implements Serializable {
@@ -28,8 +30,7 @@ public class TransactionRecover implements Serializable {
     private String taskId;
 
 
-    private TransactionInvocation transactionInvocation;
-
+    private List<TransactionMsg> transactionMsgs;
 
     private int status;
 

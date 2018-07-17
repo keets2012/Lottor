@@ -3,25 +3,22 @@ package com.blueskykong.sc.producer.service.impl;
 import com.blueskykong.sc.producer.domain.Product;
 import com.blueskykong.sc.producer.service.PayService;
 import com.blueskykong.tm.common.entity.TransactionMsg;
-import com.blueskykong.tm.common.entity.TxTransactionMsg;
 import com.blueskykong.tm.common.enums.MethodNameEnum;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
 import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.netty.serizlize.kryo.KryoSerialize;
 import com.blueskykong.tm.common.serializer.KryoSerializer;
 import com.blueskykong.tm.core.service.ExternalNettyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author keets
@@ -38,26 +35,22 @@ public class PayServiceImpl implements PayService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PayServiceImpl.class);
 
     @Override
+    @Transactional
     public Boolean createAffair() {
         TransactionMsg transactionMsg = new TransactionMsg();
         transactionMsg.setSource(ServiceNameEnum.TEST_PRODUCER.getServiceName());
         transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
         //TODO 下个版本优化，客户端暂时需要序列化对象
-        try {
 //            Product product = new Product("123", "apple", "an apple a day");
-            Map<String, String> arg = new HashMap<>();
-            arg.put("123", "456");
-            transactionMsg.setArgs(kryoSerialize.serialize(arg));
-        } catch (TransactionException e) {
-            LogUtil.error(LOGGER, "failed to serialize: {} for: {} ", () -> Product.class.toString(), e::getLocalizedMessage);
-            throw new IllegalArgumentException("illegal params to serialize!");
-        }
+        Map<String, String> arg = new HashMap<>();
+        arg.put("123", "456");
+        transactionMsg.setArgs(arg);
+//            LogUtil.error(LOGGER, "failed to serialize: {} for: {} ", () -> Product.class.toString(), e::getLocalizedMessage);
+//            throw new IllegalArgumentException("illegal params to serialize!");
 
         transactionMsg.setMethod(MethodNameEnum.CONSUMER_TEST.getMethod());
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
-        TxTransactionMsg txTransactionMsg = new TxTransactionMsg();
-        txTransactionMsg.setMsgs(Collections.singletonList(transactionMsg));
-        nettyService.preSend(txTransactionMsg);
+        nettyService.preSend(Collections.singletonList(transactionMsg));
 
         try {
             LogUtil.debug(LOGGER, () -> "执行本地事务！");

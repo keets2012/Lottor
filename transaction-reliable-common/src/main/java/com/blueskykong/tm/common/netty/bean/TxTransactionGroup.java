@@ -22,11 +22,16 @@ public class TxTransactionGroup implements Serializable {
      */
     private int waitTime;
 
+    private String source;
+
+    private String target;
     /**
      * 事务状态
      */
     private int status;
 
-    private  List<TxTransactionItem> itemList;
+    private List<TxTransactionItem> itemList;
+
+    private TxTransactionItem item;
 
 }

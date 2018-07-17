@@ -36,6 +36,6 @@ public class NettyConfig {
      */
     private int heartTime;
 
-
+    private boolean onEpoll = false;
 }
 

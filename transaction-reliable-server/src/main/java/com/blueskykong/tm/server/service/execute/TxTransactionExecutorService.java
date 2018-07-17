@@ -3,7 +3,7 @@ package com.blueskykong.tm.server.service.execute;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.holder.httpclient.OkHttpTools;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.config.ChannelSender;
 import com.blueskykong.tm.server.config.Constant;
@@ -55,10 +55,10 @@ public class TxTransactionExecutorService extends AbstractTxTransactionExecutor 
                         .map(item ->
                                 CompletableFuture.runAsync(() -> {
                                     ChannelSender channelSender = new ChannelSender();
-                                    HeartBeat heartBeat = ExecutorMessageTool.buildMessage(item, channelSender,
+                                    LottorRequest lottorRequest = ExecutorMessageTool.buildMessage(item, channelSender,
                                             TransactionStatusEnum.ROLLBACK);
                                     if (Objects.nonNull(channelSender.getChannel())) {
-                                        channelSender.getChannel().writeAndFlush(heartBeat);
+                                        channelSender.getChannel().writeAndFlush(lottorRequest);
                                     } else {
                                         LOGGER.error("txManger rollback指令失败，channel为空，事务组id：{}, 事务taskId为:{}",
                                                 txGroupId, item.getTaskKey());
@@ -91,9 +91,9 @@ public class TxTransactionExecutorService extends AbstractTxTransactionExecutor 
         try {
             txTransactionItems.forEach(item -> {
                 ChannelSender sender = new ChannelSender();
-                HeartBeat heartBeat = ExecutorMessageTool.buildMessage(item, sender, TransactionStatusEnum.COMMIT);
+                LottorRequest lottorRequest = ExecutorMessageTool.buildMessage(item, sender, TransactionStatusEnum.COMMIT);
                 if (Objects.nonNull(sender.getChannel())) {
-                    sender.getChannel().writeAndFlush(heartBeat);
+                    sender.getChannel().writeAndFlush(lottorRequest);
                     LogUtil.info(LOGGER, "txManger 成功发送doCommit指令 事务taskId为：{}", item::getTaskKey);
                 } else {
                     LOGGER.error("txManger 发送doCommit指令失败，channel为空，事务组id：{}, 事务taskId为:{}", txGroupId, item.getTaskKey());

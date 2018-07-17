@@ -1,7 +1,7 @@
 package com.blueskykong.tm.sc.feign;
 
+import com.blueskykong.tm.common.concurrent.threadlocal.TxTransactionLocal;
 import com.blueskykong.tm.common.constant.CommonConstant;
-import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionLocal;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 

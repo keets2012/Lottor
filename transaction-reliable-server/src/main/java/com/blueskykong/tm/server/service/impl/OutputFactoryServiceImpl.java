@@ -1,6 +1,6 @@
 package com.blueskykong.tm.server.service.impl;
 
-import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.ServiceNameEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.server.service.OutputFactoryService;
@@ -45,7 +45,7 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
      * @return Boolean
      */
     @Override
-    public Boolean sendMsg(TransactionMsg msg) {
+    public Boolean sendMsg(TransactionMsgAdapter msg) {
         ServiceNameEnum serviceNameEnum = ServiceNameEnum.fromString(msg.getTarget());
         if (!Objects.nonNull(serviceNameEnum)) {
             LogUtil.warn(LOGGER, "no available cases for {}. pls check if this topic exists.", () -> msg.getTarget());

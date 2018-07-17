@@ -70,5 +70,6 @@ public class TxConfig {
 
     private TxRedisConfig txRedisConfig;
 
+    private boolean onEpoll = false;
 
 }

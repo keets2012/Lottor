@@ -18,6 +18,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -62,8 +63,6 @@ public class NettyClientServiceImpl implements NettyClientService {
 
     private int retryInterval;
 
-    private static final String OS_NAME = "Linux";
-
     private final NettyClientHandlerInitializer nettyClientHandlerInitializer;
 
     private final DiscoveryClient discoveryClient;
@@ -96,7 +95,7 @@ public class NettyClientServiceImpl implements NettyClientService {
         TxManagerLocator.getInstance().schedulePeriodicRefresh();
         try {
             bootstrap = new Bootstrap();
-            groups(bootstrap, txConfig.getNettyThreadMax());
+            groups(bootstrap, txConfig);
             doConnect();
         } catch (Exception e) {
             LogUtil.error(LOGGER, "tx client start failed for {}", () -> e.getLocalizedMessage());
@@ -104,9 +103,10 @@ public class NettyClientServiceImpl implements NettyClientService {
         }
     }
 
-    private void groups(Bootstrap bootstrap, int workThreads) {
+    private void groups(Bootstrap bootstrap, TxConfig txConfig) {
+        int workThreads = txConfig.getNettyThreadMax();
         //暂时不使用EpollEventLoopGroup，Ubuntu报错
-/*        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+        if (Epoll.isAvailable() && txConfig.isOnEpoll()) {
             workerGroup = new EpollEventLoopGroup(workThreads);
             bootstrap.group(workerGroup);
             bootstrap.channel(EpollSocketChannel.class);
@@ -116,19 +116,19 @@ public class NettyClientServiceImpl implements NettyClientService {
                     .option(EpollChannelOption.SO_BACKLOG, 1024)
                     .option(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .handler(nettyClientHandlerInitializer);*/
-//        } else {
-        workerGroup = new NioEventLoopGroup(workThreads);
-        bootstrap.group(workerGroup);
-        bootstrap.channel(NioSocketChannel.class);
-        bootstrap.option(ChannelOption.SO_BACKLOG, 1024)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .handler(new LoggingHandler(LogLevel.INFO))
-                .handler(nettyClientHandlerInitializer);
-
+                    .handler(nettyClientHandlerInitializer);
+        } else {
+            workerGroup = new NioEventLoopGroup(workThreads);
+            bootstrap.group(workerGroup);
+            bootstrap.channel(NioSocketChannel.class);
+            bootstrap.option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .handler(nettyClientHandlerInitializer);
+        }
     }
 
 

@@ -1,20 +1,22 @@
 package com.blueskykong.tm.core.service.handler;
 
 import com.blueskykong.tm.common.bean.TxTransactionInfo;
-import com.blueskykong.tm.common.entity.TxTransactionMsg;
+import com.blueskykong.tm.common.concurrent.threadlocal.TxTransactionLocal;
+import com.blueskykong.tm.common.concurrent.threadlocal.TxTransactionTaskLocal;
+import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.TransactionRoleEnum;
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
+import com.blueskykong.tm.common.helper.TransactionMsgHelper;
 import com.blueskykong.tm.common.holder.DateUtils;
 import com.blueskykong.tm.common.holder.IdWorkerUtils;
 import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
-import com.blueskykong.tm.core.compensation.command.TxCompensationCommand;
-import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionLocal;
-import com.blueskykong.tm.core.concurrent.threadlocal.TxTransactionTaskLocal;
+import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import com.blueskykong.tm.core.service.TxTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author keets
@@ -35,25 +38,23 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(StartTxTransactionHandler.class);
 
-    private final TxCompensationCommand txCompensationCommand;
+    private final TxOperateCommand txOperateCommand;
 
     private final TxManagerMessageService txManagerMessageService;
 
     private final ObjectSerializer objectSerializer;
 
-    @Autowired(required = false)
-    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxCompensationCommand txCompensationCommand, ObjectSerializer objectSerializer) {
+    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand, ObjectSerializer objectSerializer) {
         this.objectSerializer = objectSerializer;
         this.txManagerMessageService = txManagerMessageService;
-        this.txCompensationCommand = txCompensationCommand;
-
+        this.txOperateCommand = txOperateCommand;
     }
 
 
     @Override
-    public Object handler(ProceedingJoinPoint point, TxTransactionInfo info) throws Throwable {
+    public Object handler(TxTransactionInfo info) {
         LogUtil.info(LOGGER, "tx-transaction start,  事务发起类：{}",
-                () -> point.getTarget().getClass());
+                () -> "");
 
         final String groupId = IdWorkerUtils.getInstance().createGroupId();
 
@@ -67,15 +68,15 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         final Boolean success = txManagerMessageService.saveTxTransactionGroup(newTxTransactionGroup(groupId, waitKey, info));
         if (success) {
             try {
-                final Object res = point.proceed();
                 //本地服务记录，用作补偿
-                txCompensationCommand.saveTxCompensation(info.getInvocation(), groupId, waitKey);
-                return res;
+                txOperateCommand.saveTxCompensation((List<TransactionMsg>) info.getArgs()[0], groupId, waitKey);
+                return "";
             } catch (Throwable throwable) {
                 //通知tm整个事务组失败，需要回滚，标志事务组的状态
-                //TODO ROLLABCK待优化
+                //TODO ROLLBACK待优化
                 txManagerMessageService.rollBackTxTransaction(groupId, waitKey);
-                throwable.printStackTrace();
+                txOperateCommand.updateTxCompensation(groupId, TransactionStatusEnum.ROLLBACK.getCode());
+                LogUtil.error(LOGGER, "failed to start TxTransaction for: {}", throwable::getLocalizedMessage);
                 throw throwable;
             }
         } else {
@@ -88,29 +89,6 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
         txTransactionGroup.setId(groupId);
 
-        List<TxTransactionItem> items = new ArrayList<>(2);
-
-        //tmManager 用redis hash 结构来存储 整个事务组的状态做为hash结构的第一条数据
-
-        TxTransactionItem groupItem = new TxTransactionItem();
-
-        //整个事务组状态为预提交
-        groupItem.setStatus(TransactionStatusEnum.PRE_COMMIT.getCode());
-
-        //设置事务id为组的id  即为 hashKey
-        groupItem.setTransId(groupId);
-        groupItem.setTaskKey(groupId);
-        groupItem.setCreateDate(DateUtils.getCurrentDateTime());
-
-        //设置执行类名称
-        groupItem.setTargetClass(info.getInvocation().getTargetClazz().getName());
-        //设置执行类方法
-        groupItem.setTargetMethod(info.getInvocation().getMethod());
-
-        groupItem.setRole(TransactionRoleEnum.GROUP.getCode());
-
-        items.add(groupItem);
-
         TxTransactionItem item = new TxTransactionItem();
         item.setTaskKey(taskKey);
         item.setTransId(IdWorkerUtils.getInstance().createUUID());
@@ -122,22 +100,24 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         item.setWaitMaxTime(info.getWaitMaxTime());
         //设置创建时间
         item.setCreateDate(DateUtils.getCurrentDateTime());
-        //设置执行类名称
-        item.setTargetClass(info.getInvocation().getTargetClazz().getName());
-        //设置执行类方法
-        item.setTargetMethod(info.getInvocation().getMethod());
         //设置参数，只会是第一个
-        try {
-            byte[] args = objectSerializer.serialize(info.getInvocation().getArgumentValues()[0]);
-            TxTransactionMsg msg = (TxTransactionMsg) info.getInvocation().getArgumentValues()[0];
-            item.setArgs(args);
-        } catch (TransactionException e) {
-            e.printStackTrace();
-            LogUtil.error(LOGGER, "failed to serialize transactionMsg, groupId is: {}, cause is: {}", () -> groupId, e::getLocalizedMessage);
-        }
-        items.add(item);
+        List<TransactionMsg> msgList = (List<TransactionMsg>) info.getArgs()[0];
+        List<TransactionMsgAdapter> adapters = msgList.stream().map(msg -> {
+            TransactionMsgAdapter transactionMsgAdapter = null;
+            try {
+                byte[] args = objectSerializer.serialize(msg.getArgs());
+                transactionMsgAdapter = TransactionMsgHelper.convertTransactionMsg(msg);
+                transactionMsgAdapter.setArgs(args);
+            } catch (TransactionException e) {
+                e.printStackTrace();
+                LogUtil.error(LOGGER, "failed to serialize transactionMsg, groupId is: {}, cause is: {}", () -> groupId, e::getLocalizedMessage);
+            }
+            return transactionMsgAdapter;
+        }).collect(Collectors.toList());
 
-        txTransactionGroup.setItemList(items);
+        item.setMsgs(adapters);
+
+        txTransactionGroup.setItem(item);
         return txTransactionGroup;
     }
 

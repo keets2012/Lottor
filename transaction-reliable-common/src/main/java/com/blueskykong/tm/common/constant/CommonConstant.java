@@ -36,4 +36,6 @@ public interface CommonConstant {
     String LOAD_TX_MANAGER_SERVICE_URL = "/loadTxManagerService";
 
     String FIND_SERVER = "/findTxManagerServer";
+
+    int HEAD_DATA = 0X76;
 }

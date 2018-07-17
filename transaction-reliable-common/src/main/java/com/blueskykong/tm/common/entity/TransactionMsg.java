@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -45,7 +46,7 @@ public class TransactionMsg {
     /**
      * 参数，即要传递的内容，可以为null
      */
-    private byte[] args;
+    private Object args;
 
     /**
      * 创建时间
@@ -68,7 +69,6 @@ public class TransactionMsg {
      * {@linkplain com.blueskykong.tm.common.enums.ConsumedStatus}
      */
     private int consumed = ConsumedStatus.UNCONSUMED.getStatus();
-
 
     public static class Builder {
         private TransactionMsg transactionMsg = new TransactionMsg();
@@ -118,7 +118,7 @@ public class TransactionMsg {
             return this;
         }
 
-        public Builder setArgs(byte[] args) {
+        public Builder setArgs(Object args) {
             if (args != null) {
                 transactionMsg.setArgs(args);
             }
@@ -127,6 +127,14 @@ public class TransactionMsg {
 
         public Builder setConsumed(int consumed) {
             transactionMsg.setConsumed(consumed);
+            return this;
+        }
+
+        public Builder setMessage(String message) {
+            if (StringUtils.isNotBlank(message)) {
+
+                transactionMsg.setMessage(message);
+            }
             return this;
         }
 

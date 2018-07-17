@@ -2,7 +2,7 @@ package com.blueskykong.tm.server.service.execute;
 
 import com.blueskykong.tm.common.enums.TransactionStatusEnum;
 import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.netty.bean.HeartBeat;
+import com.blueskykong.tm.common.netty.bean.LottorRequest;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.config.ChannelSender;
 import com.blueskykong.tm.server.config.ExecutorMessageTool;
@@ -50,10 +50,10 @@ public class HttpTransactionExecutor {
                     .map(item ->
                             CompletableFuture.runAsync(() -> {
                                 ChannelSender channelSender = new ChannelSender();
-                                final HeartBeat heartBeat = ExecutorMessageTool.buildMessage(item,
+                                final LottorRequest lottorRequest = ExecutorMessageTool.buildMessage(item,
                                         channelSender, transactionStatusEnum);
                                 if (Objects.nonNull(channelSender.getChannel())) {
-                                    channelSender.getChannel().writeAndFlush(heartBeat);
+                                    channelSender.getChannel().writeAndFlush(lottorRequest);
                                 } else {
                                     LOGGER.error("txMange {},指令失败，channel为空，事务组id：{}, 事务taskId为:{}",
                                             transactionStatusEnum.getDesc(), item.getTxGroupId(), item.getTaskKey());

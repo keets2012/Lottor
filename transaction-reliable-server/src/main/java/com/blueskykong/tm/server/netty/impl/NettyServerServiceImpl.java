@@ -15,6 +15,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -92,7 +93,7 @@ public class NettyServerServiceImpl implements NettyService {
         /**
          * ubuntu系统不能很好的适配EpollEventLoopGroup，暂时不启用
          */
-/*        if (Objects.equals(StandardSystemProperty.OS_NAME.value(), OS_NAME)) {
+        if (Epoll.isAvailable() && nettyConfig.isOnEpoll()) {
             bossGroup = new EpollEventLoopGroup(1);
             workerGroup = new EpollEventLoopGroup(workThreads);
             b.group(bossGroup, workerGroup)
@@ -104,20 +105,20 @@ public class NettyServerServiceImpl implements NettyService {
                     .childOption(EpollChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(nettyServerHandlerInitializer);
-        } else {*/
-        bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup(workThreads);
-        b.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, 100)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(nettyServerHandlerInitializer);
-//        }
+        } else {
+            bossGroup = new NioEventLoopGroup();
+            workerGroup = new NioEventLoopGroup(workThreads);
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 100)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(nettyServerHandlerInitializer);
+        }
     }
 
 

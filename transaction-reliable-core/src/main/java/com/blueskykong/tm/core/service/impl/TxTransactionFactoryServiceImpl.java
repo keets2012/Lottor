@@ -13,7 +13,7 @@ import com.blueskykong.tm.core.service.handler.StartTxTransactionHandler;
 public class TxTransactionFactoryServiceImpl implements TxTransactionFactoryService {
 
     @Override
-    public Class factoryOf(TxTransactionInfo info) throws Throwable {
+    public Class factoryOf(TxTransactionInfo info) {
         OperationEnum operation = info.getOperationEnum();
         Class handler;
         switch (operation) {
