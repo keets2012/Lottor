@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * @author keets
- */
+
 public class ExternalNettyServiceImpl implements ExternalNettyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalNettyServiceImpl.class);
 

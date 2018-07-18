@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Objects;
 
-/**
- * @author keets
- */
 public class NettyMessageServiceImpl implements TxManagerMessageService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyMessageServiceImpl.class);
 

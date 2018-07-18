@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author keets
- */
 @Component
 public class NettyClientHandlerInitializer extends ChannelInitializer<SocketChannel> {
 

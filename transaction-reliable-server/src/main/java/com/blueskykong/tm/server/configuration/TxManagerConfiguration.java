@@ -7,6 +7,11 @@ import com.blueskykong.tm.common.serializer.KryoSerializer;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.config.NettyConfig;
 import com.blueskykong.tm.server.discovery.DiscoveryService;
+import com.blueskykong.tm.server.netty.handler.NettyServerMessageHandler;
+import com.blueskykong.tm.server.service.BaseItemService;
+import com.blueskykong.tm.server.service.TxManagerService;
+import com.blueskykong.tm.server.service.impl.BaseItemServiceImpl;
+import com.blueskykong.tm.server.task.TxSyncTask;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
@@ -54,6 +60,16 @@ public class TxManagerConfiguration {
         return new DiscoveryService(discoveryClient);
     }
 
+    @Bean
+    public TxSyncTask txSyncTask(TxManagerService txManagerService, NettyServerMessageHandler serverMessageHandler,
+                                 NettyConfig nettyConfig, BaseItemService baseItemService) {
+        return new TxSyncTask(txManagerService, serverMessageHandler, nettyConfig, baseItemService);
+    }
+
+    @Bean
+    public BaseItemService baseItemService(MongoTemplate mongoTemplate) {
+        return new BaseItemServiceImpl(mongoTemplate);
+    }
 
     @Configuration
     static class NettyConfiguration {
@@ -97,7 +113,7 @@ public class TxManagerConfiguration {
         }
 
         @Override
-        public Mongo mongo() throws Exception {
+        public Mongo mongo() {
             return new MongoClient(MONGODB_HOST, MONGODB_PORT);
         }
 

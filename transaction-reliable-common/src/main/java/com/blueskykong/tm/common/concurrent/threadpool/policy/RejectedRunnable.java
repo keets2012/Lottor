@@ -1,8 +1,5 @@
 package com.blueskykong.tm.common.concurrent.threadpool.policy;
 
-/**
- * @author keets
- */
 public interface RejectedRunnable extends Runnable {
 
     /**

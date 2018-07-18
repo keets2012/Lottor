@@ -7,15 +7,9 @@ import java.util.Optional;
 public enum CompensationCacheTypeEnum {
 
 
-    DB("db"),
-
-    FILE("file"),
-
     REDIS("redis"),
 
-    MONGODB("mongodb"),
-
-    ZOOKEEPER("zookeeper");
+    MONGODB("mongodb");
 
     private String compensationCacheType;
 
@@ -29,7 +23,7 @@ public enum CompensationCacheTypeEnum {
                 Arrays.stream(CompensationCacheTypeEnum.values())
                         .filter(v -> Objects.equals(v.getCompensationCacheType(), compensationCacheType))
                         .findFirst();
-        return serializeProtocolEnum.orElse(CompensationCacheTypeEnum.DB);
+        return serializeProtocolEnum.orElse(CompensationCacheTypeEnum.REDIS);
     }
 
 

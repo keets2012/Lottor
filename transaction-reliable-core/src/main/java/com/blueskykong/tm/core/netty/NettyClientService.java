@@ -3,7 +3,7 @@ package com.blueskykong.tm.core.netty;
 import com.blueskykong.tm.common.config.TxConfig;
 
 /**
- * @author keets
+ *
  */
 public interface NettyClientService {
 

@@ -1,6 +1,7 @@
 package com.blueskykong.tm.server.service;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
@@ -72,7 +73,6 @@ public interface TxManagerService {
      */
     int findTxTransactionGroupStatus(String txGroupId);
 
-
     /**
      * 删除已经提交的事务组 每个子项都必须提交才删除
      *
@@ -80,9 +80,9 @@ public interface TxManagerService {
      */
     Boolean removeCommitTxGroup();
 
-    List<TxTransactionItem> listTxItemByDelay(long delay);
+    List<TxTransactionItem> listTxItemByDelay(Long delay);
 
-    List<TransactionMsg> listTxMsgByDelay(long delay);
+    List<TransactionMsgAdapter> listTxMsgByDelay(Long delay);
     /**
      * 删除回滚的事务组
      *

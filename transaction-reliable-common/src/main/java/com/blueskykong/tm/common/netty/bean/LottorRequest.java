@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * @author keets
- */
 @Data
 public class LottorRequest implements Serializable {
 

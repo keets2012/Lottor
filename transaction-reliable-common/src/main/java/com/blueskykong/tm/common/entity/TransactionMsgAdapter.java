@@ -10,9 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-/**
- * @author keets
- */
 @Data
 @NoArgsConstructor
 public class TransactionMsgAdapter implements Serializable {
@@ -72,6 +69,21 @@ public class TransactionMsgAdapter implements Serializable {
      */
     private int consumed = ConsumedStatus.UNCONSUMED.getStatus();
 
+
+    public static TransactionMsg convert(TransactionMsgAdapter transactionMsgAdapter) {
+
+        TransactionMsg transactionMsg = new TransactionMsg.Builder()
+                .setSource(transactionMsgAdapter.getSource())
+                .setMethod(transactionMsgAdapter.getMethod())
+                .setGroupId(transactionMsgAdapter.getGroupId())
+                .setSubTaskId(transactionMsgAdapter.getSubTaskId())
+                .setTarget(transactionMsgAdapter.getTarget())
+                .setConsumed(transactionMsgAdapter.getConsumed())
+                .build();
+
+        return transactionMsg;
+
+    }
 
     public static class Builder {
         private TransactionMsgAdapter transactionMsg = new TransactionMsgAdapter();

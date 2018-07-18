@@ -1,6 +1,5 @@
 package com.blueskykong.tm.core.compensation.command;
 
-import com.blueskykong.tm.common.bean.TransactionInvocation;
 import com.blueskykong.tm.common.bean.TransactionRecover;
 import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.enums.CompensationActionEnum;
@@ -15,9 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author keets
- */
 public class TxOperateCommand implements Command {
 
     private final TxOperateService txOperateService;
@@ -80,7 +76,11 @@ public class TxOperateCommand implements Command {
     }
 
     public LottorRequest getTxGroupStatus(String key) {
-        int status = getTxCompensation(key).getStatus();
+        TransactionRecover transactionRecover = getTxCompensation(key);
+        if (Objects.isNull(transactionRecover)) {
+            return null;
+        }
+        int status = transactionRecover.getStatus();
 
         LottorRequest request = new LottorRequest();
         request.setAction(NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS

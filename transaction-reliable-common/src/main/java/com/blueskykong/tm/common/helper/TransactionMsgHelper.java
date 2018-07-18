@@ -6,7 +6,6 @@ import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 
 /**
- * @author keets
  * @data 2018/6/27.
  */
 public class TransactionMsgHelper {

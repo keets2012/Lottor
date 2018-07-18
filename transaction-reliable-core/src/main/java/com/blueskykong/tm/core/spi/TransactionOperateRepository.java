@@ -11,9 +11,6 @@ import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author keets
- */
 public interface TransactionOperateRepository {
 
     /**

@@ -21,8 +21,7 @@ public enum TransactionRoleEnum {
     /**
      * 事务组
      */
-    GROUP(2,"事务组")
-    ;
+    GROUP(2, "事务组");
 
 
     private int code;

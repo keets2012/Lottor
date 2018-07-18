@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author keets
+ *
  */
 @ChannelHandler.Sharable
 public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
@@ -80,8 +80,10 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case GET_TRANSACTION_GROUP_STATUS:
                     LottorRequest replyTxGroup = txOperateCommand.getTxGroupStatus(lottorRequest.getKey());
-                    replyTxGroup.setAction(NettyMessageActionEnum.SYNC_TX_STATUS.getCode());
-                    ctx.writeAndFlush(replyTxGroup);
+                    if (Objects.nonNull(replyTxGroup)) {
+                        replyTxGroup.setAction(NettyMessageActionEnum.SYNC_TX_STATUS.getCode());
+                        ctx.writeAndFlush(replyTxGroup);
+                    }
                     break;
                 case GET_TRANSACTION_MSG_STATUS:
                     TransactionMsg transactionMsg = lottorRequest.getTransactionMsg();

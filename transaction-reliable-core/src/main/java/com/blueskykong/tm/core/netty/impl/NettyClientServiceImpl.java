@@ -36,9 +36,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author keets
- */
 public class NettyClientServiceImpl implements NettyClientService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyClientServiceImpl.class);

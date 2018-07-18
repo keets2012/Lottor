@@ -4,9 +4,6 @@ import com.blueskykong.tm.common.entity.TransactionMsg;
 
 import java.util.List;
 
-/**
- * @author keets
- */
 public interface ExternalNettyService {
 
     /**

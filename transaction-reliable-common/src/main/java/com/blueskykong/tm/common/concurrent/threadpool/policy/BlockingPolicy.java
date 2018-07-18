@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * @author keets
- */
+
 public class BlockingPolicy implements RejectedExecutionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(BlockingPolicy.class);
 

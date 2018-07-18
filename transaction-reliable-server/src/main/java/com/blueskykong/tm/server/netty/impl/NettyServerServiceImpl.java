@@ -93,7 +93,7 @@ public class NettyServerServiceImpl implements NettyService {
         /**
          * ubuntu系统不能很好的适配EpollEventLoopGroup，暂时不启用
          */
-        if (Epoll.isAvailable() && nettyConfig.isOnEpoll()) {
+        if (Epoll.isAvailable() && nettyConfig.getOnEpoll()) {
             bossGroup = new EpollEventLoopGroup(1);
             workerGroup = new EpollEventLoopGroup(workThreads);
             b.group(bossGroup, workerGroup)

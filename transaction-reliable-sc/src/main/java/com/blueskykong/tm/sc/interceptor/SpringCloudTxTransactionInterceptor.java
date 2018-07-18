@@ -7,9 +7,6 @@ import com.blueskykong.tm.core.service.AspectTransactionService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * @author keets
- */
 public class SpringCloudTxTransactionInterceptor implements TxTransactionInterceptor {
 
     private final AspectTransactionService aspectTransactionService;

@@ -1,9 +1,6 @@
 package com.blueskykong.tm.common.concurrent.threadlocal;
 
 
-/**
- * @author keets
- */
 public class TxTransactionLocal {
 
     private static final TxTransactionLocal TX_TRANSACTION_LOCAL = new TxTransactionLocal();

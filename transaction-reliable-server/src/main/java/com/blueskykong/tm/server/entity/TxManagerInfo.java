@@ -4,9 +4,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author keets
- */
 @Data
 public class TxManagerInfo {
 

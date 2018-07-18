@@ -5,7 +5,6 @@ import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 
 /**
- * @author keets
  * @data 2018/7/15.
  */
 public interface TransactionMsgRepository {

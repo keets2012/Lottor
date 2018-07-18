@@ -1,8 +1,5 @@
 package com.blueskykong.tm.core.service;
 
-/**
- * @author keets
- */
 public interface ModelNameService {
 
     /**

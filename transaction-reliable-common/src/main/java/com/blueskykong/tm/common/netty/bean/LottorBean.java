@@ -14,7 +14,7 @@ import java.util.Arrays;
  * 3.要传输的数据,长度不应该超过2048，防止socket流的攻击
  * </pre>
  *
- * @author keets
+ *
  * @data 2018/6/9.
  */
 public class LottorBean {

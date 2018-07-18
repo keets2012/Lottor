@@ -6,7 +6,6 @@ import org.springframework.data.domain.Sort;
 import java.io.Serializable;
 
 /**
- * @author keets
  * @data 2018/4/13.
  */
 public class MongoPageable implements Serializable, Pageable {

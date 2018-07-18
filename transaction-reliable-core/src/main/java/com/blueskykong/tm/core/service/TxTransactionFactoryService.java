@@ -4,9 +4,6 @@ package com.blueskykong.tm.core.service;
 
 import com.blueskykong.tm.common.bean.TxTransactionInfo;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface TxTransactionFactoryService<T> {
 

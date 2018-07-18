@@ -7,9 +7,6 @@ import com.blueskykong.tm.core.service.handler.ConfirmTxTransactionHandler;
 import com.blueskykong.tm.core.service.handler.ConsumedTransactionHandler;
 import com.blueskykong.tm.core.service.handler.StartTxTransactionHandler;
 
-/**
- * @author keets
- */
 public class TxTransactionFactoryServiceImpl implements TxTransactionFactoryService {
 
     @Override

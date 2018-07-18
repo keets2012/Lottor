@@ -9,7 +9,6 @@ import com.blueskykong.tm.core.service.ExternalNettyService;
 import org.springframework.messaging.Message;
 
 /**
- * @author keets
  * @data 2018/6/27.
  */
 public abstract class InitStreamHandler {

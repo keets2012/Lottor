@@ -2,9 +2,6 @@ package com.blueskykong.tm.common.config;
 
 import lombok.Data;
 
-/**
- * @author keets
- */
 @Data
 public class TxRedisConfig {
 

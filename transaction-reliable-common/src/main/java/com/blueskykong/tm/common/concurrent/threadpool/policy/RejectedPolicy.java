@@ -8,9 +8,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
-/**
- * @author keets
- */
 public class RejectedPolicy implements RejectedExecutionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RejectedPolicy.class);
 

@@ -10,9 +10,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.concurrent.ExecutionException;
 
-/**
- * @author keets
- */
 public class BlockTaskHelper {
 
     private static final int MAX_COUNT = 10000;
