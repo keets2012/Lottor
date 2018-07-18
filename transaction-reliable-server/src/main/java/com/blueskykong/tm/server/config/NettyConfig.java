@@ -36,6 +36,12 @@ public class NettyConfig {
      */
     private int heartTime;
 
-    private boolean onEpoll = false;
+    private Boolean onEpoll = false;
+
+    private Boolean check = true;
+
+    private int checkPeriod = 45;
+
+    private int initDelay = 30;
 }
 

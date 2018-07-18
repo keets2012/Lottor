@@ -5,7 +5,8 @@ spring:
       name: t-producer
   cloud:
     consul:
-      host: localhost
+      host: 120.55.43.136
+#      host: ${CONSUL_ADDRESS:192.168.1.204}
       port: 8501
       discovery:
         ip-address: ${HOST_ADDRESS:localhost}
@@ -41,11 +42,11 @@ tx:
   core:
     compensation-cache-type: redis
     tx-redis-config:
-      host-name: localhost
+      host-name: 192.168.1.200
       port: 6378
-      password: pwd
+      password: Superid123
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
-    compensation: true
+    compensation: false
     tx-manager-id: lotor

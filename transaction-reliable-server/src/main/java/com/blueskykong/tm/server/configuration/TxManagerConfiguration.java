@@ -7,6 +7,9 @@ import com.blueskykong.tm.common.serializer.KryoSerializer;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.server.config.NettyConfig;
 import com.blueskykong.tm.server.discovery.DiscoveryService;
+import com.blueskykong.tm.server.netty.handler.NettyServerMessageHandler;
+import com.blueskykong.tm.server.service.TxManagerService;
+import com.blueskykong.tm.server.task.TxSyncTask;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +57,10 @@ public class TxManagerConfiguration {
         return new DiscoveryService(discoveryClient);
     }
 
+    @Bean
+    public TxSyncTask txSyncTask(TxManagerService txManagerService, NettyServerMessageHandler serverMessageHandler, NettyConfig nettyConfig) {
+        return new TxSyncTask(txManagerService, serverMessageHandler, nettyConfig);
+    }
 
     @Configuration
     static class NettyConfiguration {
@@ -97,7 +104,7 @@ public class TxManagerConfiguration {
         }
 
         @Override
-        public Mongo mongo() throws Exception {
+        public Mongo mongo() {
             return new MongoClient(MONGODB_HOST, MONGODB_PORT);
         }
 

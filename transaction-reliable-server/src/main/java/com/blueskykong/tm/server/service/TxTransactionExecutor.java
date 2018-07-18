@@ -1,5 +1,9 @@
 package com.blueskykong.tm.server.service;
 
+import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
+
+import java.util.List;
+
 /**
  * @author keets
  */
@@ -13,6 +17,8 @@ public interface TxTransactionExecutor {
      */
     void rollBack(String txGroupId);
 
+
+    void checkTxGroup(List<TxTransactionItem> items);
 
     /**
      * 事务预提交

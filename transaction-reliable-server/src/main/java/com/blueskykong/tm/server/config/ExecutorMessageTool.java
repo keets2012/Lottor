@@ -33,8 +33,22 @@ public class ExecutorMessageTool {
             item.setStatus(TransactionStatusEnum.COMMIT.getCode());
             txTransactionGroup.setStatus(TransactionStatusEnum.COMMIT.getCode());
         }
+
         txTransactionGroup.setItemList(Collections.singletonList(item));
         lottorRequest.setTxTransactionGroup(txTransactionGroup);
+        return lottorRequest;
+    }
+
+
+    public static LottorRequest buildCheck(TxTransactionItem item, ChannelSender channelSender, NettyMessageActionEnum nettyMessageActionEnum) {
+        LottorRequest lottorRequest = new LottorRequest();
+        Channel channel = SocketManager.getInstance().getChannelByModelName(item.getModelName());
+        if (Objects.nonNull(channel)) {
+            if (channel.isActive()) {
+                channelSender.setChannel(channel);
+            }
+        }
+        lottorRequest.setAction(nettyMessageActionEnum.getCode());
         return lottorRequest;
     }
 }

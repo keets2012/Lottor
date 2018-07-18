@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static com.blueskykong.tm.common.enums.NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS;
+
 
 @Component
 public class TxTransactionExecutorService extends AbstractTxTransactionExecutor {
@@ -65,7 +67,7 @@ public class TxTransactionExecutorService extends AbstractTxTransactionExecutor 
                                     }
 
                                 }).whenComplete((v, e) ->
-                                        LogUtil.info(LOGGER, "txManger 成功发送rollback指令 事务taskId为：{}", item::getTaskKey)))
+                                        LogUtil.info(LOGGER, "txManger成功发送rollback指令 事务taskId为：{}", item::getTaskKey)))
                         .toArray(CompletableFuture[]::new);
                 CompletableFuture.allOf(cfs).join();
                 LogUtil.info(LOGGER, "txManger 成功发送rollback指令 事务组id为：{}", () -> txGroupId);
@@ -110,13 +112,6 @@ public class TxTransactionExecutorService extends AbstractTxTransactionExecutor 
 
 
     /**
-     * 获取当前连接的channel  为什么？
-     * 因为如果tm是集群环境，可能业务的channel对象连接到不同的tm
-     * 那么当前的tm可没有其他业务模块的长连接信息，那么就应该做：
-     * 1.检查当前tm的channel状态，并只提交当前渠道的命令
-     * 2.通知 连接到其他tm的channel，执行命令
-     * 通过http 执行 连接到其他tm 的channel
-     *
      * @param elseItems             其他的渠道集合
      * @param transactionStatusEnum 执行动作
      */
@@ -141,4 +136,13 @@ public class TxTransactionExecutorService extends AbstractTxTransactionExecutor 
     }
 
 
+    @Override
+    public void checkTxGroup(List<TxTransactionItem> items) {
+
+        if (CollectionUtils.isNotEmpty(items)) {
+
+
+        }
+
+    }
 }

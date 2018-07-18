@@ -189,7 +189,6 @@ public class TxOperateServiceImpl implements TxOperateService {
         } catch (InterruptedException e) {
             LogUtil.error(LOGGER, "补偿命令提交队列失败：{}", e::getMessage);
             return false;
-
         }
         return true;
     }

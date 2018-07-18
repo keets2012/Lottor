@@ -1,6 +1,6 @@
 spring:
   rabbitmq:
-    host: localhost
+    host: 120.55.43.136
     port: 5672
     username: guest
     password: guest
@@ -10,7 +10,7 @@ spring:
     mongodb:
       authentication-database: lotor_test
       database: lotor_test
-      host: localhost
+      host: 192.168.1.204
       port: ${MONGO_PORT:27017}
   thymeleaf:
     prefix: classpath:/html/
