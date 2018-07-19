@@ -54,8 +54,8 @@ public class TxOperateServiceImpl implements TxOperateService {
         scheduledExecutorService
                 .scheduleAtFixedRate(() -> {
                     LogUtil.debug(LOGGER, "compensate recover execute delayTime:{}", () -> txConfig.getCompensationRecoverTime());
-                    final List<TransactionRecover> transactionRecovers =
-                            transactionOperateRepository.listAllByDelay(acquireData());
+                    /*final List<TransactionRecover> transactionRecovers =
+                            transactionOperateRepository.listAllByDelay(acquireData());*/
                     /*if (CollectionUtils.isNotEmpty(transactionRecovers)) {
                         for (TransactionRecover transactionRecover : transactionRecovers) {
                             if (transactionRecover.getRetriedCount() > txConfig.getRetryMax()) {
@@ -112,7 +112,7 @@ public class TxOperateServiceImpl implements TxOperateService {
         this.txConfig = txConfig;
         if (txConfig.getCompensation()) {
             final String modelName = modelNameService.findModelName();
-            transactionOperateRepository = SpringBeanUtils.getInstance().getBean(TransactionOperateRepository.class);
+            this.transactionOperateRepository = SpringBeanUtils.getInstance().getBean(TransactionOperateRepository.class);
             transactionOperateRepository.init(modelName, txConfig);
             initCompensatePool();//初始化补偿操作的线程池
             compensate();//执行定时补偿

@@ -58,9 +58,9 @@ public class PayServiceImpl implements PayService {
                 throw new IllegalArgumentException("check your parameter!");
             }*/
             int i = 2;
-            int j = i / 1;
+            int j = i / 0;
         } catch (Exception e) {
-            nettyService.postSend(false, e.getMessage());
+//            nettyService.postSend(false, e.getMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
             return false;
         }

@@ -8,9 +8,9 @@ spring:
 
   data:
     mongodb:
-      authentication-database: lotor_test
-      database: lotor_test
-      host: 192.168.1.204
+      authentication-database: lottor_test3
+      database: lottor_test3
+      host: 120.55.43.136
       port: ${MONGO_PORT:27017}
   thymeleaf:
     prefix: classpath:/html/
@@ -36,6 +36,8 @@ tx:
       maxThreads: 16
       delayTime: 5
       heartTime: 20
+      checkPeriod: 1
+      initDelay: 1
 
 transactionWaitMaxTime: 500
 redisSaveMaxTime: 3000

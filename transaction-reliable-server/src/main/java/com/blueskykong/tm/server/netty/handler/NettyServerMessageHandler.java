@@ -18,13 +18,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -42,17 +42,18 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     private ConcurrentHashMap<String, Integer> clients = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String, List<ChannelHandlerContext>> clientContext = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ArrayList<ChannelHandlerContext>> clientContext = new ConcurrentHashMap<>();
 
-    public ConcurrentHashMap<String, List<ChannelHandlerContext>> getClientContext() {
+    public ConcurrentHashMap<String, ArrayList<ChannelHandlerContext>> getClientContext() {
         return clientContext;
     }
 
-    public List<ChannelHandlerContext> getCtxByName(String service) {
+    public ArrayList<ChannelHandlerContext> getCtxByName(String service) {
+        ArrayList<ChannelHandlerContext> contexts = new ArrayList<>();
         if (StringUtils.isNotBlank(service)) {
-            return clientContext.get(service);
+            contexts = clientContext.get(service);
         }
-        return null;
+        return contexts;
     }
 
     @Autowired
@@ -63,7 +64,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         LottorRequest hb = (LottorRequest) msg;
         TxTransactionGroup txTransactionGroup = hb.getTxTransactionGroup();
         String clientCtx = ctx.channel().remoteAddress().toString();
@@ -84,12 +85,15 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                         SocketManager.getInstance().completeClientInfo(ctx.channel(), hb.getMetaInfo(), hb.getSerialProtocol());
                         clients.computeIfPresent(clientCtx, (clientValue, val) -> clients.get(clientValue) + 1);
                         String source = txTransactionGroup.getSource();
-                        List<ChannelHandlerContext> contexts = getCtxByName(source);
+                        ArrayList<ChannelHandlerContext> contexts;
+                        contexts = getCtxByName(source);
                         if (contexts != null) {
                             contexts.add(ctx);
                             clientContext.put(source, contexts);
                         } else {
-                            clientContext.putIfAbsent(source, Collections.singletonList(ctx));
+                            contexts = new ArrayList<>();
+                            contexts.add(ctx);
+                            clientContext.putIfAbsent(source, contexts);
                         }
                         LogUtil.debug(LOGGER, "heart set {} : {}", () -> clientCtx, () -> clients.get(clientCtx));
                     }
@@ -98,10 +102,6 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                 case CREATE_GROUP:
                     //预提交，并创建事务组
                     if (Objects.nonNull(item)) {
-                        String modelName = ctx.channel().remoteAddress().toString();
-                        //这里创建事务组的时候，事务组也作为第一条数据来存储
-                        //第二条数据才是发起方 因此是get(1)
-                        item.setModelName(modelName);
                         item.setTmDomain(Address.getInstance().getDomain());
                         txTransactionGroup.setItem(item);
                     }

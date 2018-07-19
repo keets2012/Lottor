@@ -51,7 +51,6 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
                 txOperateCommand.updateTxCompensation(groupId, TransactionStatusEnum.COMMIT.getCode());
             } else {
                 status = TransactionStatusEnum.ROLLBACK.getCode();
-
             }
             LogUtil.debug(LOGGER, "confirm status: {}", () -> status);
 

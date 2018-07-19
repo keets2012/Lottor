@@ -17,6 +17,7 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
+import com.blueskykong.tm.core.service.ModelNameService;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import com.blueskykong.tm.core.service.TxTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -44,10 +45,14 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
 
     private final ObjectSerializer objectSerializer;
 
-    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand, ObjectSerializer objectSerializer) {
+    private ModelNameService modelNameService;
+
+    public StartTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand,
+                                     ObjectSerializer objectSerializer, ModelNameService modelNameService) {
         this.objectSerializer = objectSerializer;
         this.txManagerMessageService = txManagerMessageService;
         this.txOperateCommand = txOperateCommand;
+        this.modelNameService = modelNameService;
     }
 
 
@@ -95,6 +100,7 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
         item.setRole(TransactionRoleEnum.START.getCode());
         item.setStatus(TransactionStatusEnum.PRE_COMMIT.getCode());
         item.setTxGroupId(groupId);
+        item.setModelName(modelNameService.findModelName());
 
         //设置事务最大等待时间
         item.setWaitMaxTime(info.getWaitMaxTime());

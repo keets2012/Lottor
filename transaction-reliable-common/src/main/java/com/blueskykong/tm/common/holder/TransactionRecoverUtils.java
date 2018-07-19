@@ -60,6 +60,9 @@ public class TransactionRecoverUtils {
                                                    ObjectSerializer objectSerializer) throws TransactionException {
         TransactionRecover transactionRecover = new TransactionRecover();
 
+        if (!Objects.nonNull(contents)) {
+            return null;
+        }
         final TransactionRecoverAdapter adapter =
                 objectSerializer.deSerialize(contents, TransactionRecoverAdapter.class);
 

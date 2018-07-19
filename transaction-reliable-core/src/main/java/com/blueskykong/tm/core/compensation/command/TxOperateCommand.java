@@ -80,6 +80,9 @@ public class TxOperateCommand implements Command {
     }
 
     public LottorRequest getTxGroupStatus(String key) {
+        if (Objects.isNull(getTxCompensation(key))) {
+            return null;
+        }
         int status = getTxCompensation(key).getStatus();
 
         LottorRequest request = new LottorRequest();

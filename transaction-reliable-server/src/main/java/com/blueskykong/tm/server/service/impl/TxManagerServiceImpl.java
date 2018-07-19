@@ -238,7 +238,7 @@ public class TxManagerServiceImpl implements TxManagerService {
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String toStr = "";
         toStr = sdf.format(ddl);
-        Criteria criteria = Criteria.where("createDate").lte(toStr).and("status").is(TransactionStatusEnum.BEGIN.getCode());
+        Criteria criteria = Criteria.where("status").is(TransactionStatusEnum.PRE_COMMIT.getCode());
         Query query = Query.query(criteria);
         return mongoTemplate.find(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
     }

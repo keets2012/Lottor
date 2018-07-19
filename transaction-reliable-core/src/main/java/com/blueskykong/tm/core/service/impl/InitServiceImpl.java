@@ -45,7 +45,6 @@ public class InitServiceImpl implements InitService {
             loadSpi(txConfig);
             nettyClientService.start(txConfig);
             txOperateService.start(txConfig);
-
         } catch (Exception e) {
             throw new TransactionRuntimeException("补偿配置异常：" + e.getMessage());
         }

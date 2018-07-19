@@ -48,5 +48,5 @@ tx:
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
-    compensation: false
+    compensation: true
     tx-manager-id: lotor

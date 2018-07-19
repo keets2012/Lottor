@@ -131,8 +131,11 @@ public class TransactionCoreAutoConfiguration {
         }
 
         @Bean
-        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand, ObjectSerializer objectSerializer) {
-            return new StartTxTransactionHandler(txManagerMessageService, txOperateCommand, objectSerializer);
+        public TxTransactionHandler startTxTransactionHandler(TxManagerMessageService txManagerMessageService,
+                                                              TxOperateCommand txOperateCommand,
+                                                              ObjectSerializer objectSerializer,
+                                                              ModelNameService modelNameService) {
+            return new StartTxTransactionHandler(txManagerMessageService, txOperateCommand, objectSerializer, modelNameService);
         }
     }
 

@@ -15,7 +15,8 @@ import java.sql.Timestamp;
  */
 @Data
 @NoArgsConstructor
-public class TransactionMsg {
+public class TransactionMsg implements Serializable {
+
 
     /**
      * 用于消息的追溯
