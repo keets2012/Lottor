@@ -2,6 +2,7 @@ package com.blueskykong.tm.server.task;
 
 import com.blueskykong.tm.common.concurrent.threadpool.TxTransactionThreadFactory;
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
 import com.blueskykong.tm.common.holder.Assert;
@@ -106,8 +107,8 @@ public class TxSyncTask {
     }
 
     private void checkTxMsg() {
-        List<TransactionMsg> transactionMsgs = txManagerService.listTxMsgByDelay(period);
-        LogUtil.info(LOGGER, "schedule check tx-msg at {} and transactionMsgs size id {}", () -> getNowDate(), () -> transactionMsgs.size());
+        List<TransactionMsgAdapter> transactionMsgs = txManagerService.listTxMsgByDelay(period);
+        LogUtil.info(LOGGER, "schedule check tx-msg at {} and transactionMsgs size is {}", () -> getNowDate(), () -> transactionMsgs.size());
 
         if (CollectionUtils.isNotEmpty(transactionMsgs)) {
             transactionMsgs.stream().filter(transactionMsg -> {
@@ -126,7 +127,7 @@ public class TxSyncTask {
                 Channel context = contexts.stream().findAny().get().channel();
                 if (context.isActive()) {
                     request.setKey(transactionMsg.getGroupId());
-                    request.setTransactionMsg(transactionMsg);
+                    request.setTransactionMsg(TransactionMsgAdapter.convert(transactionMsg));
                     context.writeAndFlush(request);
                 } else {
                     throw new TransactionRuntimeException("no available servers.");
@@ -134,6 +135,7 @@ public class TxSyncTask {
             });
         }
     }
+
 
     private String getNowDate() {
         String now;

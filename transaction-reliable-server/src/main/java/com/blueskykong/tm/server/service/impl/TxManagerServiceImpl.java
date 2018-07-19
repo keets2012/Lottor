@@ -244,15 +244,15 @@ public class TxManagerServiceImpl implements TxManagerService {
     }
 
     @Override
-    public List<TransactionMsg> listTxMsgByDelay(long delay) {
+    public List<TransactionMsgAdapter> listTxMsgByDelay(long delay) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         Timestamp ddl = new Timestamp(current.getTime() - delay * 60 * 1000);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String toStr = "";
         toStr = sdf.format(ddl);
-        Criteria criteria = Criteria.where("createTime").lte(toStr).and("status").is(ConsumedStatus.UNCONSUMED.getStatus());
+        Criteria criteria = Criteria.where("consumed").is(ConsumedStatus.UNCONSUMED.getStatus());
         Query query = Query.query(criteria);
-        return mongoTemplate.find(query, TransactionMsg.class, CollectionNameEnum.TransactionMsg.name());
+        return mongoTemplate.find(query, TransactionMsgAdapter.class, CollectionNameEnum.TransactionMsg.name());
     }
 
     /**

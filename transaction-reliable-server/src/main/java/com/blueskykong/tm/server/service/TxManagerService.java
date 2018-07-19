@@ -1,6 +1,7 @@
 package com.blueskykong.tm.server.service;
 
 import com.blueskykong.tm.common.entity.TransactionMsg;
+import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
@@ -82,7 +83,7 @@ public interface TxManagerService {
 
     List<TxTransactionItem> listTxItemByDelay(long delay);
 
-    List<TransactionMsg> listTxMsgByDelay(long delay);
+    List<TransactionMsgAdapter> listTxMsgByDelay(long delay);
     /**
      * 删除回滚的事务组
      *
