@@ -49,7 +49,7 @@ public class ConsumedTransactionHandler implements TxTransactionHandler {
             transactionMsg.setConsumed(status);
             transactionMsg.setUpdateTime(System.currentTimeMillis());
             //通知tm完成事务消息消费
-//            CompletableFuture.runAsync(() -> txManagerMessageService.asyncCompleteConsume(transactionMsg));
+            CompletableFuture.runAsync(() -> txManagerMessageService.asyncCompleteConsume(transactionMsg));
             //完成消费为异步，本地记录结果
             txOperateService.saveTransactionMsg(transactionMsg);
 

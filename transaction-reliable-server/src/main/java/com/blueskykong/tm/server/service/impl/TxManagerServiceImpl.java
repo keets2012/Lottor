@@ -231,26 +231,22 @@ public class TxManagerServiceImpl implements TxManagerService {
     }
 
     @Override
-    public List<TxTransactionItem> listTxItemByDelay(long delay) {
+    public List<TxTransactionItem> listTxItemByDelay(Long delay) {
 
         Timestamp current = new Timestamp(System.currentTimeMillis());
         Timestamp ddl = new Timestamp(current.getTime() - delay * 60 * 1000);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String toStr = "";
-        toStr = sdf.format(ddl);
-        Criteria criteria = Criteria.where("status").is(TransactionStatusEnum.PRE_COMMIT.getCode());
+        String toStr = sdf.format(ddl);
+        Criteria criteria = Criteria.where("createDate").lte(toStr).and("status").is(TransactionStatusEnum.PRE_COMMIT.getCode());
         Query query = Query.query(criteria);
         return mongoTemplate.find(query, TxTransactionItem.class, CollectionNameEnum.TxTransactionItem.name());
     }
 
     @Override
-    public List<TransactionMsgAdapter> listTxMsgByDelay(long delay) {
-        Timestamp current = new Timestamp(System.currentTimeMillis());
-        Timestamp ddl = new Timestamp(current.getTime() - delay * 60 * 1000);
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String toStr = "";
-        toStr = sdf.format(ddl);
-        Criteria criteria = Criteria.where("consumed").is(ConsumedStatus.UNCONSUMED.getStatus());
+    public List<TransactionMsgAdapter> listTxMsgByDelay(Long delay) {
+        Long current = System.currentTimeMillis();
+        Long ddl = current - delay * 60 * 1000;
+        Criteria criteria = Criteria.where("createTime").lte(ddl).and("consumed").is(ConsumedStatus.UNCONSUMED.getStatus());
         Query query = Query.query(criteria);
         return mongoTemplate.find(query, TransactionMsgAdapter.class, CollectionNameEnum.TransactionMsg.name());
     }

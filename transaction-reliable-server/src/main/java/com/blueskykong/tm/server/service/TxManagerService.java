@@ -73,7 +73,6 @@ public interface TxManagerService {
      */
     int findTxTransactionGroupStatus(String txGroupId);
 
-
     /**
      * 删除已经提交的事务组 每个子项都必须提交才删除
      *
@@ -81,9 +80,9 @@ public interface TxManagerService {
      */
     Boolean removeCommitTxGroup();
 
-    List<TxTransactionItem> listTxItemByDelay(long delay);
+    List<TxTransactionItem> listTxItemByDelay(Long delay);
 
-    List<TransactionMsgAdapter> listTxMsgByDelay(long delay);
+    List<TransactionMsgAdapter> listTxMsgByDelay(Long delay);
     /**
      * 删除回滚的事务组
      *

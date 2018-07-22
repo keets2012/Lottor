@@ -117,7 +117,6 @@ public class TxSyncTask {
                 }
                 return true;
             }).forEach(transactionMsg -> {
-
                 baseItemService.updateItem(new BaseItem(CollectionNameEnum.TransactionMsg.getType(), transactionMsg.getSubTaskId()));
                 LottorRequest request = new LottorRequest();
                 request.setAction(NettyMessageActionEnum.GET_TRANSACTION_MSG_STATUS.getCode());
