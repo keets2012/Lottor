@@ -2,9 +2,6 @@ package com.blueskykong.tm.common.helper;
 
 import java.nio.ByteBuffer;
 
-/**
- * @author keets
- */
 public class ByteUtils {
 
     public static byte[] longToBytes(long l) {

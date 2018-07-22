@@ -3,9 +3,6 @@ package com.blueskykong.tm.core.service;
 import com.blueskykong.tm.common.enums.OperationEnum;
 import org.aspectj.lang.ProceedingJoinPoint;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface AspectTransactionService {
 

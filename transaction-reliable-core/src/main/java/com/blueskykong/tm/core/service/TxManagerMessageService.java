@@ -7,7 +7,7 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
 /**
- * @author keets
+ *
  */
 public interface TxManagerMessageService {
 

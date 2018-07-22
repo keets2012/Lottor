@@ -9,9 +9,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-/**
- * @author keets
- */
 public class SpringBeanUtils {
     private ConfigurableApplicationContext cfgContext;
     /**

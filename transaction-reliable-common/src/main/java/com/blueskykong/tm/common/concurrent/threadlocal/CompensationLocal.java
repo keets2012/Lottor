@@ -1,8 +1,5 @@
 package com.blueskykong.tm.common.concurrent.threadlocal;
 
-/**
- * @author keets
- */
 public class CompensationLocal {
 
     private static final CompensationLocal COMPENSATION_LOCAL = new CompensationLocal();

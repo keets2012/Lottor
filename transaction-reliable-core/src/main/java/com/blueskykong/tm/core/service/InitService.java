@@ -3,9 +3,6 @@ package com.blueskykong.tm.core.service;
 
 import com.blueskykong.tm.common.config.TxConfig;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface InitService {
 

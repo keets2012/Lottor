@@ -29,9 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author keets
- */
 public class StartTxTransactionHandler implements TxTransactionHandler {
 
     /**
@@ -96,8 +93,6 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
 
         TxTransactionItem item = new TxTransactionItem();
         item.setTaskKey(taskKey);
-        item.setTransId(IdWorkerUtils.getInstance().createUUID());
-        item.setRole(TransactionRoleEnum.START.getCode());
         item.setStatus(TransactionStatusEnum.PRE_COMMIT.getCode());
         item.setTxGroupId(groupId);
         item.setModelName(modelNameService.findModelName());

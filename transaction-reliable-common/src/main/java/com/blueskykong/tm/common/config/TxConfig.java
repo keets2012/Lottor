@@ -3,9 +3,6 @@ package com.blueskykong.tm.common.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * @author keets
- */
 @Data
 @ConfigurationProperties(prefix = "tx.core")
 public class TxConfig {
@@ -35,7 +32,6 @@ public class TxConfig {
 
     private String compensationCacheType;
 
-
     private int compensationQueueMax = 5000;
 
     private int compensationThreadMax = Runtime.getRuntime().availableProcessors() << 1;
@@ -63,8 +59,6 @@ public class TxConfig {
 
 
     private String txManagerId = "lotor";
-
-    private TxDbConfig txDbConfig;
 
     private TxMongoConfig txMongoConfig;
 

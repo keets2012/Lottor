@@ -29,21 +29,15 @@ public class SerializeTest {
             //创建事务组信息
             TxTransactionGroup txTransactionGroup = new TxTransactionGroup();
             txTransactionGroup.setId(groupId);
-            List<TxTransactionItem> items = new ArrayList<>(2);
             //tmManager 用redis hash 结构来存储 整个事务组的状态做为hash结构的第一条数据
             TxTransactionItem groupItem = new TxTransactionItem();
             //整个事务组状态为开始
             groupItem.setStatus(TransactionStatusEnum.BEGIN.getCode());
-            //设置事务id为组的id  即为 hashKey
-            groupItem.setTransId(groupId);
             groupItem.setTaskKey(groupId);
-            items.add(groupItem);
             TxTransactionItem item = new TxTransactionItem();
             item.setTaskKey(IdWorkerUtils.getInstance().createTaskKey());
-            item.setTransId(IdWorkerUtils.getInstance().createUUID());
             item.setStatus(TransactionStatusEnum.BEGIN.getCode());
-            items.add(item);
-            txTransactionGroup.setItemList(items);
+            txTransactionGroup.setItem(item);
 
 
             LottorRequest lottorRequest = new LottorRequest();

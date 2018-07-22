@@ -10,9 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-/**
- * @author keets
- */
 @Data
 @NoArgsConstructor
 public class TransactionMsgAdapter implements Serializable {

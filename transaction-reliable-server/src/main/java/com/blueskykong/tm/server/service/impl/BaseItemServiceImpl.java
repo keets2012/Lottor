@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import java.util.Objects;
 
 /**
- * @author keets
  * @data 2018/7/19.
  */
 public class BaseItemServiceImpl implements BaseItemService {

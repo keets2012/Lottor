@@ -3,7 +3,6 @@ package com.blueskykong.tm.common.netty.bean;
 import lombok.Data;
 
 /**
- * @author keets
  * @data 2018/7/19.
  */
 @Data

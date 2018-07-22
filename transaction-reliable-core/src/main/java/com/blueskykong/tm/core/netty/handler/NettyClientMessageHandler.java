@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author keets
+ *
  */
 @ChannelHandler.Sharable
 public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {

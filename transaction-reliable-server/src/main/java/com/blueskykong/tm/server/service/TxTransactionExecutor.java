@@ -4,9 +4,6 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
 import java.util.List;
 
-/**
- * @author keets
- */
 public interface TxTransactionExecutor {
 
 

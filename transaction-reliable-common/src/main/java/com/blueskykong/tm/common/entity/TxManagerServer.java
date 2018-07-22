@@ -1,11 +1,7 @@
-
 package com.blueskykong.tm.common.entity;
 
 import lombok.Data;
 
-/**
- * @author keets
- */
 @Data
 public class TxManagerServer {
 

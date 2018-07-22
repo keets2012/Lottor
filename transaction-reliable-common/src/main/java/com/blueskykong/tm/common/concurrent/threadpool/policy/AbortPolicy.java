@@ -5,9 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * @author keets
- */
 public class AbortPolicy extends ThreadPoolExecutor.AbortPolicy {
     private static final Logger LOG = LoggerFactory.getLogger(AbortPolicy.class);
 

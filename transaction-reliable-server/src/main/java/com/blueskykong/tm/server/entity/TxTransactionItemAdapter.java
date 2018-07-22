@@ -3,7 +3,6 @@ package com.blueskykong.tm.server.entity;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 
 /**
- * @author keets
  * @data 2018/4/3.
  */
 public class TxTransactionItemAdapter extends TxTransactionItem {

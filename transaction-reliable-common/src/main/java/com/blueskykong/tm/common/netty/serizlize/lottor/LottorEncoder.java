@@ -21,7 +21,6 @@ import java.util.List;
  * 3.要传输的数据
  * </pre>
  *
- * @author keets
  * @data 2018/6/9.
  */
 public class LottorEncoder extends MessageToByteEncoder<LottorBean> {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 
 /**
- * @author keets
+ *
  * @data 2018/4/19.
  */
 public class SimpleObject implements Cloneable, Serializable {

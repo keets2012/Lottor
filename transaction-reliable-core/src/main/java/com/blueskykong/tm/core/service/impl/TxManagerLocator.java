@@ -25,9 +25,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @author keets
- */
 public class TxManagerLocator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TxManagerLocator.class);

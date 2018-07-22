@@ -9,7 +9,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 /**
- * @author keets
  * @data 2018/6/9.
  */
 public class LottorDecoder extends ByteToMessageDecoder {

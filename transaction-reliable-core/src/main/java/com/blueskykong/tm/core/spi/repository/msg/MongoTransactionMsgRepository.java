@@ -6,7 +6,6 @@ import com.blueskykong.tm.common.serializer.ObjectSerializer;
 import com.blueskykong.tm.core.spi.TransactionMsgRepository;
 
 /**
- * @author keets
  * @data 2018/7/15.
  */
 public class MongoTransactionMsgRepository implements TransactionMsgRepository {

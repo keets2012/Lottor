@@ -14,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * @author keets
- */
 public class ConsumedTransactionHandler implements TxTransactionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumedTransactionHandler.class);
@@ -48,9 +45,9 @@ public class ConsumedTransactionHandler implements TxTransactionHandler {
             TransactionMsg transactionMsg = (TransactionMsg) info.getArgs()[0];
             transactionMsg.setConsumed(status);
             transactionMsg.setUpdateTime(System.currentTimeMillis());
-            //通知tm完成事务消息消费
+            // 通知tm完成事务消息消费
             CompletableFuture.runAsync(() -> txManagerMessageService.asyncCompleteConsume(transactionMsg));
-            //完成消费为异步，本地记录结果
+            // 完成消费为异步，本地记录结果
             txOperateService.saveTransactionMsg(transactionMsg);
 
             LogUtil.info(LOGGER, "tx-transaction 消费完成, 事务发起类：{}", () -> "");

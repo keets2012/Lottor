@@ -8,7 +8,6 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.socket.SocketManager;
 import io.netty.channel.Channel;
 
-import java.util.Collections;
 import java.util.Objects;
 
 
@@ -34,7 +33,7 @@ public class ExecutorMessageTool {
             txTransactionGroup.setStatus(TransactionStatusEnum.COMMIT.getCode());
         }
 
-        txTransactionGroup.setItemList(Collections.singletonList(item));
+        txTransactionGroup.setItem(item);
         lottorRequest.setTxTransactionGroup(txTransactionGroup);
         return lottorRequest;
     }

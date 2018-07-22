@@ -10,9 +10,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author keets
- */
 public class TxTransactionThreadFactory implements ThreadFactory {
 
     private static final Logger log = LoggerFactory.getLogger(TxTransactionThreadFactory.class);

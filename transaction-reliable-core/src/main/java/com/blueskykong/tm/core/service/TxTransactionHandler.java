@@ -4,9 +4,6 @@ package com.blueskykong.tm.core.service;
 import com.blueskykong.tm.common.bean.TxTransactionInfo;
 import org.aspectj.lang.ProceedingJoinPoint;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface TxTransactionHandler {
 

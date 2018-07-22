@@ -4,9 +4,6 @@ import com.blueskykong.tm.common.holder.RedisKeyUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-/**
- * @author keets
- */
 public class RedisHelper {
 
     public static byte[] getRedisKey(String keyPrefix, String id) {

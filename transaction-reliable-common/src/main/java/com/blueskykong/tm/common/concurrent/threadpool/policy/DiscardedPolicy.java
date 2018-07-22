@@ -7,9 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * @author keets
- */
 public class DiscardedPolicy implements RejectedExecutionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DiscardedPolicy.class);
 

@@ -17,9 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.Objects;
 
-/**
- * @author keets
- */
 @Component
 @EnableBinding
 public class OutputFactoryServiceImpl implements OutputFactoryService {

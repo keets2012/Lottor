@@ -1,8 +1,5 @@
 package com.blueskykong.tm.common.enums;
 
-/**
- * @author keets
- */
 public enum ConsumedStatus {
 
     UNCONSUMED("未消费", 0),

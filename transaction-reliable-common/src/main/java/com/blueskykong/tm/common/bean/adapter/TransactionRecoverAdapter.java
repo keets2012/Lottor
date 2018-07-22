@@ -1,14 +1,9 @@
 package com.blueskykong.tm.common.bean.adapter;
 
-import com.blueskykong.tm.common.entity.TransactionMsg;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
-/**
- * @author keets
- */
 @Data
 public class TransactionRecoverAdapter {
 

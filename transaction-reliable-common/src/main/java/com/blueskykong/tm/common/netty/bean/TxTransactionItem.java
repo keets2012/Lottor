@@ -12,25 +12,16 @@ import java.util.List;
 public class TxTransactionItem implements Serializable {
 
     private static final long serialVersionUID = -983809184773470584L;
+
     /**
      * taskKey
      */
     private String taskKey;
 
     /**
-     * 参与事务id
-     */
-    private String transId;
-
-    /**
      * 事务状态 {@link TransactionStatusEnum}
      */
     private int status;
-
-    /**
-     * 事务角色
-     */
-    private int role;
 
     /**
      * 模块信息
@@ -43,7 +34,7 @@ public class TxTransactionItem implements Serializable {
     private String tmDomain;
 
     /**
-     * 存放事务组id
+     * 事务组id
      */
     private String txGroupId;
 
@@ -56,16 +47,6 @@ public class TxTransactionItem implements Serializable {
      * 事务最大等待时间 单位秒
      */
     private Integer waitMaxTime;
-
-    /**
-     * 执行类名称
-     */
-    private String targetClass;
-
-    /**
-     * 执行方法
-     */
-    private String targetMethod;
 
     /**
      * 耗时 秒

@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * @author keets
  * @data 2018/7/15.
  */
 public class RedisTransactionMsgRepository implements TransactionMsgRepository {

@@ -21,9 +21,6 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 
-/**
- * @author keets
- */
 public class InitServiceImpl implements InitService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InitServiceImpl.class);

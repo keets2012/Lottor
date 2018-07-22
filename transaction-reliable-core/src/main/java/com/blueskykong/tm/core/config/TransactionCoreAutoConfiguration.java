@@ -43,9 +43,6 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 
-/**
- * @author keets
- */
 @Configuration
 @EnableConfigurationProperties(TxConfig.class)
 @ConditionalOnBean({DiscoveryClient.class})

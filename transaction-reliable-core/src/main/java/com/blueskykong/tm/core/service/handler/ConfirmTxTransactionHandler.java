@@ -16,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * @author keets
- */
 public class ConfirmTxTransactionHandler implements TxTransactionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfirmTxTransactionHandler.class);

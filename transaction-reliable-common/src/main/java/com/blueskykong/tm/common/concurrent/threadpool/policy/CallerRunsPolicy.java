@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * @author keets
- */
+
 public class CallerRunsPolicy extends ThreadPoolExecutor.CallerRunsPolicy {
     private static final Logger LOG = LoggerFactory.getLogger(CallerRunsPolicy.class);
 

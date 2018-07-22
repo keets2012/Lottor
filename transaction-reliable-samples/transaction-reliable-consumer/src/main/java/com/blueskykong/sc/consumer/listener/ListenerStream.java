@@ -21,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * @author keets
- */
 @Component
 @EnableBinding({TestSink.class})
 public class ListenerStream extends InitStreamHandler {

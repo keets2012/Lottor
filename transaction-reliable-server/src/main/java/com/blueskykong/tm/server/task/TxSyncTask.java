@@ -1,7 +1,6 @@
 package com.blueskykong.tm.server.task;
 
 import com.blueskykong.tm.common.concurrent.threadpool.TxTransactionThreadFactory;
-import com.blueskykong.tm.common.entity.TransactionMsg;
 import com.blueskykong.tm.common.entity.TransactionMsgAdapter;
 import com.blueskykong.tm.common.enums.NettyMessageActionEnum;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
@@ -15,7 +14,6 @@ import com.blueskykong.tm.server.entity.CollectionNameEnum;
 import com.blueskykong.tm.server.netty.handler.NettyServerMessageHandler;
 import com.blueskykong.tm.server.service.BaseItemService;
 import com.blueskykong.tm.server.service.TxManagerService;
-import com.blueskykong.tm.server.socket.SocketManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,13 +25,14 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.blueskykong.tm.common.enums.NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS;
 
+
+//TODO 异常待处理
 public class TxSyncTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TxSyncTask.class);
@@ -87,13 +86,13 @@ public class TxSyncTask {
         LogUtil.info(LOGGER, "schedule check tx-group at {} and txTransactionItems size is {}", () -> getNowDate(), () -> txTransactionItems.size());
         if (CollectionUtils.isNotEmpty(txTransactionItems)) {
             txTransactionItems.stream().forEach(txTransactionItem -> {
-                baseItemService.updateItem(new BaseItem(CollectionNameEnum.TxTransactionItem.getType(), txTransactionItem.getTxGroupId()));
+                baseItemService.updateItem(new BaseItem(CollectionNameEnum.TxTransactionItem.getType(), txTransactionItem.getTxGroupId())); //TODO 增加重试次数
 
                 String service = txTransactionItem.getModelName();
                 LottorRequest request = new LottorRequest();
                 request.setAction(GET_TRANSACTION_GROUP_STATUS.getCode());
                 List<ChannelHandlerContext> contexts = nettyServerMessageHandler.getCtxByName(service);
-                Assert.notNull(contexts, "no available servers.");
+                Assert.notNull(contexts, "no available servers."); //TODO 异常待处理
                 Collections.shuffle(contexts);
                 Channel context = contexts.stream().findAny().get().channel();
                 if (context.isActive()) {

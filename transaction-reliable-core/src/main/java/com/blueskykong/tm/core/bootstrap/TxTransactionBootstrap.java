@@ -11,9 +11,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * @author keets
- */
 public class TxTransactionBootstrap implements ApplicationContextAware {
 
 

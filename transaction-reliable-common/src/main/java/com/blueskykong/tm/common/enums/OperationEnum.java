@@ -1,9 +1,6 @@
 package com.blueskykong.tm.common.enums;
 
 
-/**
- * @author keets
- */
 public enum OperationEnum {
 
     /**

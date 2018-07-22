@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * @author keets
- */
 public enum ServiceNameEnum {
     AFFAIR("affair", "tx-affair"),
     MATERIAL("material", "tx-material"),

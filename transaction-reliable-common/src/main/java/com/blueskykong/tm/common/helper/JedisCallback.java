@@ -2,9 +2,6 @@ package com.blueskykong.tm.common.helper;
 
 import redis.clients.jedis.Jedis;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface JedisCallback<T> {
 

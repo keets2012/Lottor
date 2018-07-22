@@ -10,7 +10,7 @@ import com.blueskykong.tm.core.service.TxTransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @author keets
+ *
  */
 public class AspectTransactionServiceImpl implements AspectTransactionService {
 

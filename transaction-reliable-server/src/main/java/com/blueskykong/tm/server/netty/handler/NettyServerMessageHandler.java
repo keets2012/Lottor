@@ -42,14 +42,14 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
 
     private ConcurrentHashMap<String, Integer> clients = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String, ArrayList<ChannelHandlerContext>> clientContext = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, List<ChannelHandlerContext>> clientContext = new ConcurrentHashMap<>();
 
-    public ConcurrentHashMap<String, ArrayList<ChannelHandlerContext>> getClientContext() {
+    public ConcurrentHashMap<String, List<ChannelHandlerContext>> getClientContext() {
         return clientContext;
     }
 
-    public ArrayList<ChannelHandlerContext> getCtxByName(String service) {
-        ArrayList<ChannelHandlerContext> contexts = new ArrayList<>();
+    public List<ChannelHandlerContext> getCtxByName(String service) {
+        List<ChannelHandlerContext> contexts = new ArrayList<>();
         if (StringUtils.isNotBlank(service)) {
             contexts = clientContext.get(service);
         }
@@ -85,7 +85,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                         SocketManager.getInstance().completeClientInfo(ctx.channel(), hb.getMetaInfo(), hb.getSerialProtocol());
                         clients.computeIfPresent(clientCtx, (clientValue, val) -> clients.get(clientValue) + 1);
                         String source = txTransactionGroup.getSource();
-                        ArrayList<ChannelHandlerContext> contexts;
+                        List<ChannelHandlerContext> contexts;
                         contexts = getCtxByName(source);
                         if (contexts != null) {
                             contexts.add(ctx);
@@ -126,7 +126,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case FIND_TRANSACTION_GROUP_INFO:
                     final List<TxTransactionItem> txTransactionItems = txManagerService.get().listByTxGroupId(txTransactionGroup.getId());
-                    txTransactionGroup.setItemList(txTransactionItems);
+//                    txTransactionGroup.setItemList(txTransactionItems);
                     hb.setTxTransactionGroup(txTransactionGroup);
                     ctx.writeAndFlush(hb);
                     break;

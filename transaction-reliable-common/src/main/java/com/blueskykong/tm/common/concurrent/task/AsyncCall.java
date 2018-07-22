@@ -1,8 +1,5 @@
 package com.blueskykong.tm.common.concurrent.task;
 
-/**
- * @author keets
- */
 @FunctionalInterface
 public interface AsyncCall {
 

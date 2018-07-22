@@ -2,9 +2,6 @@ package com.blueskykong.tm.common.helper;
 
 import com.blueskykong.tm.common.holder.DbTypeUtils;
 
-/**
- * @author keets
- */
 public class SqlHelper {
 
     public static String buildCreateTableSql(String tableName, String driverClassName) {
