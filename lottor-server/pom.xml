@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blueskykong</groupId>
-    <artifactId>transaction-reliable-server</artifactId>
+    <artifactId>lottor-server</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>transaction-reliable-server</name>
-    <description>transaction-reliable-server</description>
+    <name>lottor-server</name>
+    <description>lottor-server</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -75,7 +75,7 @@
         </dependency>-->
         <dependency>
             <groupId>com.blueskykong</groupId>
-            <artifactId>transaction-reliable-common</artifactId>
+            <artifactId>lottor-common</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -144,7 +144,7 @@
 
             <dependency>
                 <groupId>com.blueskykong</groupId>
-                <artifactId>transaction-reliable-dependencies</artifactId>
+                <artifactId>lottor-dependencies</artifactId>
                 <version>${transaction.reliable.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
