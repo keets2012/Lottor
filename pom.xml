@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blueskykong</groupId>
-    <artifactId>transaction-reliable</artifactId>
+    <artifactId>lottor-parent</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>transaction-reliable</name>
-    <description>transaction-reliable</description>
+    <name>lottor</name>
+    <description>lottor</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,19 +18,19 @@
     </properties>
 
     <modules>
-        <module>transaction-reliable-common</module>
-        <module>transaction-reliable-core</module>
-        <module>transaction-reliable-server</module>
-        <module>transaction-reliable-dependencies</module>
-        <module>transaction-reliable-samples</module>
-        <module>transaction-reliable-sc</module>
+        <module>lottor-common</module>
+        <module>lottor-core</module>
+        <module>lottor-server</module>
+        <module>lottor-dependencies</module>
+        <module>lottor-samples</module>
+        <module>lottor-starter</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.blueskykong</groupId>
-                <artifactId>transaction-reliable-dependencies</artifactId>
+                <artifactId>lottor-dependencies</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

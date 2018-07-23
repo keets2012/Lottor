@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blueskykong</groupId>
-    <artifactId>transaction-reliable-samples</artifactId>
+    <artifactId>lottor-samples</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>transaction-reliable-samples</name>
-    <description>transaction-reliable-samples</description>
+    <name>lottor-samples</name>
+    <description>lottor-samples</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -25,8 +25,8 @@
     </properties>
 
     <modules>
-        <module>transaction-demo-producer</module>
-        <module>transaction-reliable-consumer</module>
+        <module>lottor-demo-producer</module>
+        <module>lottor-demo-consumer</module>
     </modules>
 
     <dependencies>

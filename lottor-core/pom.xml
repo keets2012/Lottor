@@ -3,15 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>transaction-reliable-core</artifactId>
+    <artifactId>lottor-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>transaction-reliable-core</name>
-    <description>transaction-reliable-core</description>
+    <name>lottor-core</name>
+    <description>lottor-core</description>
 
     <parent>
         <groupId>com.blueskykong</groupId>
-        <artifactId>transaction-reliable</artifactId>
+        <artifactId>lottor-parent</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
@@ -25,7 +25,7 @@
 
         <dependency>
             <groupId>com.blueskykong</groupId>
-            <artifactId>transaction-reliable-common</artifactId>
+            <artifactId>lottor-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>

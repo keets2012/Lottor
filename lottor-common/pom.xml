@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.blueskykong</groupId>
-    <artifactId>transaction-reliable-common</artifactId>
+    <artifactId>lottor-common</artifactId>
     <packaging>jar</packaging>
 
-    <name>transaction-reliable-common</name>
-    <description>transaction-reliable-common</description>
+    <name>lottor-common</name>
+    <description>lottor-common</description>
 
     <parent>
         <groupId>com.blueskykong</groupId>
-        <artifactId>transaction-reliable</artifactId>
+        <artifactId>lottor-parent</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
