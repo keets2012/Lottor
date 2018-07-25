@@ -1,0 +1,63 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+  data:
+    mongodb:
+      authentication-database: lottor_test
+      database: lottor_test
+      host: localhost
+      port: ${MONGO_PORT:27017}
+  thymeleaf:
+    prefix: classpath:/html/
+    suffix: .html
+    cache: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+
+tx:
+  redis:
+    cluster: false
+#      redirects: 20
+    hostName: localhost
+    port: 6378
+    password: password
+  manager:
+    netty:
+      port: 9998
+      serialize: kryo
+      maxConnection: 100
+      maxThreads: 16
+      delayTime: 5
+      heartTime: 20
+      checkPeriod: 60
+      initDelay: 10
+
+transactionWaitMaxTime: 500
+redisSaveMaxTime: 3000
+
+logging:
+  level:
+    root: info
+    com.blueskykong.tm.server: debug
+  path: "./logs"
+
+stream.content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsgAdapter
+
+---
+swagger:
+  enabled: true
+  title: tx-server
+  description: tx-server
+  version: 1.0
+  contact:
+    name: aoho
+  base-package: com.blueskykong.tm.server.controller
+  base-path: /**
+  exclude-path: /error, /ops/**

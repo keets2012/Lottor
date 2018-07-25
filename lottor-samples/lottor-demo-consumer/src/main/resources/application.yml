@@ -1,0 +1,73 @@
+spring:
+  profiles:
+    active: dev
+  application:
+      name: t-consumer
+  cloud:
+    consul:
+      host: localhost
+#      host: ${CONSUL_ADDRESS:192.168.1.204}
+      port: 8501
+      discovery:
+        ip-address: ${HOST_ADDRESS:localhost}
+        port: ${SERVER_PORT:${server.port}}
+#        healthCheckPath: /health
+        healthCheckInterval: 15s
+        instance-id: transaction-consumer-${server.port}
+        service-name: transaction-consumer
+
+server:
+  port: 8007
+
+management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: false
+  security:
+    enabled: false
+
+logging:
+  level:
+    root: info
+    com.blueskykong.tm.core: debug
+  path: "./logs"
+
+---
+spring:
+  cloud:
+    stream:
+      bindings:
+        test-input:
+          group: testGroup
+          content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsgAdapter
+          destination: tx-test
+          binder: rabbit1
+      binders:
+        rabbit1:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+
+---
+tx:
+  enabled: true
+  core:
+    compensation-cache-type: redis
+    tx-redis-config:
+      host-name: localhost
+      port: 6378
+      password: password
+    serializer: kryo
+    netty-serializer: kryo
+    blocking-queue-type: Linked
+    compensation: true
+    tx-manager-id: lotor
