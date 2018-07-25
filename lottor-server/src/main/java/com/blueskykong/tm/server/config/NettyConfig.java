@@ -26,9 +26,6 @@ public class NettyConfig {
      */
     private String serialize;
 
-    /**
-     * 与客户端通信最大延迟时间，超过该时间就会自动唤醒线程,返回失败  单位：秒）
-     */
     private int delayTime;
 
     /**
@@ -40,8 +37,14 @@ public class NettyConfig {
 
     private Boolean check = true;
 
+    /**
+     * check period default is 45 minutes
+     */
     private int checkPeriod = 45;
 
+    /**
+     * initDelay default is 30 minutes
+     */
     private int initDelay = 30;
 }
 

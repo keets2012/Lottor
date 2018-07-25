@@ -54,9 +54,8 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
 
 
     @Override
-    public Object handler(TxTransactionInfo info) {
-        LogUtil.info(LOGGER, "tx-transaction start,  事务发起类：{}",
-                () -> "");
+    public void handler(TxTransactionInfo info) {
+        LogUtil.info(LOGGER, "tx-transaction start,  事务组 id 为：{}", info::getTxGroupId);
 
         final String groupId = IdWorkerUtils.getInstance().createGroupId();
 
@@ -72,7 +71,7 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
             try {
                 //本地服务记录，用作补偿
                 txOperateCommand.saveTxCompensation((List<TransactionMsg>) info.getArgs()[0], groupId, waitKey);
-                return "";
+                return;
             } catch (Throwable throwable) {
                 //通知tm整个事务组失败，需要回滚，标志事务组的状态
                 //TODO ROLLBACK待优化
@@ -110,8 +109,8 @@ public class StartTxTransactionHandler implements TxTransactionHandler {
                 transactionMsgAdapter = TransactionMsgHelper.convertTransactionMsg(msg);
                 transactionMsgAdapter.setArgs(args);
             } catch (TransactionException e) {
-                e.printStackTrace();
-                LogUtil.error(LOGGER, "failed to serialize transactionMsg, groupId is: {}, cause is: {}", () -> groupId, e::getLocalizedMessage);
+                LogUtil.error(LOGGER, "failed to serialize transactionMsg, groupId is: {}, cause is: {}",
+                        () -> groupId, e::getLocalizedMessage);
             }
             return transactionMsgAdapter;
         }).collect(Collectors.toList());

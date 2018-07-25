@@ -7,10 +7,8 @@ import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.compensation.TxOperateService;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import com.blueskykong.tm.core.service.TxTransactionHandler;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -22,15 +20,13 @@ public class ConsumedTransactionHandler implements TxTransactionHandler {
 
     private final TxOperateService txOperateService;
 
-    @Autowired
     public ConsumedTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateService txOperateService) {
         this.txManagerMessageService = txManagerMessageService;
         this.txOperateService = txOperateService;
     }
 
     @Override
-    public Object handler(TxTransactionInfo info) {
-        LogUtil.info(LOGGER, "tx-transaction confirm,  事务确认类：{}", () -> "");
+    public void handler(TxTransactionInfo info) {
         try {
             int status;
             if (info.getArgs().length != 2) {
@@ -50,8 +46,8 @@ public class ConsumedTransactionHandler implements TxTransactionHandler {
             // 完成消费为异步，本地记录结果
             txOperateService.saveTransactionMsg(transactionMsg);
 
-            LogUtil.info(LOGGER, "tx-transaction 消费完成, 事务发起类：{}", () -> "");
-            return "";
+            LogUtil.info(LOGGER, "tx-transaction 消费完成, 事务组 id 为 {},消息 id 为：{}",
+                    transactionMsg::getGroupId, transactionMsg::getSubTaskId);
         } catch (final Throwable throwable) {
             LogUtil.error(LOGGER, throwable::getLocalizedMessage);
             throw throwable;

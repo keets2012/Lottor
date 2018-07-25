@@ -10,7 +10,6 @@ import com.blueskykong.tm.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.config.Address;
 import com.blueskykong.tm.server.service.TxManagerService;
-import com.blueskykong.tm.server.service.TxTransactionExecutor;
 import com.blueskykong.tm.server.socket.SocketManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,8 +35,6 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerMessageHandler.class);
 
     private final ThreadLocal<TxManagerService> txManagerService;
-
-    private final TxTransactionExecutor txTransactionExecutor;
 
     private ConcurrentHashMap<String, Integer> clients = new ConcurrentHashMap<>();
 
@@ -57,9 +53,8 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Autowired
-    public NettyServerMessageHandler(TxManagerService txManagerService, TxTransactionExecutor txTransactionExecutor) {
+    public NettyServerMessageHandler(TxManagerService txManagerService) {
         this.txManagerService = ThreadLocal.withInitial(() -> txManagerService);
-        this.txTransactionExecutor = txTransactionExecutor;
     }
 
 

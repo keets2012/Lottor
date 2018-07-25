@@ -9,12 +9,6 @@ import com.blueskykong.tm.core.compensation.command.TxOperateAction;
 public interface TxOperateService {
 
     /**
-     * 补偿操作
-     */
-    void compensate();
-
-
-    /**
      * 启动本地补偿事务，根据配置是否进行补偿
      *
      * @param txConfig 配置信息

@@ -21,7 +21,6 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
     }
 
     @Override
-//    @ReliableTransaction
     public Boolean preSend(List<TransactionMsg> preCommitMsgs) {
         Object[] args = new Object[]{preCommitMsgs};
         LogUtil.info(LOGGER, () -> "发送preCommit消息");
@@ -30,15 +29,13 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
     }
 
     @Override
-//    @ReliableTransaction(OperationEnum.TX_COMPLETE)
     public void postSend(Boolean success, Object message) {
         Object[] args = new Object[]{success, message};
-        LogUtil.info(LOGGER, "发送confirm消息, {} ", () -> success);
+        LogUtil.info(LOGGER, "发送事务组confirm消息, {} ", () -> success);
         txTransactionInterceptor.interceptor(args, OperationEnum.TX_COMPLETE);
     }
 
     @Override
-//    @ReliableTransaction(OperationEnum.TX_CONSUMED)
     public void consumedSend(TransactionMsg msg, Boolean success) {
         Object[] args = new Object[]{msg, success};
 

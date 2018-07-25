@@ -2,28 +2,19 @@ package com.blueskykong.tm.server.controller;
 
 import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.entity.TxManagerServiceDTO;
-import com.blueskykong.tm.common.netty.bean.TxTransactionItem;
 import com.blueskykong.tm.server.entity.ChannelInfo;
 import com.blueskykong.tm.server.entity.TxManagerInfo;
 import com.blueskykong.tm.server.service.TxManagerInfoService;
-import com.blueskykong.tm.server.service.execute.HttpTransactionExecutor;
 import com.blueskykong.tm.server.socket.SocketManager;
-import io.netty.channel.Channel;
-import io.netty.channel.DefaultChannelPipeline;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +24,9 @@ public class TxManagerController {
 
     private final TxManagerInfoService txManagerInfoService;
 
-    private final HttpTransactionExecutor httpTransactionExecutor;
-
     @Autowired
-    public TxManagerController(TxManagerInfoService txManagerInfoService, HttpTransactionExecutor transactionExecutor) {
+    public TxManagerController(TxManagerInfoService txManagerInfoService) {
         this.txManagerInfoService = txManagerInfoService;
-        this.httpTransactionExecutor = transactionExecutor;
     }
 
     @GetMapping
@@ -86,19 +74,4 @@ public class TxManagerController {
     public List<TxManagerInfo> getTxManagerDetails() {
         return txManagerInfoService.findClusterInfo();
     }
-
-    /**
-     * 消费补偿相关，待完善
-     */
-    @PostMapping("/httpCommit")
-    public void httpCommit(@RequestBody List<TxTransactionItem> items) {
-        httpTransactionExecutor.commit(items);
-    }
-
-    //TODO
-    @PostMapping("/httpRollBack")
-    public void httpRollBack(@RequestBody List<TxTransactionItem> items) {
-        httpTransactionExecutor.rollBack(items);
-    }
-
 }

@@ -10,12 +10,5 @@ import org.aspectj.lang.ProceedingJoinPoint;
 @FunctionalInterface
 public interface TxTransactionInterceptor {
 
-    /**
-     * 事务切面的拦截方法
-     *
-     * @param pjp spring事务切点
-     * @return Object
-     * @ 异常
-     */
-    Object interceptor(Object[] pjp, OperationEnum operationEnum);
+    void interceptor(Object[] args, OperationEnum operationEnum);
 }

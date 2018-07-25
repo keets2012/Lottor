@@ -9,5 +9,4 @@ public class TxManagerServer {
 
     private Integer port;
 
-
 }

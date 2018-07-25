@@ -22,7 +22,7 @@ public class AspectTransactionServiceImpl implements AspectTransactionService {
     }
 
     @Override
-    public Object invoke(String transactionGroupId, Object[] args, OperationEnum operationEnum){
+    public void invoke(String transactionGroupId, Object[] args, OperationEnum operationEnum) {
 
         final String compensationId = CompensationLocal.getInstance().getCompensationId();
 
@@ -30,6 +30,6 @@ public class AspectTransactionServiceImpl implements AspectTransactionService {
         final Class c = txTransactionFactoryService.factoryOf(info);
         final TxTransactionHandler txTransactionHandler =
                 (TxTransactionHandler) SpringBeanUtils.getInstance().getBean(c);
-        return txTransactionHandler.handler(info);
+        txTransactionHandler.handler(info);
     }
 }

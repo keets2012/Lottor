@@ -25,14 +25,15 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.blueskykong.tm.common.enums.NettyMessageActionEnum.GET_TRANSACTION_GROUP_STATUS;
+import static com.blueskykong.tm.common.enums.NettyMessageActionEnum.GET_TRANSACTION_MSG_STATUS;
 
 
-//TODO 异常待处理
 public class TxSyncTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TxSyncTask.class);
@@ -54,7 +55,7 @@ public class TxSyncTask {
         this.txManagerService = txManagerService;
         this.nettyServerMessageHandler = nettyServerMessageHandler;
         this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
-                TxTransactionThreadFactory.create("CompensationService", true));
+                TxTransactionThreadFactory.create("CheckService", true));
         this.txConfig = nettyConfig;
         this.baseItemService = baseItemService;
     }
@@ -71,7 +72,7 @@ public class TxSyncTask {
     private void scheduleCheck() {
         scheduledExecutorService
                 .scheduleAtFixedRate(() -> {
-                    LogUtil.debug(LOGGER, "check for unCommitted tx-groups&&tx-msg and execute delayTime:{}", () -> txConfig.getDelayTime());
+                    LogUtil.debug(LOGGER, "check for unCommitted tx-groups&&tx-msg and execute delayTime: {}", () -> txConfig.getInitDelay());
 
                     // 检测事务组信息的状态
                     checkTxGroup();
@@ -85,23 +86,36 @@ public class TxSyncTask {
         final List<TxTransactionItem> txTransactionItems = txManagerService.listTxItemByDelay(period);
         LogUtil.info(LOGGER, "schedule check tx-group at {} and txTransactionItems size is {}", () -> getNowDate(), () -> txTransactionItems.size());
         if (CollectionUtils.isNotEmpty(txTransactionItems)) {
-            txTransactionItems.stream().forEach(txTransactionItem -> {
+            CompletableFuture[] cfs = txTransactionItems.stream().map(txTransactionItem -> CompletableFuture.runAsync(() -> {
                 baseItemService.updateItem(new BaseItem(CollectionNameEnum.TxTransactionItem.getType(), txTransactionItem.getTxGroupId())); //TODO 增加重试次数
 
                 String service = txTransactionItem.getModelName();
                 LottorRequest request = new LottorRequest();
                 request.setAction(GET_TRANSACTION_GROUP_STATUS.getCode());
                 List<ChannelHandlerContext> contexts = nettyServerMessageHandler.getCtxByName(service);
-                Assert.notNull(contexts, "no available servers."); //TODO 异常待处理
+                if (CollectionUtils.isNotEmpty(contexts)) {
+                    LogUtil.error(LOGGER, "no available servers for check tx-group, group-id is {} .", txTransactionItem::getTxGroupId);
+                    return;
+                }
                 Collections.shuffle(contexts);
                 Channel context = contexts.stream().findAny().get().channel();
                 if (context.isActive()) {
                     request.setKey(txTransactionItem.getTxGroupId());
                     context.writeAndFlush(request);
                 } else {
-                    throw new TransactionRuntimeException("no available servers.");
+                    LogUtil.error(LOGGER, "channel context is inactive for service: {}, and msg-id is {} .",
+                            () -> service, txTransactionItem::getTxGroupId);
+                    return;
                 }
-            });
+            }).exceptionally(e -> {
+                LogUtil.error(LOGGER, "no available servers for check tx-group, group-id is {} and cause is {}.",
+                        txTransactionItem::getTxGroupId, e::getLocalizedMessage);
+                return null;
+            }).whenComplete((v, e) ->
+                    LOGGER.info("txManger 成功发送 {} 指令, 事务groupId为：{}", GET_TRANSACTION_GROUP_STATUS.getDesc(), txTransactionItem.getTxGroupId())))
+                    .toArray(CompletableFuture[]::new);
+
+            CompletableFuture.allOf(cfs).join();
         }
     }
 
@@ -110,17 +124,20 @@ public class TxSyncTask {
         LogUtil.info(LOGGER, "schedule check tx-msg at {} and transactionMsgs size is {}", () -> getNowDate(), () -> transactionMsgs.size());
 
         if (CollectionUtils.isNotEmpty(transactionMsgs)) {
-            transactionMsgs.stream().filter(transactionMsg -> {
+            CompletableFuture[] cfs = transactionMsgs.stream().filter(transactionMsg -> {
                 if (StringUtils.isBlank(transactionMsg.getTarget())) {
                     return false;
                 }
                 return true;
-            }).forEach(transactionMsg -> {
+            }).map(transactionMsg -> CompletableFuture.runAsync(() -> {
                 baseItemService.updateItem(new BaseItem(CollectionNameEnum.TransactionMsg.getType(), transactionMsg.getSubTaskId()));
                 LottorRequest request = new LottorRequest();
                 request.setAction(NettyMessageActionEnum.GET_TRANSACTION_MSG_STATUS.getCode());
                 List<ChannelHandlerContext> contexts = nettyServerMessageHandler.getCtxByName(transactionMsg.getTarget());
-                Assert.notNull(contexts, "no available servers.");
+                if (CollectionUtils.isNotEmpty(contexts)) {
+                    LogUtil.error(LOGGER, "no available servers for check tx-msg, msg-id is {} .", transactionMsg::getSubTaskId);
+                    return;
+                }
                 Collections.shuffle(contexts);
                 Channel context = contexts.stream().findAny().get().channel();
                 if (context.isActive()) {
@@ -128,9 +145,18 @@ public class TxSyncTask {
                     request.setTransactionMsg(TransactionMsgAdapter.convert(transactionMsg));
                     context.writeAndFlush(request);
                 } else {
-                    throw new TransactionRuntimeException("no available servers.");
+                    LogUtil.error(LOGGER, "channel context is inactive for service: {}, and msg-id is {} .",
+                            transactionMsg::getTarget, transactionMsg::getSubTaskId);
+                    return;
                 }
-            });
+            }).exceptionally(e -> {
+                LogUtil.error(LOGGER, "no available servers for check tx-msg, msg-id is {} and cause is {}.",
+                        transactionMsg::getSubTaskId, e::getLocalizedMessage);
+                return null;
+            }).whenComplete((v, e) ->
+                    LOGGER.info("txManger 成功发送 {} 指令 事务msgId为：{}", GET_TRANSACTION_MSG_STATUS.getDesc(), transactionMsg.getSubTaskId())))
+                    .toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(cfs).join();
         }
     }
 

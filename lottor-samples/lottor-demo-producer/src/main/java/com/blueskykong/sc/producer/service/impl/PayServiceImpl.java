@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @data 2018/3/19.
@@ -44,7 +45,6 @@ public class PayServiceImpl implements PayService {
         transactionMsg.setArgs(arg);
 //            LogUtil.error(LOGGER, "failed to serialize: {} for: {} ", () -> Product.class.toString(), e::getLocalizedMessage);
 //            throw new IllegalArgumentException("illegal params to serialize!");
-
         transactionMsg.setMethod(MethodNameEnum.CONSUMER_TEST.getMethod());
         transactionMsg.setSubTaskId(IdWorkerUtils.getInstance().createUUID());
         nettyService.preSend(Collections.singletonList(transactionMsg));
@@ -57,7 +57,7 @@ public class PayServiceImpl implements PayService {
             int i = 2;
             int j = i / 0;
         } catch (Exception e) {
-//            nettyService.postSend(false, e.getMessage());
+            nettyService.postSend(false, e.getMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
             return false;
         }

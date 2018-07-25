@@ -3,14 +3,12 @@ package com.blueskykong.tm.core.netty.impl;
 import com.blueskykong.tm.common.config.TxConfig;
 import com.blueskykong.tm.common.entity.TxManagerServer;
 import com.blueskykong.tm.common.enums.SerializeProtocolEnum;
-import com.blueskykong.tm.common.exception.TransactionException;
 import com.blueskykong.tm.common.exception.TransactionRuntimeException;
 import com.blueskykong.tm.common.holder.LogUtil;
+import com.blueskykong.tm.core.feign.ManagerClient;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.netty.handler.NettyClientHandlerInitializer;
 import com.blueskykong.tm.core.netty.handler.NettyClientMessageHandler;
-import com.blueskykong.tm.core.service.impl.TxManagerLocator;
-import com.google.common.base.StandardSystemProperty;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -30,10 +28,11 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class NettyClientServiceImpl implements NettyClientService {
@@ -62,13 +61,11 @@ public class NettyClientServiceImpl implements NettyClientService {
 
     private final NettyClientHandlerInitializer nettyClientHandlerInitializer;
 
-    private final DiscoveryClient discoveryClient;
+    private final ManagerClient managerClient;
 
+    public NettyClientServiceImpl(NettyClientHandlerInitializer nettyClientHandlerInitializer, ManagerClient managerClient) {
 
-    @Autowired
-    public NettyClientServiceImpl(NettyClientHandlerInitializer nettyClientHandlerInitializer, DiscoveryClient discoveryClient) {
-
-        this.discoveryClient = discoveryClient;
+        this.managerClient = managerClient;
         this.nettyClientHandlerInitializer = nettyClientHandlerInitializer;
     }
 
@@ -87,9 +84,6 @@ public class NettyClientServiceImpl implements NettyClientService {
         servletExecutor = new DefaultEventExecutorGroup(txConfig.getNettyThreadMax());
         nettyClientHandlerInitializer.setServletExecutor(servletExecutor);
         nettyClientHandlerInitializer.setTxConfig(txConfig);
-        TxManagerLocator.getInstance().setTxConfig(txConfig);
-        TxManagerLocator.getInstance().setDiscoveryClient(discoveryClient);
-        TxManagerLocator.getInstance().schedulePeriodicRefresh();
         try {
             bootstrap = new Bootstrap();
             groups(bootstrap, txConfig);
@@ -134,7 +128,20 @@ public class NettyClientServiceImpl implements NettyClientService {
         if (channel != null && channel.isActive()) {
             return;
         }
-        final TxManagerServer txManagerServer = TxManagerLocator.getInstance().locator();
+        TxManagerServer txManagerServer = getTmServer();
+/*        ExecutorService es = Executors.newFixedThreadPool(1);
+        txManagerServer = CompletableFuture.supplyAsync(() -> {
+            TxManagerServer  tmp   =null;
+            System.out.println(getTmServer());
+            return getTmServer();
+        }, es).exceptionally(e -> {
+            System.out.println("exceptionally");
+            e.printStackTrace();
+            return null;
+        }).whenComplete((v, e) -> {
+            System.out.println("complete");
+        }).join();*/
+
         if (Objects.nonNull(txManagerServer) &&
                 StringUtils.isNoneBlank(txManagerServer.getHost())
                 && Objects.nonNull(txManagerServer.getPort())) {
@@ -160,6 +167,31 @@ public class NettyClientServiceImpl implements NettyClientService {
         });
 
     }
+
+    //TODO 重试机制待优化
+    //    @Retryable(value = {Exception.class}, maxAttempts = 6, backoff = @Backoff(delay = 3000L, multiplier = 1))
+    private TxManagerServer getTmServer() {
+        TxManagerServer txManagerServer = null;
+
+        for (int i = 0; i < 6; i++) {
+            try {
+                txManagerServer = managerClient.findTxManagerServers();
+
+            } catch (Exception e) {
+                LOGGER.error("{}th retry for getting txManagerServer", i + 1);
+            }
+            if (Objects.nonNull(txManagerServer)) {
+                break;
+            }
+            try {
+                Thread.sleep(10000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return txManagerServer;
+    }
+
 
     /**
      * 停止服务

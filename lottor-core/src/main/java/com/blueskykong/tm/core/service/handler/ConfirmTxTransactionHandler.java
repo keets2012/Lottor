@@ -8,10 +8,8 @@ import com.blueskykong.tm.common.holder.LogUtil;
 import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
 import com.blueskykong.tm.core.service.TxManagerMessageService;
 import com.blueskykong.tm.core.service.TxTransactionHandler;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +22,6 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
 
     private final TxOperateCommand txOperateCommand;
 
-    @Autowired
     public ConfirmTxTransactionHandler(TxManagerMessageService txManagerMessageService, TxOperateCommand txOperateCommand) {
 
         this.txManagerMessageService = txManagerMessageService;
@@ -32,10 +29,10 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
     }
 
     @Override
-    public Object handler(TxTransactionInfo info) {
-        LogUtil.info(LOGGER, "tx-transaction confirm,  事务确认类：{}", () -> "");
+    public void handler(TxTransactionInfo info) {
 
         final String groupId = TxTransactionLocal.getInstance().getTxGroupId();
+        LogUtil.info(LOGGER, "tx-transaction confirm, 事务组 id 为：{}", () -> groupId);
 
         final String waitKey = TxTransactionTaskLocal.getInstance().getTxTaskId();
 
@@ -55,16 +52,13 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
                 final Object exceptionMsg = info.getArgs()[1];
                 //通知tm完成事务
                 CompletableFuture.runAsync(() ->
-                        txManagerMessageService
-                                .asyncCompleteCommit(groupId, waitKey,
-                                        status, exceptionMsg));
+                        txManagerMessageService.asyncCompleteCommit(groupId, waitKey, status, exceptionMsg));
             } else {
                 CompletableFuture.runAsync(() ->
-                        txManagerMessageService.asyncCompleteCommit(groupId, waitKey, status, ""));
+                        txManagerMessageService.asyncCompleteCommit(groupId, waitKey, status, null));
             }
 
-            LogUtil.info(LOGGER, "tx-transaction end, 事务发起类：{}", () -> "");
-            return "";
+            LogUtil.info(LOGGER, "tx-transaction end, 事务组 id 为：{}", () -> groupId);
         } catch (final Throwable throwable) {
             //通知tm整个事务组失败，需要回滚标志状态
             //TODO ROLLABCK待优化

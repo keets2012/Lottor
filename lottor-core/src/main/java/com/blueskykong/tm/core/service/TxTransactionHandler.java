@@ -14,5 +14,5 @@ public interface TxTransactionHandler {
      * @return Object
      * @throws Throwable 异常
      */
-    Object handler(TxTransactionInfo info);
+    void handler(TxTransactionInfo info);
 }

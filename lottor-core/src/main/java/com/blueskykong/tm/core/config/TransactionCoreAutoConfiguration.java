@@ -11,6 +11,7 @@ import com.blueskykong.tm.core.bootstrap.TxTransactionInitialize;
 import com.blueskykong.tm.core.compensation.TxOperateService;
 import com.blueskykong.tm.core.compensation.command.TxOperateCommand;
 import com.blueskykong.tm.core.compensation.impl.TxOperateServiceImpl;
+import com.blueskykong.tm.core.feign.ManagerClient;
 import com.blueskykong.tm.core.interceptor.TxTransactionInterceptor;
 import com.blueskykong.tm.core.netty.NettyClientService;
 import com.blueskykong.tm.core.netty.handler.NettyClientHandlerInitializer;
@@ -34,9 +35,11 @@ import com.blueskykong.tm.core.service.message.NettyMessageServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.retry.annotation.EnableRetry;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +49,8 @@ import java.util.stream.StreamSupport;
 @Configuration
 @EnableConfigurationProperties(TxConfig.class)
 @ConditionalOnBean({DiscoveryClient.class})
+@EnableFeignClients(basePackages = {"com.blueskykong.tm.core.feign"})
+@EnableRetry
 public class TransactionCoreAutoConfiguration {
 
     @Bean
@@ -54,8 +59,8 @@ public class TransactionCoreAutoConfiguration {
     }
 
     @Bean
-    public NettyClientService nettyClientService(NettyClientHandlerInitializer nettyClientHandlerInitializer, DiscoveryClient discoveryClient) {
-        return new NettyClientServiceImpl(nettyClientHandlerInitializer, discoveryClient);
+    public NettyClientService nettyClientService(NettyClientHandlerInitializer nettyClientHandlerInitializer, ManagerClient managerClient) {
+        return new NettyClientServiceImpl(nettyClientHandlerInitializer, managerClient);
     }
 
     @Bean

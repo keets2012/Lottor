@@ -18,11 +18,11 @@ public class SpringCloudTxTransactionInterceptor implements TxTransactionInterce
 
 
     @Override
-    public Object interceptor(Object[] pjp, OperationEnum operationEnum) {
+    public void interceptor(Object[] args, OperationEnum operationEnum) {
 
         String groupId = TxTransactionLocal.getInstance().getTxGroupId();
 
-        return aspectTransactionService.invoke(groupId, pjp, operationEnum);
+        aspectTransactionService.invoke(groupId, args, operationEnum);
     }
 
 }
