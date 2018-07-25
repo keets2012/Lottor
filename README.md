@@ -82,7 +82,7 @@ Lottor 客户端的持久化，提供了SPI接口，可通过配置动态指定�
 
 ### 项目截图
 
-![项目结构](http://ovcibtedi.bkt.clouddn.com/lottor-structure.jpg)
+![项目结构](http://image.blueskykong.com/lottor-project.jpg)
 
 ![UI界面](http://ovcibtedi.bkt.clouddn.com/lottor-ui.jpg)
 
