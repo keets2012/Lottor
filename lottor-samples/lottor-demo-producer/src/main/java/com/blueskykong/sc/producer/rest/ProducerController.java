@@ -18,7 +18,7 @@ public class ProducerController {
     @Autowired
     private PayService payService;
 
-    @GetMapping("/test")
+    @GetMapping("/produce")
     public String test() {
         LogUtil.info(LOGGER, () -> "开始调用事务！");
 //        preSends(null);
