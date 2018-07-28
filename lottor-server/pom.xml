@@ -151,27 +151,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>all</id>
-            <name>all</name>
-            <url>http://192.168.1.100:8081/artifactory/all</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>simu-server-snapshots</name>
-            <url>http://192.168.1.100:8081/artifactory/all</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <repositories>
-        <repository>
-            <id>all</id>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <name>all</name>
-            <url>http://192.168.1.100:8081/artifactory/all</url>
-        </repository>
-    </repositories>
 </project>
