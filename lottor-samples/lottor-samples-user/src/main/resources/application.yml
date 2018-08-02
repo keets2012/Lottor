@@ -1,0 +1,71 @@
+spring:
+  profiles:
+    active: dev
+  application:
+      name: t-producer
+  cloud:
+    consul:
+      host: localhost
+#      host: ${CONSUL_ADDRESS:192.168.1.204}
+      port: 8501
+      discovery:
+        ip-address: ${HOST_ADDRESS:192.168.1.77}
+        port: ${SERVER_PORT:${server.port}}
+#        healthCheckPath: /health
+        healthCheckInterval: 15s
+        instance-id: ${spring.cloud.consul.discovery.service-name}-${spring.profiles.active}-${spring.cloud.consul.discovery.ip-address}-${random.value}
+        service-name: transaction-user
+
+server:
+  port: 8009
+
+
+management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: false
+  security:
+    enabled: false
+
+logging:
+  level:
+    root: info
+    com.blueskykong.lottor.core: debug
+  path: "./logs"
+
+---
+tx:
+  enabled: true
+  core:
+    compensation-cache-type: redis
+    tx-redis-config:
+      host-name: localhost
+      port: 6379
+      password: pwd
+    serializer: kryo
+    netty-serializer: kryo
+    blocking-queue-type: Linked
+    compensation: true
+    tx-manager-id: lotor
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.1.204:3306/user_tmp?autoReconnect=true&useSSL=false
+    continue-on-error: false
+    initialize: true
+    max-active: 50
+    max-idle: 10
+    max-wait: 10000
+    min-evictable-idle-time-millis: 60000
+    min-idle: 8
+    name: dbcp1
+    test-on-borrow: false
+    test-on-return: false
+    test-while-idle: false
+    time-between-eviction-runs-millis: 5000
+    username: user
+    password: pwd
+    schema[0]: classpath:/user.sql

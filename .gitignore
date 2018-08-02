@@ -28,5 +28,4 @@ hs_err_pid*
 .mvn/
 logs/
 *.log
-*.yml
 logs/
