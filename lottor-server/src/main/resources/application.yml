@@ -1,6 +1,6 @@
 spring:
   rabbitmq:
-    host: localhost
+    host: 120.55.43.136
     port: 5672
     username: guest
     password: guest
@@ -10,7 +10,7 @@ spring:
     mongodb:
       authentication-database: lottor_test
       database: lottor_test
-      host: localhost
+      host: 120.55.43.136
       port: ${MONGO_PORT:27017}
   thymeleaf:
     prefix: classpath:/html/
@@ -25,9 +25,9 @@ tx:
   redis:
     cluster: false
 #      redirects: 20
-    hostName: localhost
-    port: 6378
-    password: password
+    hostName: 120.55.43.136
+    port: 6379
+    password: __@picker-redis
   manager:
     netty:
       port: 9998
@@ -45,10 +45,10 @@ redisSaveMaxTime: 3000
 logging:
   level:
     root: info
-    com.blueskykong.tm.server: debug
+    com.blueskykong.lottor.server: debug
   path: "./logs"
 
-stream.content-type: application/x-java-object;type=com.blueskykong.tm.common.entity.TransactionMsgAdapter
+stream.content-type: application/x-java-object;type=com.blueskykong.lottor.common.entity.TransactionMsgAdapter
 
 ---
 swagger:
@@ -58,6 +58,6 @@ swagger:
   version: 1.0
   contact:
     name: aoho
-  base-package: com.blueskykong.tm.server.controller
+  base-package: com.blueskykong.lottor.server.controller
   base-path: /**
   exclude-path: /error, /ops/**

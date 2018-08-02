@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.blueskykong.tm.sc.config.SpringCloudAutoConfiguration,\
-com.blueskykong.tm.core.config.TransactionCoreAutoConfiguration
+com.blueskykong.lottor.sc.config.SpringCloudAutoConfiguration,\
+com.blueskykong.lottor.core.config.TransactionCoreAutoConfiguration

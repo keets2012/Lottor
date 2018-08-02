@@ -1,13 +1,13 @@
 package com.blueskykong.lottor.samples.auth;
 
-import com.blueskykong.lottor.samples.auth.service.ConsumerService;
+import com.blueskykong.lottor.common.entity.TransactionMsg;
+import com.blueskykong.lottor.common.enums.MethodNameEnum;
+import com.blueskykong.lottor.common.holder.LogUtil;
+import com.blueskykong.lottor.common.serializer.ObjectSerializer;
+import com.blueskykong.lottor.core.service.ExternalNettyService;
+import com.blueskykong.lottor.samples.auth.service.RoleUserService;
 import com.blueskykong.lottor.samples.auth.stream.TestSink;
-import com.blueskykong.tm.common.entity.TransactionMsg;
-import com.blueskykong.tm.common.enums.MethodNameEnum;
-import com.blueskykong.tm.common.holder.LogUtil;
-import com.blueskykong.tm.common.serializer.ObjectSerializer;
-import com.blueskykong.tm.core.service.ExternalNettyService;
-import com.blueskykong.tm.sc.service.InitStreamHandler;
+import com.blueskykong.lottor.sc.service.InitStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class ListenerStream extends InitStreamHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListenerStream.class);
 
     @Autowired
-    private ConsumerService consumerService;
+    private RoleUserService roleUserService;
 
     @Autowired
     public ListenerStream(ExternalNettyService nettyService, ObjectSerializer objectSerializer) {
@@ -50,7 +50,6 @@ public class ListenerStream extends InitStreamHandler {
                     LogUtil.info(LOGGER, () -> message.getMethod());
                     switch (method) {
                         case CONSUMER_TEST:
-//                            Map product = objectSerializer.deSerialize(message.getArgs(), HashMap.class);
                             Map product = (Map) message.getArgs();
                             LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.CONSUMER_TEST, () -> product.get("123"));
 //                            consumerService.testConsumer(product);

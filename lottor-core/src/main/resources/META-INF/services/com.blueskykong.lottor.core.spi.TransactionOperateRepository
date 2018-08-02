@@ -1,0 +1,2 @@
+com.blueskykong.lottor.core.spi.repository.recover.MongoTransactionOperateRepository
+com.blueskykong.lottor.core.spi.repository.recover.RedisTransactionOperateRepository
