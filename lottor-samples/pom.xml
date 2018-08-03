@@ -27,6 +27,7 @@
     <modules>
         <module>lottor-samples-user</module>
         <module>lottor-samples-auth</module>
+        <module>lottor-samples-common</module>
     </modules>
 
     <dependencies>

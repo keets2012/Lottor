@@ -20,7 +20,7 @@ spring:
         preferIpAddress: true
         enabled: true
         register: true
-        service-name: lotor
+        service-name: lottor
         health-check-interval: 10s
         health-check-timeout: 20s
         heartbeat:
@@ -36,7 +36,7 @@ spring:
         tags: master
         query-passing: true
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
-      host: ${CONSUL_ADDRESS:localhost}
+      host: ${CONSUL_ADDRESS:120.55.43.136}
       port: ${CONSUL_PORT:8501}
     config:
       discovery:

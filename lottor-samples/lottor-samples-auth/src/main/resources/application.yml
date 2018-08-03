@@ -3,24 +3,24 @@ spring:
     active: dev
   datasource:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.1.204:3306/auth_tmp?useUnicode=true&characterEncoding=utf8
-      username: user
-      password: pwd
-    schema[0]: classpath:/user.sql
+      url: jdbc:mysql://192.168.1.204:3306/auth_tmp?useUnicode=true&characterEncoding=utf8&useSSL=false
+      username: simu
+      password: simu123
+      schema[0]: classpath:/auth.sql
   application:
-      name: t-consumer
+      name: auth-service
   cloud:
     consul:
-      host: localhost
+      host: 120.55.43.136
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
       port: 8501
       discovery:
-        ip-address: ${HOST_ADDRESS:localhost}
+        ip-address: ${HOST_ADDRESS:120.55.43.136}
         port: ${SERVER_PORT:${server.port}}
 #        healthCheckPath: /health
         healthCheckInterval: 15s
-        instance-id: transaction-consumer-${server.port}
-        service-name: transaction-consumer
+        instance-id: auth-service-${server.port}
+        service-name: auth-service
 
 server:
   port: 8007
@@ -48,8 +48,8 @@ spring:
       bindings:
         test-input:
           group: testGroup
-          content-type: application/x-java-object;type=com.blueskykong.lottor.common.entity.TransactionMsg
-          destination: tx-test
+          content-type: application/x-java-object;type=com.blueskykong.lottor.common.entity.TransactionMsgAdapter
+          destination: tx-auth
           binder: rabbit1
       binders:
         rabbit1:
@@ -57,7 +57,7 @@ spring:
           environment:
             spring:
               rabbitmq:
-                host: localhost
+                host: 120.55.43.136
                 port: 5672
                 username: guest
                 password: guest
@@ -69,11 +69,11 @@ tx:
   core:
     compensation-cache-type: redis
     tx-redis-config:
-      host-name: localhost
+      host-name: 120.55.43.136
       port: 6379
-      password: pwd
+      password: __@picker-redis
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
     compensation: false
-    tx-manager-id: lotor
+    tx-manager-id: lottor

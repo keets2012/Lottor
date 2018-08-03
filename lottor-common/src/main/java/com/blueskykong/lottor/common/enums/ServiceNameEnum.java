@@ -5,11 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public enum ServiceNameEnum {
-    AFFAIR("affair", "tx-affair"),
-    MATERIAL("material", "tx-material"),
-    TSS("tss-app", "tx-tss-app"),
-    TEST_PRODUCER("producer", "tx-producer"),
-    TEST("test", "tx-test");
+    TEST_USER("user", "tx-user"),
+    TEST_AUTH("auth", "tx-auth");
 
     String serviceName;
 

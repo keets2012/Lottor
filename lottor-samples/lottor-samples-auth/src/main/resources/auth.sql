@@ -23,7 +23,7 @@ CREATE TABLE `user_role` (
 
 DROP TABLE IF EXISTS `permission`;
 CREATE TABLE `permission` (
-  `id` varchar(36) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `permission` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -38,7 +38,7 @@ CREATE TABLE `permission` (
 
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
-  `id` varchar(36) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `update_time` timestamp NULL DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,

@@ -6,7 +6,9 @@ import com.blueskykong.lottor.common.enums.ServiceNameEnum;
 import com.blueskykong.lottor.common.holder.IdWorkerUtils;
 import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.core.service.ExternalNettyService;
+import com.blueskykong.lottor.samples.user.domain.UserEntity;
 import com.blueskykong.lottor.samples.user.service.UserService;
+import com.blueskykong.lottor.samples.user.service.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +28,22 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ExternalNettyService nettyService;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
+    public Boolean createUser(UserEntity userEntity) {
+        int result = userMapper.saveUser(userEntity);
+        System.out.println("======" + result);
+        return result > 0;
+    }
+
+    /*@Override
     @Transactional
-    public Boolean createUser() {
+    public Boolean createUser(UserEntity userEntity) {
         TransactionMsg transactionMsg = new TransactionMsg();
-        transactionMsg.setSource(ServiceNameEnum.TEST_PRODUCER.getServiceName());
-        transactionMsg.setTarget(ServiceNameEnum.TEST.getServiceName());
-        //TODO 下个版本优化，客户端暂时需要序列化对象
+        transactionMsg.setSource(ServiceNameEnum.TEST_USER.getServiceName());
+        transactionMsg.setTarget(ServiceNameEnum.TEST_AUTH.getServiceName());
         Map<String, String> arg = new HashMap<>();
         arg.put("123", "456");
         transactionMsg.setArgs(arg);
@@ -44,17 +55,19 @@ public class UserServiceImpl implements UserService {
 
         try {
             LogUtil.debug(LOGGER, () -> "执行本地事务！");
-/*            if (Objects.nonNull(transactionMsg)) {
-                throw new IllegalArgumentException("check your parameter!");
-            }*/
             int i = 2;
             int j = i / 0;
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             nettyService.postSend(false, e.getMessage());
             LogUtil.error(LOGGER, () -> "执行本地事务失败！");
             return false;
         }
         nettyService.postSend(true, null);
         return true;
-    }
+    }*/
+
+
 }

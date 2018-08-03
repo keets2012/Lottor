@@ -2,10 +2,10 @@ spring:
   profiles:
     active: dev
   application:
-      name: t-producer
+      name: user-service
   cloud:
     consul:
-      host: localhost
+      host: 120.55.43.136
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
       port: 8501
       discovery:
@@ -14,7 +14,7 @@ spring:
 #        healthCheckPath: /health
         healthCheckInterval: 15s
         instance-id: ${spring.cloud.consul.discovery.service-name}-${spring.profiles.active}-${spring.cloud.consul.discovery.ip-address}-${random.value}
-        service-name: transaction-user
+        service-name: user-service
 
 server:
   port: 8009
@@ -42,14 +42,14 @@ tx:
   core:
     compensation-cache-type: redis
     tx-redis-config:
-      host-name: localhost
+      host-name: 120.55.43.136
       port: 6379
-      password: pwd
+      password: __@picker-redis
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
     compensation: true
-    tx-manager-id: lotor
+    tx-manager-id: lottor
 
 spring:
   datasource:
@@ -66,6 +66,6 @@ spring:
     test-on-return: false
     test-while-idle: false
     time-between-eviction-runs-millis: 5000
-    username: user
-    password: pwd
+    username: simu
+    password: simu123
     schema[0]: classpath:/user.sql
