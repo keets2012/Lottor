@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  * @author keets
  * @data 2018/7/25.
  */
-@FeignClient(name = "lotor")
+@FeignClient(name = "lottor")
 public interface ManagerClient {
 
     @PostMapping(value = "/tx/manager/findTxManagerServer", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -58,7 +58,7 @@ public class TxConfig {
     private int recoverDelayTime = 60;
 
 
-    private String txManagerId = "lotor";
+    private String txManagerId = "lottor";
 
     private TxMongoConfig txMongoConfig;
 

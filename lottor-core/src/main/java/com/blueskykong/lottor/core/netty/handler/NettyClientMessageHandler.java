@@ -61,7 +61,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
         LottorRequest lottorRequest = (LottorRequest) msg;
         String server_ctx = ctx.channel().remoteAddress().toString();
         final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(lottorRequest.getAction());
-        LogUtil.debug(LOGGER, "接收服务端 {} ，执行的动作为:{}", () -> server_ctx, actionEnum::getDesc);
+        LogUtil.debug(LOGGER, "接收到 Lottor 服务端 【{}】 的【{}】事件", () -> server_ctx.substring(1), actionEnum::getDesc);
         try {
             switch (actionEnum) {
                 case HEART:
@@ -139,7 +139,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        LogUtil.info(LOGGER, "与服务器断开连接服务器");
+        LogUtil.info(LOGGER, "与Lottor Server断开连接服务器");
         super.channelInactive(ctx);
         SpringBeanUtils.getInstance().getBean(NettyClientService.class).doConnect();
 
@@ -149,13 +149,13 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.ctx = ctx;
-        LogUtil.info(LOGGER, "建立链接-->" + ctx);
+        LogUtil.info(LOGGER, "成功连接到Lottor Server【{}】", () -> ctx);
         net_state = true;
     }
 
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         //心跳配置
         if (IdleStateEvent.class.isAssignableFrom(evt.getClass())) {
             IdleStateEvent event = (IdleStateEvent) evt;
@@ -170,7 +170,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
                 group.setSource(modelNameService.findModelName());
                 HEART_BEAT.setTxTransactionGroup(group);
                 ctx.writeAndFlush(HEART_BEAT);
-                LogUtil.debug(LOGGER, () -> "向服务端发送的心跳");
+                LogUtil.debug(LOGGER, "发送【心跳】事件到Lottor Server【{}】", () -> ctx.channel().remoteAddress().toString().substring(1));
             } else if (event.state() == IdleState.ALL_IDLE) {
                 //表示已经多久既没有收到也没有发送数据了
                 SpringBeanUtils.getInstance().getBean(NettyClientService.class).doConnect();

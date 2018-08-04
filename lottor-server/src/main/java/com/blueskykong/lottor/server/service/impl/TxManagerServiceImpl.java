@@ -69,7 +69,7 @@ public class TxManagerServiceImpl implements TxManagerService {
                 mongoTemplate.insert(item, CollectionNameEnum.TxTransactionItem.name());
             }
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "failed to save TxTransactionGroup, groupId is {} and cause is {}",
+            LogUtil.error(LOGGER, "failed to save TxTransactionGroup, groupId is 【{}】and cause is 【{}】",
                     () -> txTransactionGroup.getId(), e::getLocalizedMessage);
             return false;
         }
@@ -132,12 +132,12 @@ public class TxManagerServiceImpl implements TxManagerService {
                         msg.setGroupId(groupId);
                         outputFactoryService.sendMsg(msg);
                         mongoTemplate.insert(msg, CollectionNameEnum.TransactionMsg.name());
-                        LogUtil.debug(LOGGER, () -> "success send msg");
+                        LogUtil.debug(LOGGER, "success send msg, and msg id is 【{}】", msg::getSubTaskId);
                     }
                 });
             }
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "send msgs failure and groupId id {}", () -> groupId);
+            LogUtil.error(LOGGER, "send msgs failure and groupId id is 【{}】", () -> groupId);
             e.printStackTrace();
             return false;
         }
@@ -159,6 +159,7 @@ public class TxManagerServiceImpl implements TxManagerService {
             if (StringUtils.isNotBlank(message)) {
                 update.set("message", message);
             }
+            update.set("updateTime", Timestamp.valueOf(DateUtils.getCurrentDateTime()).getTime());
             final WriteResult writeResult = mongoTemplate.updateFirst(query, update, TransactionMsg.class, CollectionNameEnum.TransactionMsg.name());
             return writeResult.getN() > 0;
         } catch (Exception e) {

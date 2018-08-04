@@ -46,11 +46,12 @@ public class OutputFactoryServiceImpl implements OutputFactoryService {
     public Boolean sendMsg(TransactionMsgAdapter msg) {
         ServiceNameEnum serviceNameEnum = ServiceNameEnum.fromString(msg.getTarget());
         if (!Objects.nonNull(serviceNameEnum)) {
-            LogUtil.warn(LOGGER, "no available cases for {}. pls check if this topic exists.", () -> msg.getTarget());
+
+            LogUtil.warn(LOGGER, "no available cases for【{}】. pls check if this topic exists.", () -> msg.getTarget());
             resolver.resolveDestination(CHANNEL_PREFIX + msg.getTarget()).send(MessageBuilder.createMessage(msg,
                     new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
         } else {
-            LogUtil.debug(LOGGER, "send tx-msg and target service: {}", () -> serviceNameEnum.getServiceName());
+            LogUtil.debug(LOGGER, "send tx-msg and target service【{}】", () -> serviceNameEnum.getServiceName());
             resolver.resolveDestination(serviceNameEnum.getTopic()).send(MessageBuilder.createMessage(msg,
                     new MessageHeaders(Collections.singletonMap(MessageHeaders.CONTENT_TYPE, contentType))));
         }

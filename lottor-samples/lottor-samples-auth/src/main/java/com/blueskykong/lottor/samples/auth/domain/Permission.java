@@ -12,7 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Permission {
 
-    private Long id;
+    private String id;
 
     private String permission;
 

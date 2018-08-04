@@ -1,13 +1,10 @@
 package com.blueskykong.lottor.server.entity;
 
-/**
- * @data 2018/4/3.
- */
 public enum CollectionNameEnum {
     TxTransactionItem("TxTransactionItem", 0),
-    TransactionMsg("TxTransactionItem", 1),
-    TxManagerInfo("TxTransactionItem", 2),
-    BaseItem("TxTransactionItem", 3);
+    TransactionMsg("TransactionMsg", 1),
+    TxManagerInfo("TxManagerInfo", 2),
+    BaseItem("BaseItem", 3);
 
 
     private String name;

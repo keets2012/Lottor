@@ -64,7 +64,7 @@ public class TransactionMsg implements Serializable {
     /**
      * 是否消费，默认为否
      *
-     * {@linkplain com.blueskykong.tm.common.enums.ConsumedStatus}
+     * {@linkplain com.blueskykong.lottor.common.enums.ConsumedStatus}
      */
     private int consumed = ConsumedStatus.UNCONSUMED.getStatus();
 

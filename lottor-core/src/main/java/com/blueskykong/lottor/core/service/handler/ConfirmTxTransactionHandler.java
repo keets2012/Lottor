@@ -32,7 +32,7 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
     public void handler(TxTransactionInfo info) {
 
         final String groupId = TxTransactionLocal.getInstance().getTxGroupId();
-        LogUtil.info(LOGGER, "tx-transaction confirm, 事务组 id 为：{}", () -> groupId);
+        LogUtil.info(LOGGER, "事务发起方事务组confirm, 事务组 id 为【{}】", () -> groupId);
 
         final String waitKey = TxTransactionTaskLocal.getInstance().getTxTaskId();
 
@@ -46,7 +46,7 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
             } else {
                 status = TransactionStatusEnum.ROLLBACK.getCode();
             }
-            LogUtil.debug(LOGGER, "confirm status: {}", () -> status);
+            LogUtil.debug(LOGGER, "事务组【{}】, confirm status为【{}】", () -> groupId, () -> TransactionStatusEnum.acquireByCode(status).getDesc());
 
             if (Objects.nonNull(info.getArgs()[1])) {
                 final Object exceptionMsg = info.getArgs()[1];
@@ -58,7 +58,7 @@ public class ConfirmTxTransactionHandler implements TxTransactionHandler {
                         txManagerMessageService.asyncCompleteCommit(groupId, waitKey, status, null));
             }
 
-            LogUtil.info(LOGGER, "tx-transaction end, 事务组 id 为：{}", () -> groupId);
+            LogUtil.info(LOGGER, "事务组【{}】成功发送确认消息", () -> groupId);
         } catch (final Throwable throwable) {
             //通知tm整个事务组失败，需要回滚标志状态
             //TODO ROLLABCK待优化

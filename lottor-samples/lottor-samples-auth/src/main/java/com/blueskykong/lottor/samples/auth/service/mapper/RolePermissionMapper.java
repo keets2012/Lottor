@@ -10,10 +10,10 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface RolePermissionMapper {
 
-    @Insert("INSERT INTO role_permission(role_id,permission_id) VALUES(#{permission},#{description})")
+    @Insert("INSERT INTO role_permission(id,role_id,permission_id) VALUES(#{id},#{roleId},#{permissionId})")
     int savePermission(RolePermission rolePermission);
 
     @Select("select * from role_permission where id = #{id}")
-    RolePermission getRolePermissionById(Long id);
+    RolePermission getRolePermissionById(String id);
 
 }

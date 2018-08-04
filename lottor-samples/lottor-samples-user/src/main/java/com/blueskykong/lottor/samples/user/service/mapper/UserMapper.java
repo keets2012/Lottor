@@ -3,7 +3,6 @@ package com.blueskykong.lottor.samples.user.service.mapper;
 import com.blueskykong.lottor.samples.user.domain.UserEntity;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
 
 /**
  * @author keets
@@ -11,9 +10,11 @@ import org.apache.ibatis.annotations.SelectKey;
  */
 public interface UserMapper {
 
-    @Insert("INSERT INTO user(username,password,self_desc) VALUES(#{username},#{password},#{selfDesc})")
-    @SelectKey(before = false, keyProperty = "id", resultType = Long.class, statement = {" SELECT LAST_INSERT_ID()  "})
+    @Insert("INSERT INTO user(id,username,password,self_desc) VALUES(#{id},#{username},#{password},#{selfDesc})")
     int saveUser(UserEntity userEntity);
+
+    @Insert("INSERT INTO user(id,username,password,self_desc) VALUES(#{id},#{username})")
+    int saveUserFailure(UserEntity userEntity);
 
     @Select("select * from user where id = #{id}")
     UserEntity getUserById(Long id);

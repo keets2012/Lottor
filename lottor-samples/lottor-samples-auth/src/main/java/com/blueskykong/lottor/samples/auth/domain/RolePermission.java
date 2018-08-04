@@ -11,9 +11,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class RolePermission {
 
-    private Long id;
+    private String id;
 
-    private Long roleId;
+    private String roleId;
 
-    private Long permissionId;
+    private String permissionId;
 }

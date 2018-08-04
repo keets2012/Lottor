@@ -29,4 +29,3 @@ hs_err_pid*
 logs/
 *.log
 logs/
-*.yml

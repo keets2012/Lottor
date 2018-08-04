@@ -10,10 +10,10 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface RoleMapper {
 
-    @Insert("INSERT INTO role(name,update_time,description) VALUES(#{name},#{updateTime},#{description})")
+    @Insert("INSERT INTO role(id,name,update_time,description) VALUES(#{id},#{name},#{updateTime},#{description})")
     int saveRole(RoleEntity roleEntity);
 
-    @Select("select * from role where id = #{id}")
-    RoleEntity getRoleById(Long id);
+    @Select("select * from role where name = #{name}")
+    RoleEntity getRoleByName(String name);
 
 }

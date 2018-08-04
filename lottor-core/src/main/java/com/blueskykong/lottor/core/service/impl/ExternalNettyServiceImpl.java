@@ -31,7 +31,7 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
     @Override
     public void postSend(Boolean success, Object message) {
         Object[] args = new Object[]{success, message};
-        LogUtil.info(LOGGER, "发送事务组confirm消息, {} ", () -> success);
+        LogUtil.info(LOGGER, "发送事务组confirm消息, 本地事务完场状态为【{}】", () -> success);
         txTransactionInterceptor.interceptor(args, OperationEnum.TX_COMPLETE);
     }
 
@@ -39,7 +39,7 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
     public void consumedSend(TransactionMsg msg, Boolean success) {
         Object[] args = new Object[]{msg, success};
 
-        LogUtil.info(LOGGER, "发送Consume消息，groupId {} and subTaskId {}，消费结果为：{}", () -> msg.getGroupId(),
+        LogUtil.info(LOGGER, "发送Consume消息，groupId【{}】 and subTaskId【{}】，消费结果为【{}】", () -> msg.getGroupId(),
                 () -> msg.getSubTaskId(), () -> success);
 
         txTransactionInterceptor.interceptor(args, OperationEnum.TX_CONSUMED);

@@ -11,7 +11,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserEntity {
 
-    private Long id;
+    private String id;
 
     private String username;
 

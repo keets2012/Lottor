@@ -126,18 +126,6 @@ public class NettyClientServiceImpl implements NettyClientService {
             return;
         }
         TxManagerServer txManagerServer = getTmServer();
-/*        ExecutorService es = Executors.newFixedThreadPool(1);
-        txManagerServer = CompletableFuture.supplyAsync(() -> {
-            TxManagerServer  tmp   =null;
-            System.out.println(getTmServer());
-            return getTmServer();
-        }, es).exceptionally(e -> {
-            System.out.println("exceptionally");
-            e.printStackTrace();
-            return null;
-        }).whenComplete((v, e) -> {
-            System.out.println("complete");
-        }).join();*/
 
         if (Objects.nonNull(txManagerServer) &&
                 StringUtils.isNoneBlank(txManagerServer.getHost())
@@ -178,7 +166,7 @@ public class NettyClientServiceImpl implements NettyClientService {
                 LOGGER.error("{}th retry for getting txManagerServer", i + 1);
             }
             if (Objects.nonNull(txManagerServer)) {
-                break;
+                return txManagerServer;
             }
             try {
                 Thread.sleep(10000L);

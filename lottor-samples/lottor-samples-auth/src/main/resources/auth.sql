@@ -8,7 +8,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `user_role`;
 CREATE TABLE `user_role` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(128) NOT NULL,
   `user_id` varchar(36) NOT NULL,
   `role_id` varchar(36) NOT NULL,
   PRIMARY KEY (`id`),
@@ -23,7 +23,7 @@ CREATE TABLE `user_role` (
 
 DROP TABLE IF EXISTS `permission`;
 CREATE TABLE `permission` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(128) NOT NULL,
   `permission` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -38,7 +38,7 @@ CREATE TABLE `permission` (
 
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(128) NOT NULL,
   `name` varchar(255) NOT NULL,
   `update_time` timestamp NULL DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE `role` (
 
 DROP TABLE IF EXISTS `role_permission`;
 CREATE TABLE `role_permission` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(128) NOT NULL,
   `role_id` varchar(36) NOT NULL,
   `permission_id` varchar(36) NOT NULL,
   PRIMARY KEY (`id`),

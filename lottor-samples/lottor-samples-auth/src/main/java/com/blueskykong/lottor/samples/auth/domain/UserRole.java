@@ -11,9 +11,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserRole {
 
-    private Long id;
+    private String id;
 
-    private Long userId;
+    private String userId;
 
-    private Long roleId;
+    private String roleId;
 }

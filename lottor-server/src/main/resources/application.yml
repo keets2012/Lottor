@@ -8,10 +8,10 @@ spring:
 
   data:
     mongodb:
-      authentication-database: lottor_test
-      database: lottor_test
+      authentication-database: lottor
+      database: lottor
       host: 120.55.43.136
-      port: ${MONGO_PORT:27017}
+      port: ${MONGO_PORT:27027}
 
 tx:
   redis:

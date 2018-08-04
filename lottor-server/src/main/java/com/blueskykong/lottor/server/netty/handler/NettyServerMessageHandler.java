@@ -67,7 +67,7 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
         TxTransactionItem item = null;
         try {
             final NettyMessageActionEnum actionEnum = NettyMessageActionEnum.acquireByCode(hb.getAction());
-            LogUtil.debug(LOGGER, "接收到客户端 {} 事件，执行的动作为:{}", () -> clientCtx, actionEnum::getDesc);
+            LogUtil.debug(LOGGER, "Lottor Server接收到客户端【{}】的【{}】事件", () -> clientCtx.substring(1), actionEnum::getDesc);
             Boolean success;
             if (Objects.nonNull(txTransactionGroup)) {
                 item = txTransactionGroup.getItem();
@@ -89,7 +89,6 @@ public class NettyServerMessageHandler extends ChannelInboundHandlerAdapter {
                             contexts.add(ctx);
                             clientContext.putIfAbsent(source, contexts);
                         }
-                        LogUtil.debug(LOGGER, "heart set {} : {}", () -> clientCtx, () -> clients.get(clientCtx));
                     }
                     ctx.writeAndFlush(hb);
                     break;

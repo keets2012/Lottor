@@ -55,7 +55,7 @@ spring:
   datasource:
     url: jdbc:mysql://192.168.1.204:3306/user_tmp?autoReconnect=true&useSSL=false
     continue-on-error: false
-    initialize: true
+    initialize: false
     max-active: 50
     max-idle: 10
     max-wait: 10000

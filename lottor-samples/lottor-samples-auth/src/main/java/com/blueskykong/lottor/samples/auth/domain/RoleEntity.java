@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class RoleEntity {
 
-    private Long id;
+    private String id;
 
     private String name;
 

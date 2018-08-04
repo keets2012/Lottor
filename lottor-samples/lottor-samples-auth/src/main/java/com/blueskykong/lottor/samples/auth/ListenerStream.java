@@ -5,8 +5,11 @@ import com.blueskykong.lottor.common.enums.MethodNameEnum;
 import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.common.serializer.ObjectSerializer;
 import com.blueskykong.lottor.core.service.ExternalNettyService;
+import com.blueskykong.lottor.samples.auth.domain.RoleEntity;
+import com.blueskykong.lottor.samples.auth.domain.UserRole;
 import com.blueskykong.lottor.samples.auth.service.RoleUserService;
 import com.blueskykong.lottor.samples.auth.stream.TestSink;
+import com.blueskykong.lottor.samples.common.UserRoleDTO;
 import com.blueskykong.lottor.sc.service.InitStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,8 +21,8 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Component
 @EnableBinding({TestSink.class})
@@ -49,10 +52,15 @@ public class ListenerStream extends InitStreamHandler {
                     MethodNameEnum method = MethodNameEnum.fromString(message.getMethod());
                     LogUtil.info(LOGGER, () -> message.getMethod());
                     switch (method) {
-                        case CONSUMER_TEST:
-                            Map product = (Map) message.getArgs();
-                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.CONSUMER_TEST, () -> product.get("123"));
-//                            consumerService.testConsumer(product);
+                        case AUTH_ROLE:
+                            UserRoleDTO userRoleDTO = (UserRoleDTO) message.getArgs();
+                            RoleEntity roleEntity = roleUserService.getRole(userRoleDTO.getRoleEnum().getName());
+                            String roleId = "";
+                            if (Objects.nonNull(roleEntity)) {
+                                roleId = roleEntity.getId();
+                            }
+                            roleUserService.saveRoleUser(new UserRole(UUID.randomUUID().toString(), userRoleDTO.getUserId(), roleId));
+                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.AUTH_ROLE);
                             break;
                         default:
                             LogUtil.warn(LOGGER, () -> "no matched consumer case!");

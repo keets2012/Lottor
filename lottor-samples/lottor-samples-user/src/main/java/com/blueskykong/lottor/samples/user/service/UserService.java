@@ -1,5 +1,6 @@
 package com.blueskykong.lottor.samples.user.service;
 
+import com.blueskykong.lottor.samples.user.domain.StateEnum;
 import com.blueskykong.lottor.samples.user.domain.UserEntity;
 
 /**
@@ -7,5 +8,5 @@ import com.blueskykong.lottor.samples.user.domain.UserEntity;
  */
 public interface UserService {
 
-    Boolean createUser(UserEntity userEntity);
+    Boolean createUser(UserEntity userEntity, StateEnum flag);
 }
