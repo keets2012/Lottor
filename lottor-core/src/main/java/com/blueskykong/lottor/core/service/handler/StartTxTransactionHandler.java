@@ -15,7 +15,7 @@ import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionItem;
 import com.blueskykong.lottor.common.serializer.ObjectSerializer;
-import com.blueskykong.lottor.core.compensation.command.TxOperateCommand;
+import com.blueskykong.lottor.core.cache.command.TxOperateCommand;
 import com.blueskykong.lottor.core.service.ModelNameService;
 import com.blueskykong.lottor.core.service.TxManagerMessageService;
 import com.blueskykong.lottor.core.service.TxTransactionHandler;

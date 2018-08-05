@@ -1,9 +1,9 @@
-package com.blueskykong.lottor.core.compensation;
+package com.blueskykong.lottor.core.cache;
 
 import com.blueskykong.lottor.common.bean.TransactionRecover;
 import com.blueskykong.lottor.common.config.TxConfig;
 import com.blueskykong.lottor.common.entity.TransactionMsg;
-import com.blueskykong.lottor.core.compensation.command.TxOperateAction;
+import com.blueskykong.lottor.core.cache.command.TxOperateAction;
 
 public interface TxOperateService {
 

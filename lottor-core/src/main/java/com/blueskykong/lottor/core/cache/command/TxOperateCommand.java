@@ -1,4 +1,4 @@
-package com.blueskykong.lottor.core.compensation.command;
+package com.blueskykong.lottor.core.cache.command;
 
 import com.blueskykong.lottor.common.bean.TransactionRecover;
 import com.blueskykong.lottor.common.entity.TransactionMsg;
@@ -8,7 +8,7 @@ import com.blueskykong.lottor.common.enums.NettyMessageActionEnum;
 import com.blueskykong.lottor.common.enums.TransactionStatusEnum;
 import com.blueskykong.lottor.common.netty.bean.LottorRequest;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionGroup;
-import com.blueskykong.lottor.core.compensation.TxOperateService;
+import com.blueskykong.lottor.core.cache.TxOperateService;
 
 import java.util.Date;
 import java.util.List;

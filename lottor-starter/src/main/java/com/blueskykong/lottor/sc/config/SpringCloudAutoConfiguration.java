@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-@ConditionalOnProperty(value = "tx.enabled", matchIfMissing = false)
+@ConditionalOnProperty(value = "lottor.enabled", matchIfMissing = false)
 @AutoConfigureAfter({TransactionCoreAutoConfiguration.class})
 public class SpringCloudAutoConfiguration {
 

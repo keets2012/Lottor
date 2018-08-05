@@ -86,7 +86,7 @@ public class NettyClientServiceImpl implements NettyClientService {
             groups(bootstrap, txConfig);
             doConnect();
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "tx client start failed for {}", () -> e.getLocalizedMessage());
+            LogUtil.error(LOGGER, "Lottor client start failed for【{}】", () -> e.getLocalizedMessage());
             throw new TransactionRuntimeException(e);
         }
     }
@@ -135,18 +135,19 @@ public class NettyClientServiceImpl implements NettyClientService {
         }
 
         ChannelFuture future = bootstrap.connect(host, port);
-        LogUtil.info(LOGGER, "连接txManager-socket服务-> {}", () -> host + ":" + port);
+        LogUtil.info(LOGGER, "连接到Lottor Server【{}】", () -> host + ":" + port);
 
         future.addListener((ChannelFutureListener) futureListener -> {
             if (futureListener.isSuccess()) {
                 channel = futureListener.channel();
-                LogUtil.info(LOGGER, "Connect to -> {} server successfully!", () -> host + ":" + port);
+                LogUtil.info(LOGGER, "Connect to【{}】successfully!", () -> host + ":" + port);
             } else {
                 if (retryCount++ >= retryMax) {
-                    LogUtil.error(LOGGER, "Failed to connect to server {}, after {} times", () -> host + ":" + port, () -> --retryCount);
+                    LogUtil.error(LOGGER, "Failed to connect to server【{}】，after {} times", () -> host + ":" + port, () -> --retryCount);
                     System.exit(1);
                 }
-                LogUtil.error(LOGGER, "Failed to connect to server, retry for {} times, try connect after {}s-> {}", () -> retryCount, () -> this.retryInterval, () -> host + ":" + port);
+                LogUtil.error(LOGGER, "Failed to connect to server, retry for {} times, try connect【{}】after {}s",
+                        () -> retryCount, () -> host + ":" + port, () -> this.retryInterval);
                 futureListener.channel().eventLoop().schedule(this::doConnect, retryInterval, TimeUnit.SECONDS);
             }
         });
@@ -163,7 +164,7 @@ public class NettyClientServiceImpl implements NettyClientService {
                 txManagerServer = managerClient.findTxManagerServers();
 
             } catch (Exception e) {
-                LOGGER.error("{}th retry for getting txManagerServer", i + 1);
+                LOGGER.error("{}th retry for getting Lottor Server", i + 1);
             }
             if (Objects.nonNull(txManagerServer)) {
                 return txManagerServer;
@@ -210,14 +211,14 @@ public class NettyClientServiceImpl implements NettyClientService {
     @Override
     public boolean checkState() {
         if (!NettyClientMessageHandler.net_state) {
-            LogUtil.error(LOGGER, () -> "socket服务尚未建立连接成功,将在此等待2秒.");
+            LogUtil.error(LOGGER, () -> "Socket服务尚未建立连接成功，将在此等待2秒");
             try {
                 Thread.sleep(1000 * 2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             if (!NettyClientMessageHandler.net_state) {
-                LogUtil.error(LOGGER, () -> "TxManager还未连接成功,请检查TxManager服务后再试");
+                LogUtil.error(LOGGER, () -> "Lottor Server还未连接成功，请检查Lottor服务后再试");
                 return false;
             }
         }

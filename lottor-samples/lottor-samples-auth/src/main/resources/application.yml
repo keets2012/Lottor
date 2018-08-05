@@ -3,24 +3,24 @@ spring:
     active: dev
   datasource:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.1.204:3306/auth_tmp?useUnicode=true&characterEncoding=utf8&useSSL=false
-      username: simu
-      password: simu123
+      url: jdbc:mysql://localhost:3316/auth?useUnicode=true&characterEncoding=utf8&useSSL=false
+      username: root
+      password: _123456_
       schema[0]: classpath:/auth.sql
-      initialize: false
+      initialize: true
   application:
       name: auth-service
   cloud:
     consul:
-      host: 120.55.43.136
+      host: localhost
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
-      port: 8501
+      port: 8500
       discovery:
-        ip-address: ${HOST_ADDRESS:120.55.43.136}
+        ip-address: ${HOST_ADDRESS:192.168.1.77}
         port: ${SERVER_PORT:${server.port}}
 #        healthCheckPath: /health
         healthCheckInterval: 15s
-        instance-id: auth-service-${server.port}
+        instance-id: ${spring.cloud.consul.discovery.service-name}-${spring.profiles.active}-${spring.cloud.consul.discovery.ip-address}-${random.value}
         service-name: auth-service
 
 server:
@@ -58,23 +58,23 @@ spring:
           environment:
             spring:
               rabbitmq:
-                host: 120.55.43.136
+                host: localhost
                 port: 5672
                 username: guest
                 password: guest
                 virtual-host: /
 
 ---
-tx:
+lottor:
   enabled: true
   core:
-    compensation-cache-type: redis
+    cache-type: redis
     tx-redis-config:
-      host-name: 120.55.43.136
+      host-name: localhost
       port: 6379
-      password: __@picker-redis
+#      password: _123456_
     serializer: kryo
     netty-serializer: kryo
     blocking-queue-type: Linked
-    compensation: true
+    cache: true
     tx-manager-id: lottor

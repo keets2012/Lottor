@@ -4,7 +4,7 @@ import com.blueskykong.lottor.common.bean.TxTransactionInfo;
 import com.blueskykong.lottor.common.entity.TransactionMsg;
 import com.blueskykong.lottor.common.enums.ConsumedStatus;
 import com.blueskykong.lottor.common.holder.LogUtil;
-import com.blueskykong.lottor.core.compensation.TxOperateService;
+import com.blueskykong.lottor.core.cache.TxOperateService;
 import com.blueskykong.lottor.core.service.TxManagerMessageService;
 import com.blueskykong.lottor.core.service.TxTransactionHandler;
 import org.slf4j.Logger;

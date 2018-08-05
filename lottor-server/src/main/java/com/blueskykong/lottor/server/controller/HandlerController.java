@@ -4,7 +4,6 @@ import com.blueskykong.lottor.common.enums.NettyMessageActionEnum;
 import com.blueskykong.lottor.common.netty.bean.LottorRequest;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.lottor.server.netty.handler.NettyServerMessageHandler;
-import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,11 +17,7 @@ public class HandlerController {
 
     @GetMapping("/test")
     public String test() {
-        ChannelHandlerContext ctx = nettyServerMessageHandler.getClientContext().get("1").get(0);
-        if (ctx != null && ctx.channel() != null && ctx.channel().isActive()) {
 
-            ctx.writeAndFlush(getTxStatus("123445"));
-        }
         return "ok";
     }
 

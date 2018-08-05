@@ -51,7 +51,9 @@ public class UserServiceImpl implements UserService {
         }
 
         //netty预处理
-        nettyService.preSend(Collections.singletonList(transactionMsg));
+        if (!nettyService.preSend(Collections.singletonList(transactionMsg))) {
+            return false;
+        }
 
         //local transaction
         try {

@@ -5,7 +5,7 @@ import com.blueskykong.lottor.common.concurrent.threadlocal.TxTransactionLocal;
 import com.blueskykong.lottor.common.concurrent.threadlocal.TxTransactionTaskLocal;
 import com.blueskykong.lottor.common.enums.TransactionStatusEnum;
 import com.blueskykong.lottor.common.holder.LogUtil;
-import com.blueskykong.lottor.core.compensation.command.TxOperateCommand;
+import com.blueskykong.lottor.core.cache.command.TxOperateCommand;
 import com.blueskykong.lottor.core.service.TxManagerMessageService;
 import com.blueskykong.lottor.core.service.TxTransactionHandler;
 import org.slf4j.Logger;

@@ -12,7 +12,7 @@ import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.common.netty.bean.LottorRequest;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionGroup;
 import com.blueskykong.lottor.common.netty.bean.TxTransactionItem;
-import com.blueskykong.lottor.core.compensation.command.TxOperateCommand;
+import com.blueskykong.lottor.core.cache.command.TxOperateCommand;
 import com.blueskykong.lottor.core.netty.NettyClientService;
 import com.blueskykong.lottor.core.service.ModelNameService;
 import io.netty.channel.ChannelHandler;
@@ -149,7 +149,7 @@ public class NettyClientMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.ctx = ctx;
-        LogUtil.info(LOGGER, "成功连接到Lottor Server【{}】", () -> ctx);
+        LogUtil.info(LOGGER, "成功连接到Lottor Server");
         net_state = true;
     }
 

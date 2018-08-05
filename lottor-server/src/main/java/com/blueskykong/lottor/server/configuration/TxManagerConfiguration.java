@@ -29,6 +29,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -58,7 +64,7 @@ public class TxManagerConfiguration {
     static class NettyConfiguration {
 
         @Bean
-        @ConfigurationProperties("tx.manager.netty")
+        @ConfigurationProperties("lottor.manager.netty")
         public NettyConfig getNettyConfig() {
             return new NettyConfig();
         }
@@ -132,5 +138,28 @@ public class TxManagerConfiguration {
         public RestTemplate getRestTemplate() {
             return new RestTemplate();
         }
+    }
+
+    @Configuration
+    static class swagger {
+        @Bean
+        public Docket createRestApi() {
+            return new Docket(DocumentationType.SWAGGER_2)
+                    .apiInfo(apiInfo())
+                    .select()
+                    .apis(RequestHandlerSelectors.basePackage("com.blueskykong.lottor.server.controller"))
+                    .paths(PathSelectors.any())
+                    .build();
+        }
+
+        private ApiInfo apiInfo() {
+            return new ApiInfoBuilder()
+                    .title("Lottor Server")
+                    .description("Lottor UI接口描述")
+                    .termsOfServiceUrl("http://blueskykong.com")
+                    .version("1.0")
+                    .build();
+        }
+
     }
 }

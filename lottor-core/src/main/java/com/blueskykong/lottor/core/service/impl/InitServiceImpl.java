@@ -8,7 +8,7 @@ import com.blueskykong.lottor.common.helper.SpringBeanUtils;
 import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.common.holder.ServiceBootstrap;
 import com.blueskykong.lottor.common.serializer.ObjectSerializer;
-import com.blueskykong.lottor.core.compensation.TxOperateService;
+import com.blueskykong.lottor.core.cache.TxOperateService;
 import com.blueskykong.lottor.core.netty.NettyClientService;
 import com.blueskykong.lottor.core.service.InitService;
 import com.blueskykong.lottor.core.spi.TransactionOperateRepository;
@@ -43,9 +43,9 @@ public class InitServiceImpl implements InitService {
             nettyClientService.start(txConfig);
             txOperateService.start(txConfig);
         } catch (Exception e) {
-            throw new TransactionRuntimeException("补偿配置异常：" + e.getMessage());
+            throw new TransactionRuntimeException("Cache配置异常：" + e.getMessage());
         }
-        LogUtil.info(LOGGER, () -> "分布式补偿事务初始化成功！");
+        LogUtil.info(LOGGER, () -> "分布式事务Cache初始化成功！");
     }
 
     /**
@@ -65,7 +65,7 @@ public class InitServiceImpl implements InitService {
                         Objects.equals(objectSerializer.getScheme(), serializeProtocolEnum.getSerializeProtocol())).findFirst();
 
         //spi  RecoverRepository support
-        final CompensationCacheTypeEnum compensationCacheTypeEnum = CompensationCacheTypeEnum.acquireCompensationCacheType(txConfig.getCompensationCacheType());
+        final CompensationCacheTypeEnum compensationCacheTypeEnum = CompensationCacheTypeEnum.acquireCompensationCacheType(txConfig.getCacheType());
         final ServiceLoader<TransactionOperateRepository> recoverRepositories = ServiceBootstrap.loadAll(TransactionOperateRepository.class);
 
         final Optional<TransactionOperateRepository> repositoryOptional =

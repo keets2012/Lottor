@@ -24,24 +24,38 @@ public class ExternalNettyServiceImpl implements ExternalNettyService {
     public Boolean preSend(List<TransactionMsg> preCommitMsgs) {
         Object[] args = new Object[]{preCommitMsgs};
         LogUtil.info(LOGGER, () -> "发送preCommit消息");
-        txTransactionInterceptor.interceptor(args, OperationEnum.TX_NEW);
+        try {
+            txTransactionInterceptor.interceptor(args, OperationEnum.TX_NEW);
+
+        } catch (Exception e) {
+            LogUtil.error(LOGGER, "发送preCommit消息失败，原因为【{}】", e::getLocalizedMessage);
+            return false;
+        }
         return true;
     }
 
     @Override
     public void postSend(Boolean success, Object message) {
         Object[] args = new Object[]{success, message};
-        LogUtil.info(LOGGER, "发送事务组confirm消息, 本地事务完场状态为【{}】", () -> success);
-        txTransactionInterceptor.interceptor(args, OperationEnum.TX_COMPLETE);
+        LogUtil.info(LOGGER, "发送事务组confirm消息, 本地事务完成状态为【{}】", () -> success);
+        try {
+            txTransactionInterceptor.interceptor(args, OperationEnum.TX_COMPLETE);
+        } catch (Exception e) {
+            LogUtil.error(LOGGER, "发送事务组confirm消息失败，原因为【{}】", e::getLocalizedMessage);
+        }
     }
 
     @Override
     public void consumedSend(TransactionMsg msg, Boolean success) {
         Object[] args = new Object[]{msg, success};
 
-        LogUtil.info(LOGGER, "发送Consume消息，groupId【{}】 and subTaskId【{}】，消费结果为【{}】", () -> msg.getGroupId(),
-                () -> msg.getSubTaskId(), () -> success);
-
-        txTransactionInterceptor.interceptor(args, OperationEnum.TX_CONSUMED);
+        LogUtil.info(LOGGER, "发送Consume消息，groupId【{}】 and subTaskId【{}】，消费结果为【{}】", msg::getGroupId,
+                msg::getSubTaskId, () -> success);
+        try {
+            txTransactionInterceptor.interceptor(args, OperationEnum.TX_CONSUMED);
+        } catch (Exception e) {
+            LogUtil.error(LOGGER, "发送Consume消息失败，groupId【{}】 and subTaskId【{}】，原因为【{}】", msg::getGroupId,
+                    msg::getSubTaskId, e::getLocalizedMessage);
+        }
     }
 }

@@ -1,0 +1,49 @@
+lottor-ui:
+  container_name: lottor-ui
+  image: 'lottor/lottor-ui:1.0'
+  ports:
+    - '3000:33257'
+
+mysql-auth:
+  restart: always
+  image: mysql:5.7
+  ports:
+    - "3316:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=_123456_
+    - MYSQL_DATABASE=auth
+
+mysql-user:
+  restart: always
+  image: mysql:5.7
+  ports:
+    - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=_123456_
+    - MYSQL_DATABASE=user
+
+rabbit:
+  container_name: lottor-rabbit
+  image: 'rabbitmq:3.6-management'
+  ports:
+    - '15672:15672'
+    - '5672:5672'
+
+consul:
+  container_name: lottor-consul
+  image: 'consul:0.8.5'
+  ports:
+    - '8500:8500'
+    - '8300:8300'
+
+mongo:
+  container_name: lottor-mongo
+  image: 'mongo:3.2'
+  ports:
+    - '27017:27017'
+
+redis:
+  container_name: lottor-redis
+  image: 'redis:4'
+  ports:
+    - '6379:6379'

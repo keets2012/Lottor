@@ -1,4 +1,4 @@
-package com.blueskykong.lottor.core.compensation.command;
+package com.blueskykong.lottor.core.cache.command;
 
 import com.blueskykong.lottor.common.bean.TransactionRecover;
 import com.blueskykong.lottor.common.enums.CompensationActionEnum;

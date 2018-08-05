@@ -1,4 +1,4 @@
-package com.blueskykong.lottor.core.compensation.impl;
+package com.blueskykong.lottor.core.cache.impl;
 
 import com.blueskykong.lottor.common.bean.TransactionRecover;
 import com.blueskykong.lottor.common.concurrent.threadpool.TransactionThreadPool;
@@ -7,8 +7,8 @@ import com.blueskykong.lottor.common.entity.TransactionMsg;
 import com.blueskykong.lottor.common.enums.CompensationActionEnum;
 import com.blueskykong.lottor.common.helper.SpringBeanUtils;
 import com.blueskykong.lottor.common.holder.LogUtil;
-import com.blueskykong.lottor.core.compensation.TxOperateService;
-import com.blueskykong.lottor.core.compensation.command.TxOperateAction;
+import com.blueskykong.lottor.core.cache.TxOperateService;
+import com.blueskykong.lottor.core.cache.command.TxOperateAction;
 import com.blueskykong.lottor.core.service.ModelNameService;
 import com.blueskykong.lottor.core.spi.TransactionOperateRepository;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class TxOperateServiceImpl implements TxOperateService {
     @Override
     public void start(TxConfig txConfig) throws Exception {
         this.txConfig = txConfig;
-        if (txConfig.getCompensation()) {
+        if (txConfig.getCache()) {
             final String modelName = modelNameService.findModelName();
             this.transactionOperateRepository = SpringBeanUtils.getInstance().getBean(TransactionOperateRepository.class);
             transactionOperateRepository.init(modelName, txConfig);
@@ -47,8 +47,8 @@ public class TxOperateServiceImpl implements TxOperateService {
 
     public void initOperatePool() {
         synchronized (LOGGER) {
-            QUEUE = new LinkedBlockingQueue<>(txConfig.getCompensationQueueMax());
-            final int compensationThreadMax = txConfig.getCompensationThreadMax();
+            QUEUE = new LinkedBlockingQueue<>(txConfig.getCacheQueueMax());
+            final int compensationThreadMax = txConfig.getCacheThreadMax();
             final TransactionThreadPool threadPool = SpringBeanUtils.getInstance().getBean(TransactionThreadPool.class);
             final ExecutorService executorService = threadPool.newCustomFixedThreadPool(compensationThreadMax);
             LogUtil.info(LOGGER, "启动OperatePool操作线程数量为:{}", () -> compensationThreadMax);
@@ -108,7 +108,7 @@ public class TxOperateServiceImpl implements TxOperateService {
     @Override
     public Boolean submit(TxOperateAction txOperateAction) {
         try {
-            if (txConfig.getCompensation()) {
+            if (txConfig.getCache()) {
                 QUEUE.put(txOperateAction);
             }
         } catch (InterruptedException e) {

@@ -60,7 +60,7 @@ public class ListenerStream extends InitStreamHandler {
                                 roleId = roleEntity.getId();
                             }
                             roleUserService.saveRoleUser(new UserRole(UUID.randomUUID().toString(), userRoleDTO.getUserId(), roleId));
-                            LogUtil.info(LOGGER, "matched case {}, param is {}", () -> MethodNameEnum.AUTH_ROLE);
+                            LogUtil.info(LOGGER, "matched case {}", () -> MethodNameEnum.AUTH_ROLE);
                             break;
                         default:
                             LogUtil.warn(LOGGER, () -> "no matched consumer case!");

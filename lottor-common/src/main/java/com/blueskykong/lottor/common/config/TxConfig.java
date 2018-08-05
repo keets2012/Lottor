@@ -4,40 +4,34 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
-@ConfigurationProperties(prefix = "tx.core")
+@ConfigurationProperties(prefix = "lottor.core")
 public class TxConfig {
 
     private String serializer = "kryo";
 
-
     private String nettySerializer = "kryo";
-
 
     private int delayTime = 30;
 
-
     private int transactionThreadMax = Runtime.getRuntime().availableProcessors() << 1;
-
 
     private int nettyThreadMax = Runtime.getRuntime().availableProcessors() << 1;
 
     private int heartTime = 10;
 
-
     private String rejectPolicy = "Abort";
 
     private String blockingQueueType = "Linked";
 
-    private Boolean compensation = false;
+    private Boolean cache = false;
 
-    private String compensationCacheType;
+    private String cacheType;
 
-    private int compensationQueueMax = 5000;
+    private int cacheQueueMax = 5000;
 
-    private int compensationThreadMax = Runtime.getRuntime().availableProcessors() << 1;
+    private int cacheThreadMax = Runtime.getRuntime().availableProcessors() << 1;
 
-
-    private int compensationRecoverTime = 60;
+    private int cacheRecoverTime = 60;
 
     /**
      * 刷新manager的周期

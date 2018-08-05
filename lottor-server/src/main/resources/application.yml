@@ -1,6 +1,6 @@
 spring:
   rabbitmq:
-    host: 120.55.43.136
+    host: localhost
     port: 5672
     username: guest
     password: guest
@@ -10,16 +10,15 @@ spring:
     mongodb:
       authentication-database: lottor
       database: lottor
-      host: 120.55.43.136
-      port: ${MONGO_PORT:27027}
+      host: localhost
+      port: ${MONGO_PORT:27017}
 
-tx:
+lottor:
   redis:
     cluster: false
 #      redirects: 20
-    hostName: 120.55.43.136
+    hostName: localhost
     port: 6379
-    password: __@picker-redis
   manager:
     netty:
       port: 9998
@@ -41,15 +40,3 @@ logging:
   path: "./logs"
 
 stream.content-type: application/x-java-object;type=com.blueskykong.lottor.common.entity.TransactionMsgAdapter
-
----
-swagger:
-  enabled: true
-  title: tx-server
-  description: tx-server
-  version: 1.0
-  contact:
-    name: aoho
-  base-package: com.blueskykong.lottor.server.controller
-  base-path: /**
-  exclude-path: /error, /ops/**
