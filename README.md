@@ -1,6 +1,4 @@
 
-前面两篇文章介绍了笔者关于可靠消息方案的分布式事务的实现思路以及Java中的事务概念，奈何工作抽不出时间，如今时隔已久，分布式事务系列拖了很久，一直没能好好把项目和文章整理一下，实在心里有愧。
-
 ## Lottor介绍
 Lottor用于解决微服务架构下分布式事务的问题，基于可靠性消息事务模型实现。
 
@@ -166,6 +164,8 @@ User服务只提供了一个创建用户接口，通过请求参数来模拟创�
 ### 项目截图
 
 ![项目结构](http://image.blueskykong.com/lottor-project.jpg)
+
+打开Lottor DashBoard，地址为http://127.0.0.1:3000/lottor（Lottor Server的地址可以通过docker-compose中的环境变量`SERVER_TAG`配置，默认为http://127.0.0.1:9666），可以看到如下页面：
 
 ![UI首页](http://image.blueskykong.com/lottor-new-index.jpg)
 

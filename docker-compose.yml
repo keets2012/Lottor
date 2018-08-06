@@ -1,8 +1,10 @@
 lottor-ui:
   container_name: lottor-ui
-  image: 'lottor/lottor-ui:1.0'
+  image: 'lottor/lottor-ui:1.1'
   ports:
     - '3000:33257'
+  environment:
+    - SERVER_TAG=http://127.0.0.1:9666
 
 mysql-auth:
   restart: always
