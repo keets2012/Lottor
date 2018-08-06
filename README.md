@@ -164,7 +164,7 @@ User服务只提供了一个创建用户接口，通过请求参数来模拟创�
 
 ![项目结构](http://image.blueskykong.com/lottor-project.jpg)
 
-打开Lottor DashBoard，地址为http://127.0.0.1:3000/lottor（Lottor Server的地址可以通过docker-compose中的环境变量`SERVER_TAG`配置，默认为http://127.0.0.1:9666），可以看到如下页面：
+打开Lottor DashBoard，地址为http://127.0.0.1:3000/lottor （Lottor Server的地址可以通过docker-compose中的环境变量`SERVER_TAG`配置，默认为http://127.0.0.1:9666 ），可以看到如下页面：
 
 ![UI首页](http://image.blueskykong.com/lottor-new-index.jpg)
 
@@ -173,7 +173,7 @@ User服务只提供了一个创建用户接口，通过请求参数来模拟创�
 ![事务组状态](http://image.blueskykong.com/lottor-msg-new.jpg)
 
 ### 致谢
-Lottor的具体实现上，参考了2PC的分布式事务解决方案`happylifeplat-transaction`的通信框架。最近看了一下，发现已经更名为`Raincat`，读者欲了解更多，可以参见https://github.com/yu199195/Raincat，在此致谢。
+Lottor的具体实现上，参考了2PC的分布式事务解决方案`happylifeplat-transaction`的通信框架。最近看了一下，发现已经更名为`Raincat`，读者欲了解更多，可以参见https://github.com/yu199195/Raincat ，在此致谢。
 
 **Lottor项目地址：https://github.com/keets2012/Lottor**
 #### 订阅最新文章，欢迎关注我的公众号
