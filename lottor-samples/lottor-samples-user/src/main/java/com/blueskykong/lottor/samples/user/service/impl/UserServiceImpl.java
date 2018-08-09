@@ -4,7 +4,6 @@ import com.blueskykong.lottor.common.entity.TransactionMsg;
 import com.blueskykong.lottor.common.enums.MethodNameEnum;
 import com.blueskykong.lottor.common.enums.ServiceNameEnum;
 import com.blueskykong.lottor.common.holder.IdWorkerUtils;
-import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.core.service.ExternalNettyService;
 import com.blueskykong.lottor.samples.common.RoleEnum;
 import com.blueskykong.lottor.samples.common.UserRoleDTO;
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         //local transaction
         try {
-            LogUtil.debug(LOGGER, () -> "执行本地事务！");
+            LOGGER.debug("执行本地事务！");
             if (flag != StateEnum.PRODUCE_FAIL) {
                 userMapper.saveUser(userEntity);
             } else {
@@ -65,7 +64,7 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception e) {
             nettyService.postSend(false, e.getMessage());
-            LogUtil.error(LOGGER, "执行本地事务失败，cause is 【{}】", e::getLocalizedMessage);
+            LOGGER.error("执行本地事务失败，cause is 【{}】", e.getLocalizedMessage());
             return false;
         }
         nettyService.postSend(true, null);

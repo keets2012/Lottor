@@ -2,7 +2,6 @@ package com.blueskykong.lottor.samples.auth;
 
 import com.blueskykong.lottor.common.entity.TransactionMsg;
 import com.blueskykong.lottor.common.enums.MethodNameEnum;
-import com.blueskykong.lottor.common.holder.LogUtil;
 import com.blueskykong.lottor.common.serializer.ObjectSerializer;
 import com.blueskykong.lottor.core.service.ExternalNettyService;
 import com.blueskykong.lottor.samples.auth.domain.RoleEntity;
@@ -50,7 +49,7 @@ public class ListenerStream extends InitStreamHandler {
                 LOGGER.info("===============consume notification message: =======================" + message.toString());
                 if (StringUtils.isNotBlank(message.getMethod())) {
                     MethodNameEnum method = MethodNameEnum.fromString(message.getMethod());
-                    LogUtil.info(LOGGER, () -> message.getMethod());
+                    LOGGER.info(message.getMethod());
                     switch (method) {
                         case AUTH_ROLE:
                             UserRoleDTO userRoleDTO = (UserRoleDTO) message.getArgs();
@@ -60,10 +59,10 @@ public class ListenerStream extends InitStreamHandler {
                                 roleId = roleEntity.getId();
                             }
                             roleUserService.saveRoleUser(new UserRole(UUID.randomUUID().toString(), userRoleDTO.getUserId(), roleId));
-                            LogUtil.info(LOGGER, "matched case {}", () -> MethodNameEnum.AUTH_ROLE);
+                            LOGGER.info("matched case {}", MethodNameEnum.AUTH_ROLE);
                             break;
                         default:
-                            LogUtil.warn(LOGGER, () -> "no matched consumer case!");
+                            LOGGER.warn("no matched consumer case!");
                             message.setMessage("no matched consumer case!");
                             nettyService.consumedSend(message, false);
                             return;
@@ -71,7 +70,7 @@ public class ListenerStream extends InitStreamHandler {
                 }
             }
         } catch (Exception e) {
-            LogUtil.error(LOGGER, e::getLocalizedMessage);
+            LOGGER.error(e.getLocalizedMessage());
             message.setMessage(e.getLocalizedMessage());
             nettyService.consumedSend(message, false);
             return;
