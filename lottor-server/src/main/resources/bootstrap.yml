@@ -26,7 +26,7 @@ spring:
         heartbeat:
           enabled: true
         instanceId: ${spring.cloud.consul.discovery.service-name}-${spring.profiles.active}-${spring.cloud.consul.discovery.ip-address}-${random.value}
-        ip-address: ${HOST_ADDRESS:192.168.1.77}
+        ip-address: ${HOST_ADDRESS:localhost}
         port: ${SERVER_PORT:${server.port}}
         lifecycle:
           enabled: true

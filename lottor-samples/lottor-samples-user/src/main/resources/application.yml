@@ -9,7 +9,7 @@ spring:
 #      host: ${CONSUL_ADDRESS:192.168.1.204}
       port: 8500
       discovery:
-        ip-address: ${HOST_ADDRESS:192.168.1.77}
+        ip-address: ${HOST_ADDRESS:localhost}
         port: ${SERVER_PORT:${server.port}}
 #        healthCheckPath: /health
         healthCheckInterval: 15s
